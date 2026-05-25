@@ -416,9 +416,144 @@
     main { padding: 20px; }
     .hero-foot .hero-tag { font-size: 32px; }
   }
+
+  /* ===================== Motion ===================== */
+  @keyframes bgDrift {
+    from { background-position: 0px 0px, 0 0; }
+    to   { background-position: 80px 80px, 0 0; }
+  }
+  body { animation: bgDrift 60s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { body { animation: none; } }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes rotate360 {
+    from { transform: rotate(0deg); } to { transform: rotate(360deg); }
+  }
+  @keyframes pulseRing {
+    0%   { transform: scale(1);    opacity: 0.7; }
+    70%  { transform: scale(1.4);  opacity: 0; }
+    100% { transform: scale(1.4);  opacity: 0; }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.04); }
+  }
+  @keyframes barFill {
+    from { width: 0% !important; }
+  }
+  @keyframes dashFlow {
+    to { stroke-dashoffset: -40; }
+  }
+  @keyframes gaugeFill {
+    from { stroke-dashoffset: var(--gauge-len, 440); }
+  }
+  @keyframes drift {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: var(--p-op, 0.4); }
+    90%  { opacity: var(--p-op, 0.4); }
+    100% { transform: translate(60px, -120vh); opacity: 0; }
+  }
+
+  header { animation: fadeIn 0.6s ease both; }
+  .panel { animation: fadeUp 0.7s cubic-bezier(0.2,0.8,0.2,1) both; }
+  .panel:nth-child(2) { animation-delay: 0.10s; }
+  .panel:nth-child(3) { animation-delay: 0.20s; }
+  .hero-foot { animation: fadeUp 0.9s cubic-bezier(0.2,0.8,0.2,1) both; animation-delay: 0.3s; }
+  .card { animation: fadeUp 0.5s ease both; }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.20s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+  .card:nth-child(6) { animation-delay: 0.30s; }
+  .card:nth-child(7) { animation-delay: 0.35s; }
+  .card { transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+  .card:hover { transform: translateX(4px); box-shadow: -4px 0 0 var(--fg); }
+  .tab-panel.active { animation: fadeIn 0.4s ease both; }
+  .box { animation: fadeUp 0.55s ease both; }
+
+  .bar-fill { animation: barFill 0.9s cubic-bezier(0.2,0.8,0.2,1) both; }
+
+  /* tarot card hover lift */
+  .tarot-card { transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease; }
+  .tarot-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 10px 10px 0 var(--line); }
+  .tarot-card.reversed:hover { transform: rotate(180deg) translateY(-6px) rotate(-1deg); }
+
+  /* radial SVG decorative rings rotate slowly */
+  .ring-rotate-cw  { transform-origin: 300px 300px; animation: rotate360 240s linear infinite; }
+  .ring-rotate-ccw { transform-origin: 300px 300px; animation: rotate360 360s linear infinite reverse; }
+
+  /* relationship links: flowing dashed line */
+  .link.flowing { stroke-dasharray: 6 4; animation: dashFlow 2s linear infinite; }
+
+  /* selected node pulse */
+  .pulse-ring { animation: pulseRing 2.4s ease-out infinite; transform-origin: center; transform-box: fill-box; }
+
+  /* score gauge */
+  .gauge-wrap { position: relative; display: inline-block; }
+  .gauge-svg .gauge-fg {
+    transition: stroke-dashoffset 1.1s cubic-bezier(0.2,0.8,0.2,1), stroke 0.4s;
+    transform: rotate(-90deg); transform-origin: center;
+  }
+  .gauge-wrap .gauge-num {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 56px; font-weight: 400; color: var(--fg);
+    pointer-events: none;
+    animation: scaleIn 0.5s ease both;
+  }
+  .gauge-wrap .gauge-cap {
+    position: absolute; bottom: 4px; left: 0; right: 0;
+    text-align: center; font-size: 9px;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* moon breathes */
+  .moon-svg { animation: breathe 6s ease-in-out infinite; }
+
+  /* hex lines stagger in */
+  .hex .hex-line { animation: scaleIn 0.4s ease both; }
+  .hex .hex-line:nth-child(1) { animation-delay: 0.05s; }
+  .hex .hex-line:nth-child(2) { animation-delay: 0.10s; }
+  .hex .hex-line:nth-child(3) { animation-delay: 0.15s; }
+  .hex .hex-line:nth-child(4) { animation-delay: 0.20s; }
+  .hex .hex-line:nth-child(5) { animation-delay: 0.25s; }
+  .hex .hex-line:nth-child(6) { animation-delay: 0.30s; }
+  .hex .hex-line.changing { animation: scaleIn 0.4s ease both, breathe 1.6s ease-in-out infinite 0.5s; }
+
+  /* compass slow rotate */
+  .compass-svg { animation: fadeIn 0.8s ease both; }
+  .compass-svg .compass-needle { transform-origin: center; transition: transform 1s cubic-bezier(0.2,0.8,0.2,1); }
+
+  /* particles overlay (浮遊する点) */
+  .particles {
+    pointer-events: none; position: fixed; inset: 0; z-index: 1;
+    overflow: hidden;
+  }
+  .particles .p {
+    position: absolute; width: 3px; height: 3px;
+    background: var(--fg); border-radius: 50%;
+    opacity: 0; animation: drift linear infinite;
+  }
+
+  /* nav transitions */
+  .btn { transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s; }
+  .btn:active { transform: scale(0.96); }
+  .tab { transition: color 0.2s, border-color 0.25s; }
+  .blood-group label { transition: background 0.2s, color 0.2s, border-color 0.2s; }
 </style>
 </head>
 <body>
+<div class="particles" id="particles" aria-hidden="true"></div>
 <header>
   <h1>
     <span class="brand-mark">KA — 吉田占断</span>
@@ -1390,7 +1525,11 @@ function drawRadial(date, all) {
   const center = PEOPLE.find(p => p.center) || PEOPLE[0];
   const others = PEOPLE.filter(p => p.id !== center.id);
 
-  // 七宝-inspired decorative rings (mono)
+  // 七宝-inspired decorative rings (mono, slow rotation)
+  const ringGroupCW = document.createElementNS(NS, 'g');
+  ringGroupCW.setAttribute('class', 'ring-rotate-cw');
+  const ringGroupCCW = document.createElementNS(NS, 'g');
+  ringGroupCCW.setAttribute('class', 'ring-rotate-ccw');
   for (let i = 0; i < 4; i++) {
     const ring = document.createElementNS(NS, 'circle');
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY);
@@ -1398,9 +1537,11 @@ function drawRadial(date, all) {
     ring.setAttribute('fill', 'none');
     ring.setAttribute('stroke', '#cfcdc6');
     ring.setAttribute('stroke-width', i === 1 ? 0.8 : 0.4);
-    ring.setAttribute('stroke-dasharray', i === 0 ? '' : '2 4');
-    $svg.appendChild(ring);
+    if (i !== 0) ring.setAttribute('stroke-dasharray', i % 2 === 0 ? '2 4' : '6 10');
+    (i % 2 === 0 ? ringGroupCW : ringGroupCCW).appendChild(ring);
   }
+  $svg.appendChild(ringGroupCW);
+  $svg.appendChild(ringGroupCCW);
   // cross lines
   const cross = document.createElementNS(NS, 'g');
   cross.innerHTML = `
@@ -1416,10 +1557,11 @@ function drawRadial(date, all) {
     const link = document.createElementNS(NS, 'line');
     link.setAttribute('x1', CX); link.setAttribute('y1', CY);
     link.setAttribute('x2', x); link.setAttribute('y2', y);
-    link.setAttribute('class', 'link');
+    link.setAttribute('class', 'link flowing');
     link.setAttribute('stroke', scoreColor(c));
-    link.setAttribute('stroke-width', 1 + (c/100)*4);
+    link.setAttribute('stroke-width', 1 + (c/100)*3);
     link.setAttribute('opacity', 0.3 + (c/100)*0.5);
+    link.style.animationDuration = (4 - (c/100)*2.5).toFixed(2) + 's';
     $svg.appendChild(link);
     const mx = (CX+x)/2, my = (CY+y)/2;
     const lbl = document.createElementNS(NS, 'text');
@@ -1441,6 +1583,9 @@ function drawRadial(date, all) {
 function drawNode(cx, cy, person, r, radius, isCenter) {
   const NS = 'http://www.w3.org/2000/svg';
   const f = r;
+  const isSel = selectedId === person.id;
+
+  // outer score ring
   const ring = document.createElementNS(NS, 'circle');
   ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
   ring.setAttribute('r', radius + 6);
@@ -1450,6 +1595,28 @@ function drawNode(cx, cy, person, r, radius, isCenter) {
   ring.setAttribute('opacity', 0.7);
   $svg.appendChild(ring);
 
+  // pulse ring for selected
+  if (isSel) {
+    const pulse = document.createElementNS(NS, 'circle');
+    pulse.setAttribute('cx', cx); pulse.setAttribute('cy', cy);
+    pulse.setAttribute('r', radius + 10);
+    pulse.setAttribute('fill', 'none');
+    pulse.setAttribute('stroke', '#15151a');
+    pulse.setAttribute('stroke-width', 1.5);
+    pulse.setAttribute('class', 'pulse-ring');
+    $svg.appendChild(pulse);
+    // second wave
+    const pulse2 = document.createElementNS(NS, 'circle');
+    pulse2.setAttribute('cx', cx); pulse2.setAttribute('cy', cy);
+    pulse2.setAttribute('r', radius + 10);
+    pulse2.setAttribute('fill', 'none');
+    pulse2.setAttribute('stroke', '#15151a');
+    pulse2.setAttribute('stroke-width', 1.5);
+    pulse2.setAttribute('class', 'pulse-ring');
+    pulse2.style.animationDelay = '1.2s';
+    $svg.appendChild(pulse2);
+  }
+
   const c = document.createElementNS(NS, 'circle');
   c.setAttribute('cx', cx); c.setAttribute('cy', cy);
   c.setAttribute('r', radius);
@@ -1457,7 +1624,7 @@ function drawNode(cx, cy, person, r, radius, isCenter) {
   c.setAttribute('fill-opacity', 0.25);
   c.setAttribute('stroke', KYUSEI[f.engines.honmei].color);
   c.setAttribute('stroke-width', 2);
-  c.setAttribute('class', 'node-circle' + (selectedId === person.id ? ' selected' : ''));
+  c.setAttribute('class', 'node-circle' + (isSel ? ' selected' : ''));
   c.addEventListener('click', () => { selectedId = person.id; render(); });
   $svg.appendChild(c);
 
@@ -1510,6 +1677,32 @@ function bar(label, v) {
   return `<div class="bar"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div><span class="bar-val">${v}</span></div>`;
 }
 
+function gaugeSvg(value, color) {
+  const R = 70, C = 2 * Math.PI * R;
+  const offset = C - (value / 100) * C;
+  const W = 180;
+  return `<div class="gauge-wrap" style="width:${W}px;height:${W}px">
+    <svg class="gauge-svg" viewBox="0 0 ${W} ${W}" style="width:${W}px;height:${W}px">
+      <circle cx="${W/2}" cy="${W/2}" r="${R}" fill="none" stroke="#e4e1d9" stroke-width="6"/>
+      <circle class="gauge-fg" cx="${W/2}" cy="${W/2}" r="${R}" fill="none"
+        stroke="${color}" stroke-width="6" stroke-linecap="round"
+        stroke-dasharray="${C}" stroke-dashoffset="${offset}"
+        style="--gauge-len:${C}"/>
+      <!-- tick marks -->
+      ${Array.from({length:20}, (_,i) => {
+        const a = (i / 20) * Math.PI * 2 - Math.PI/2;
+        const x1 = W/2 + Math.cos(a) * (R - 12);
+        const y1 = W/2 + Math.sin(a) * (R - 12);
+        const x2 = W/2 + Math.cos(a) * (R - 16);
+        const y2 = W/2 + Math.sin(a) * (R - 16);
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#cfcdc6" stroke-width="0.5"/>`;
+      }).join('')}
+    </svg>
+    <div class="gauge-num" style="color:${color}">${value}</div>
+    <div class="gauge-cap">Today</div>
+  </div>`;
+}
+
 // ============== Tabs ==============
 document.getElementById('tabs').addEventListener('click', e => {
   const btn = e.target.closest('.tab'); if (!btn) return;
@@ -1548,7 +1741,7 @@ function renderOverview(p, f) {
       </div>
       <div class="box">
         <h3>今日の総合運</h3>
-        <div style="text-align:center;font-size:48px;font-weight:800;color:${scoreColor(f.total)};line-height:1;margin:10px 0">${f.total}</div>
+        <div style="text-align:center;margin:14px 0 18px">${gaugeSvg(f.total, scoreColor(f.total))}</div>
         <div class="bars" style="font-size:12px">
           ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
         </div>
@@ -1656,7 +1849,7 @@ function moonSvg(phase) {
   const W = 180, H = 180, R = 78;
   const k = Math.cos(phase * Math.PI * 2);
   const shadow = '#1a1a1f', light = '#f4f2ec', edge = '#15151a';
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:180px;height:180px">
+  return `<svg class="moon-svg" viewBox="0 0 ${W} ${H}" style="width:180px;height:180px">
     <circle cx="${W/2}" cy="${H/2}" r="${R}" fill="${light}"/>
     <ellipse cx="${W/2 + k*R}" cy="${H/2}" rx="${Math.abs(k)*R}" ry="${R}" fill="${shadow}"/>
     ${phase < 0.5 ? `<rect x="${W/2}" y="${H/2-R}" width="${R}" height="${R*2}" fill="${shadow}"/>` : `<rect x="${W/2-R}" y="${H/2-R}" width="${R}" height="${R*2}" fill="${shadow}"/>`}
@@ -1727,9 +1920,18 @@ function compassSvg(dirs) {
       <text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="10" fill="#15151a" font-weight="500" style="font-family:'Hiragino Mincho ProN',serif">${rate}</text>
       <text x="${labelX}" y="${labelY}" text-anchor="middle" font-size="13" fill="#15151a" font-weight="500" style="font-family:'Hiragino Mincho ProN',serif">${dir}</text>`;
   }).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:300px;height:300px">${segments}
+  // 生気方位を指す針 (回転角度)
+  const dirAngles = { '北':-90, '東北':-45, '東':0, '東南':45, '南':90, '西南':135, '西':180, '西北':225 };
+  const seikiDir = Object.entries(dirs).find(([k,v]) => v === '生気')?.[0];
+  const needleDeg = (dirAngles[seikiDir] ?? -90) + 90; // SVG defaults pointing up
+  return `<svg class="compass-svg" viewBox="0 0 ${W} ${H}" style="width:300px;height:300px">${segments}
     <circle cx="${CX}" cy="${CY}" r="${IR-2}" fill="#ffffff" stroke="#15151a" stroke-width="1"/>
-    <text x="${CX}" y="${CY+5}" text-anchor="middle" font-size="13" fill="#15151a" font-weight="500" style="font-family:'Hiragino Mincho ProN',serif">中心</text>
+    <g class="compass-needle" style="transform:rotate(${needleDeg}deg);transform-origin:${CX}px ${CY}px">
+      <polygon points="${CX},${CY-IR+8} ${CX-5},${CY+5} ${CX+5},${CY+5}" fill="#15151a"/>
+      <polygon points="${CX},${CY+IR-12} ${CX-3},${CY-3} ${CX+3},${CY-3}" fill="#a3a3a3"/>
+    </g>
+    <circle cx="${CX}" cy="${CY}" r="3" fill="#15151a"/>
+    <text x="${CX}" y="${CY+IR+18}" text-anchor="middle" font-size="9" fill="#7a7a78" style="letter-spacing:0.25em">SEIKI ${seikiDir||''}</text>
   </svg>`;
 }
 
@@ -1909,6 +2111,32 @@ function renderPeopleList() {
     $peopleList.appendChild(row);
   });
 }
+
+// ============================================================
+// FLOATING PARTICLES
+// ============================================================
+(function spawnParticles() {
+  const root = document.getElementById('particles');
+  if (!root) return;
+  const N = 28;
+  for (let i = 0; i < N; i++) {
+    const p = document.createElement('div');
+    p.className = 'p';
+    const left = Math.random() * 100;
+    const top  = 100 + Math.random() * 20;       // start below viewport
+    const dur  = 14 + Math.random() * 22;        // 14-36s
+    const delay = -Math.random() * dur;          // negative so they spread
+    const size = 2 + Math.random() * 3;
+    p.style.left = left + 'vw';
+    p.style.top = top + 'vh';
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.setProperty('--p-op', (0.15 + Math.random() * 0.3).toFixed(2));
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = delay + 's';
+    root.appendChild(p);
+  }
+})();
 
 // ============================================================
 // INIT
