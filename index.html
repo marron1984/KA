@@ -586,6 +586,105 @@
     opacity: 0; animation: drift linear infinite;
   }
 
+  /* WORDS feature */
+  .words-hero {
+    text-align: center;
+    padding: 20px 0 28px;
+    border-bottom: 1px solid var(--line2);
+    margin-bottom: 28px;
+  }
+  .words-hero .wh-label {
+    font-size: 9px; letter-spacing: 0.35em; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .words-hero .wh-title {
+    font-family: var(--serif); font-size: 28px;
+    margin-top: 10px; letter-spacing: 0.04em;
+  }
+  .words-hero .wh-sub {
+    font-size: 11px; color: var(--muted); margin-top: 6px;
+    letter-spacing: 0.1em;
+  }
+  .words-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  @media (max-width: 720px) { .words-cols { grid-template-columns: 1fr; } }
+  .words-col .wc-head {
+    font-family: var(--serif); font-size: 18px;
+    margin: 0 0 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--line2);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .words-col.want   .wc-head { color: var(--good); }
+  .words-col.avoid  .wc-head { color: var(--bad); }
+  .words-col .wc-head .wc-mini {
+    font-size: 9px; color: var(--muted); letter-spacing: 0.3em;
+    font-family: var(--sans); text-transform: uppercase;
+  }
+  .word-list { display: flex; flex-direction: column; gap: 8px; }
+  .word-card {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.55;
+    position: relative;
+    animation: fadeUp 0.45s ease both;
+  }
+  .word-card.want  { border-left: 3px solid var(--good); }
+  .word-card.avoid { border-left: 3px solid var(--bad); }
+  .word-card .wc-quote-l, .word-card .wc-quote-r {
+    color: var(--muted); font-size: 18px;
+    margin: 0 3px;
+  }
+  .word-card .wc-cat {
+    display: block;
+    font-size: 9px; letter-spacing: 0.25em;
+    color: var(--muted); margin-top: 8px;
+    text-transform: uppercase;
+    font-family: var(--sans);
+  }
+  .word-card:nth-child(1) { animation-delay: 0.02s; }
+  .word-card:nth-child(2) { animation-delay: 0.05s; }
+  .word-card:nth-child(3) { animation-delay: 0.08s; }
+  .word-card:nth-child(4) { animation-delay: 0.11s; }
+  .word-card:nth-child(5) { animation-delay: 0.14s; }
+  .word-card:nth-child(6) { animation-delay: 0.17s; }
+  .word-card:nth-child(7) { animation-delay: 0.20s; }
+  .word-card:nth-child(8) { animation-delay: 0.23s; }
+  .words-controls {
+    display: flex; gap: 10px;
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid var(--line2);
+    align-items: center; flex-wrap: wrap;
+  }
+  .words-controls .wc-label {
+    font-size: 9px; letter-spacing: 0.3em;
+    color: var(--muted); text-transform: uppercase;
+    margin-right: 6px;
+  }
+  .cat-chip {
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line); padding: 5px 12px;
+    font-size: 11px; cursor: pointer;
+    font-family: var(--sans); letter-spacing: 0.05em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .cat-chip:hover { border-color: var(--fg); }
+  .cat-chip.active { background: var(--fg); color: var(--bg2); border-color: var(--fg); }
+  .words-browse {
+    margin-top: 20px;
+  }
+  .words-browse .wb-head {
+    font-family: var(--serif); font-size: 14px;
+    margin: 24px 0 10px; color: var(--fg);
+  }
+  .words-stats {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-top: 14px; font-size: 10px; color: var(--muted);
+    letter-spacing: 0.1em;
+  }
   /* nav transitions */
   .btn { transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s; }
   .btn:active { transform: scale(0.96); }
@@ -706,6 +805,7 @@
       <button class="tab" data-tab="fengshui">風水</button>
       <button class="tab" data-tab="iching">易・Tarot</button>
       <button class="tab" data-tab="mbti">MBTI・統合</button>
+      <button class="tab" data-tab="words">ことば WORDS</button>
     </div>
     <div id="tab-overview"  class="tab-panel active"></div>
     <div id="tab-shichu"    class="tab-panel"></div>
@@ -714,6 +814,7 @@
     <div id="tab-fengshui"  class="tab-panel"></div>
     <div id="tab-iching"    class="tab-panel"></div>
     <div id="tab-mbti"      class="tab-panel"></div>
+    <div id="tab-words"     class="tab-panel"></div>
   </section>
 
   <div class="hero-foot">
@@ -1852,6 +1953,7 @@ function drawDetail(date, all) {
   document.getElementById('tab-fengshui').innerHTML  = renderFengshui(p, f);
   document.getElementById('tab-iching').innerHTML    = renderIching(p, f);
   document.getElementById('tab-mbti').innerHTML      = renderMBTI(p, f);
+  document.getElementById('tab-words').innerHTML     = renderWords(p, f);
 }
 
 function renderOverview(p, f) {
@@ -2264,6 +2366,612 @@ function renderPeopleList() {
     });
     $peopleList.appendChild(row);
   });
+}
+
+// ============================================================
+// WORDS — 吉田にかけて欲しい / かけられたくない言葉
+// ============================================================
+// スロット: {n}=名前 / {t}=形容詞(INFJ系) / {c}=今日のラッキーカラー / {i}=ラッキーアイテム
+// {s}=本命星(七赤金星) / {z}=星座(牡牛座) / {tb}=今日の通変
+const NAME_VARS  = ['駿成','しゅんすけ','吉田くん','吉田','あなた','君'];
+const TRAIT_VARS = ['静かな','鋭い','繊細な','深い','透明な','穏やかな','緻密な','視えてる','内省的な','遠くを見る'];
+const KIND_VARS  = ['やわらかな','切実な','まっすぐな','落ち着いた','信頼の','深い'];
+
+const WANT_WORDS = [
+  // 存在を肯定する (INFJはこれが一番響く)
+  ['存在','ここにいてくれてありがとう'],
+  ['存在','{n}がいてくれて本当によかった'],
+  ['存在','見ててくれる人が、ちゃんといるよ'],
+  ['存在','ここにいていいんだよ'],
+  ['存在','{n}の居方が好き'],
+  ['存在','誰かにわかってもらわなくてもいい、私は知ってる'],
+  ['存在','{n}の存在が空気を変える'],
+  ['存在','あなたの声を聞きたかった'],
+  ['存在','ちゃんと見えてるよ、あなたの全部'],
+  ['存在','{t}人がそばにいると安心する'],
+  ['存在','あなたがいる、それだけでいい'],
+  ['存在','急に思い出した、{n}のこと'],
+  ['存在','会えてよかった、本当に'],
+  ['存在','あなたに出会えたのは奇跡だと思ってる'],
+  ['存在','{n}の名前を呼べるのが嬉しい'],
+
+  // 視点・直感 (INFJ/七赤金星)
+  ['直感','その違和感、たぶん正しい'],
+  ['直感','あなたの直感が一番当たる'],
+  ['直感','{n}の視点が必要'],
+  ['直感','見えてないものが見えてるよね'],
+  ['直感','感じてること、もっと聞かせて'],
+  ['直感','そういう気づき、{n}にしかできない'],
+  ['直感','あなたの予感を信じてる'],
+  ['直感','深いところまで届く眼を持ってる'],
+  ['直感','他の人が見えない景色を見てるね'],
+  ['直感','その読みは正解だと思う'],
+  ['直感','{n}が違和感って言うなら、本当に何かある'],
+  ['直感','言語化できないけど、{n}が言うと納得する'],
+  ['直感','本能で動いて正解だった'],
+  ['直感','その第六感、頼りにしてる'],
+  ['直感','見抜く力、いつも怖いくらい'],
+
+  // 無理しないで (B型/INFJの過剰適応への解放)
+  ['労い','無理しなくていいよ'],
+  ['労い','今日はやらなくていい'],
+  ['労い','休んでていいから'],
+  ['労い','立ち止まっていい'],
+  ['労い','決めなくていい、まだ'],
+  ['労い','全部背負わなくていいよ'],
+  ['労い','完璧じゃなくていい'],
+  ['労い','弱音、もっと吐いていい'],
+  ['労い','頑張りすぎ。少し置いていい'],
+  ['労い','あなたのペースでいい'],
+  ['労い','期待に応えなくてもいい'],
+  ['労い','逃げてもいいよ'],
+  ['労い','{n}が決めたら、それでいい'],
+  ['労い','頼っていい、何度でも'],
+  ['労い','疲れたら寝ていい、それだけ'],
+
+  // 理解された (INFJ最大の渇望)
+  ['理解','わかるよ、その気持ち'],
+  ['理解','言わなくても伝わってるよ'],
+  ['理解','本当に言いたいこと、わかってる'],
+  ['理解','あなたの沈黙の意味、知ってる'],
+  ['理解','言葉にできないけど、わかる'],
+  ['理解','そう感じるの、当然だよ'],
+  ['理解','理屈じゃなくて、{n}が正しい'],
+  ['理解','気を遣ってくれてたの、見えてた'],
+  ['理解','察してくれてありがとう、こっちこそ'],
+  ['理解','{n}が黙ってる理由、たぶんわかる'],
+  ['理解','本音、ちゃんと届いてる'],
+  ['理解','見えにくいだけで、芯はずっと優しい人'],
+  ['理解','建前の奥のあなたを知ってる'],
+  ['理解','疲れてるの、わかってたよ'],
+  ['理解','{n}は{n}のままでいい'],
+
+  // 創造・才能 (七赤金星=表現)
+  ['創造','{n}の作るもの、好き'],
+  ['創造','そのアイデア、{n}にしか出せない'],
+  ['創造','今日の{c}みたいな閃き、いいね'],
+  ['創造','作るものに人柄が出る'],
+  ['創造','一行で全部言えちゃうのすごい'],
+  ['創造','発想が異次元'],
+  ['創造','誰も思いつかない角度'],
+  ['創造','細部の配慮が美しい'],
+  ['創造','{s}らしい鋭さがあるね'],
+  ['創造','クラフトが効いてる'],
+  ['創造','{n}の文章、ずっと読んでいたい'],
+  ['創造','言葉の選び方に品がある'],
+  ['創造','つくりが繊細で泣ける'],
+  ['創造','余白の使い方が大人'],
+  ['創造','編集が効いてて好き'],
+
+  // 過程の肯定 (INFJ/牡牛座は急かされるのを嫌う)
+  ['過程','結論より、その過程が面白い'],
+  ['過程','迷ってる時間も意味ある'],
+  ['過程','今のままで十分進んでる'],
+  ['過程','悩んでくれてよかった、雑に決めなくて'],
+  ['過程','やらない判断もすごい'],
+  ['過程','黙ってた時間にこそ意味がある'],
+  ['過程','急がなくていい、しっかり見えてる'],
+  ['過程','止まってる時もちゃんと育ってる'],
+  ['過程','考えすぎはあなたの強み'],
+  ['過程','じっくり考えてから言うところが好き'],
+  ['過程','その慎重さに救われてる'],
+  ['過程','遅くてもいい、丁寧で'],
+  ['過程','{n}の準備の細かさは武器'],
+  ['過程','時間をかけて作ったものは違う'],
+  ['過程','立ち止まれる人は強い'],
+
+  // 成果に対する反応
+  ['成果','本当にすごい、文句なし'],
+  ['成果','それ、想像してたより遥か上'],
+  ['成果','{n}に頼んでよかった'],
+  ['成果','やっぱり{n}じゃないとできない'],
+  ['成果','私が言ってたの、これだよ'],
+  ['成果','誰よりも先に気づいてたよね'],
+  ['成果','次もまた一緒にやろう'],
+  ['成果','信頼してたから任せた、正解だった'],
+  ['成果','あなたの仕事、品がある'],
+  ['成果','本気を見せてくれてありがとう'],
+  ['成果','まじでありがとう、感謝しかない'],
+  ['成果','{n}じゃなきゃ届かない仕事'],
+  ['成果','プロの仕事だ'],
+  ['成果','{n}に任せた俺の見る目を褒めたい'],
+  ['成果','想像以上、いつも'],
+
+  // 未来・ビジョン (LP11/INFJ)
+  ['未来','あなたの夢、聞かせて'],
+  ['未来','10年後も一緒に何か作りたい'],
+  ['未来','{n}の見てる未来、信じる'],
+  ['未来','そのビジョン、大事にして'],
+  ['未来','理想を語る{n}がいい'],
+  ['未来','現実的じゃなくていい、面白いから'],
+  ['未来','それ、絶対誰かを救うよ'],
+  ['未来','あなたの思想は時代より早い'],
+  ['未来','私たちの先を見てくれる人'],
+  ['未来','あなたが見てる景色を、いつか見たい'],
+  ['未来','{n}が考えてること、世界が追いつく日が来る'],
+  ['未来','その未来図に乗りたい'],
+  ['未来','100年残る仕事をしてる'],
+  ['未来','{n}の言ってたこと、いま本当になってる'],
+  ['未来','次の世代に必要な視点'],
+
+  // 個性・特殊性 (B型/INFJのアイデンティティ核)
+  ['個性','変わってる、と褒めてる'],
+  ['個性','誰とも違うから好き'],
+  ['個性','理解されにくいの、知ってる'],
+  ['個性','群れに紛れない強さがある'],
+  ['個性','孤独に強い人だけが見える光がある'],
+  ['個性','一人でいる時の{n}が一番いい顔してる'],
+  ['個性','違うことが価値'],
+  ['個性','周りに合わせなくていい'],
+  ['個性','あなたの異質さは武器'],
+  ['個性','私はあなたの普通でいてくれる場所でいたい'],
+  ['個性','{n}にしか出せない色がある'],
+  ['個性','空気を読まない強さがいい'],
+  ['個性','変な人と思われていい、{n}は本物'],
+  ['個性','普通の枠に収めなくていい'],
+  ['個性','その変態的なこだわり、好き'],
+
+  // 容姿・気配
+  ['気配','今日の空気感、いいね'],
+  ['気配','{c}が似合う'],
+  ['気配','{n}の声、落ち着く'],
+  ['気配','纏ってる雰囲気がいい'],
+  ['気配','歳を重ねて深くなってる'],
+  ['気配','立ち姿が好き'],
+  ['気配','佇まいに重みがある'],
+  ['気配','笑い方が変わったね、いい方に'],
+  ['気配','{n}の手、美しい'],
+  ['気配','あなたの目はずっと優しい'],
+  ['気配','{n}の沈黙が一番落ち着く'],
+  ['気配','髪型変えた? 似合ってる'],
+  ['気配','その服、好き'],
+  ['気配','背中で語る人になったね'],
+  ['気配','存在に静けさが宿った'],
+
+  // 専門性・知性 (七赤金星好み)
+  ['知性','{n}が言うなら間違いない'],
+  ['知性','理屈で勝てる人、{n}しかいない'],
+  ['知性','知の引き出しが深い'],
+  ['知性','ちゃんと調べてから話す人で安心する'],
+  ['知性','前提を疑える人は貴重'],
+  ['知性','それ、本質ですね'],
+  ['知性','{n}の言葉は重みが違う'],
+  ['知性','うわべの言葉じゃ通用しない人だ'],
+  ['知性','一を聞いて十を知る、ってこういう人のこと'],
+  ['知性','{n}のフレームで世界を見たい'],
+  ['知性','その整理、頭良すぎ'],
+  ['知性','{n}と話してるだけで頭の中が整う'],
+  ['知性','本読んでる量が違う'],
+  ['知性','学び続ける姿、尊敬してる'],
+  ['知性','構造化が異常にうまい'],
+
+  // 繋がり・関係
+  ['関係','一緒にいると楽'],
+  ['関係','ずっと友達でいよう'],
+  ['関係','また話したい'],
+  ['関係','なんでもない時間が一番いい'],
+  ['関係','言わなくていい時間が心地いい'],
+  ['関係','あなたといる場所が一番好き'],
+  ['関係','ここに来るとほっとする'],
+  ['関係','信頼の重さがちょうどいい'],
+  ['関係','依存じゃない関係を作れる人だね'],
+  ['関係','あなたを友達と呼べる人は幸せ'],
+  ['関係','{n}との沈黙、好き'],
+  ['関係','また飯行こう、近いうちに'],
+  ['関係','返信遅くていい、いつでも'],
+  ['関係','あなたが幸せなら私も幸せ'],
+  ['関係','次の春、また会おうね'],
+  // ---- 拡張: スロット強化版 (1000+ 達成のため) ----
+  ['存在','{n}みたいな{t}人、稀有だよ'],
+  ['存在','{k}空気を持ってる{n}が好き'],
+  ['存在','{n}の{t}まなざしに救われる'],
+  ['直感','{n}の{t}読みは外さない'],
+  ['直感','その{t}観察眼、{n}ならではだ'],
+  ['労い','{n}、{t}顔してるよ。少し休んで'],
+  ['労い','{k}言葉が出ない日もある、{n}'],
+  ['理解','{n}の{t}優しさ、ちゃんと届いてる'],
+  ['理解','{n}が{t}沈黙してる時の意味、わかる'],
+  ['創造','{c}みたいな{t}発想、{n}にしか出せない'],
+  ['創造','{n}が{i}と一緒に作るもの、楽しみ'],
+  ['過程','{n}の{t}思考の歩み、追いかけてる'],
+  ['過程','{k}決断ができる{n}は強い'],
+  ['成果','{n}の{t}仕事、品が違う'],
+  ['未来','{n}が描く{t}未来図、信じてる'],
+  ['未来','{n}の{k}ビジョンに乗りたい'],
+  ['個性','{n}の{t}異質さ、好き'],
+  ['個性','{n}の{t}変わってる所、宝物'],
+  ['気配','今日の{n}、{t}空気纏ってる'],
+  ['気配','{c}が{n}の{t}雰囲気に合う'],
+  ['知性','{n}の{t}論理、追いつくのに必死'],
+  ['知性','{n}の{t}視座、いつ見ても深い'],
+  ['関係','{n}との{k}沈黙が一番いい'],
+  ['関係','{n}と{i}飲みながら話したい'],
+];
+
+const AVOID_WORDS = [
+  // 軽視・矮小化 (INFJの感情を否定)
+  ['軽視','考えすぎ'],
+  ['軽視','それ、意味ある?'],
+  ['軽視','気にしすぎ'],
+  ['軽視','病んでる?'],
+  ['軽視','面倒くさい人'],
+  ['軽視','重い'],
+  ['軽視','重たい話やめて'],
+  ['軽視','湿っぽい'],
+  ['軽視','ネガティブ'],
+  ['軽視','また始まった'],
+  ['軽視','そんなん知らんがな'],
+  ['軽視','どうでもよくない?'],
+  ['軽視','ハイハイ'],
+  ['軽視','うわ出た'],
+  ['軽視','まーた{n}が悩んでる'],
+
+  // 普通の押し付け (B型/INFJ最大の地雷)
+  ['普通','もっと普通にしなよ'],
+  ['普通','普通そうしないよ'],
+  ['普通','それが世間ってもんだよ'],
+  ['普通','みんなやってるよ'],
+  ['普通','常識的に考えて'],
+  ['普通','現実見な'],
+  ['普通','夢みたいなこと言ってんなよ'],
+  ['普通','理想論やめて'],
+  ['普通','現実はそんな甘くない'],
+  ['普通','社会人なら'],
+  ['普通','大人になれ'],
+  ['普通','子どもじゃないんだから'],
+  ['普通','普通に生きろよ'],
+  ['普通','ちゃんとしろ'],
+  ['普通','ふつうの感覚持って'],
+
+  // 結論を急がせる
+  ['結論','で、結論は?'],
+  ['結論','話長い'],
+  ['結論','三行でまとめて'],
+  ['結論','結局何が言いたいの?'],
+  ['結論','早く決めて'],
+  ['結論','迷ってる時間がもったいない'],
+  ['結論','考えてないで動け'],
+  ['結論','早く動いた者勝ち'],
+  ['結論','また悩んでる?'],
+  ['結論','決断遅い'],
+  ['結論','とりあえずやれ'],
+  ['結論','悩んでも答え出ないよ'],
+  ['結論','考えてないで手を動かせ'],
+  ['結論','悩む暇あったら走れ'],
+  ['結論','PDCAって知ってる?'],
+
+  // 協調性 (INFJの繊細さを表面で判定)
+  ['協調','もっと愛想よく'],
+  ['協調','笑顔ないと損するよ'],
+  ['協調','コミュ障?'],
+  ['協調','もっと話して'],
+  ['協調','ノリ悪い'],
+  ['協調','つまんないやつ'],
+  ['協調','場の空気読んで'],
+  ['協調','みんなで楽しもうよ'],
+  ['協調','一人だけ浮いてる'],
+  ['協調','輪に入りなよ'],
+  ['協調','飲みは付き合いだから'],
+  ['協調','陰キャ卒業しろ'],
+  ['協調','人見知り直しなよ'],
+  ['協調','根暗'],
+  ['協調','地味だね'],
+
+  // 存在否定 (絶対地雷)
+  ['存在否定','別にいてもいなくても'],
+  ['存在否定','誰でもよかった'],
+  ['存在否定','代わりはいる'],
+  ['存在否定','君じゃなくてもいい'],
+  ['存在否定','覚えてなかった'],
+  ['存在否定','誰だっけ'],
+  ['存在否定','印象薄い'],
+  ['存在否定','影が薄い'],
+  ['存在否定','目立たないね'],
+  ['存在否定','存在感ないよね'],
+  ['存在否定','{n}? 誰?'],
+  ['存在否定','いつ入社したっけ?'],
+  ['存在否定','顔覚えてなくてごめん'],
+  ['存在否定','名前なんだっけ'],
+  ['存在否定','どうでもいい人'],
+
+  // 努力否定
+  ['努力否定','頑張ってる風'],
+  ['努力否定','やってる感だけ'],
+  ['努力否定','結果が全て'],
+  ['努力否定','過程はどうでもいい'],
+  ['努力否定','それ意味あった?'],
+  ['努力否定','コスパ悪いね'],
+  ['努力否定','効率悪い'],
+  ['努力否定','もっと要領よくやれよ'],
+  ['努力否定','時間の無駄'],
+  ['努力否定','頑張る方向間違ってる'],
+  ['努力否定','努力って報われないよね'],
+  ['努力否定','才能ないんだから'],
+  ['努力否定','向いてないよ'],
+  ['努力否定','諦めも肝心'],
+  ['努力否定','身の丈に合った仕事しなよ'],
+
+  // 容姿・年齢 (40代の地雷)
+  ['容姿','老けたね'],
+  ['容姿','疲れてる?'],
+  ['容姿','クマすごい'],
+  ['容姿','白髪増えた?'],
+  ['容姿','太った?'],
+  ['容姿','痩せた? 病気?'],
+  ['容姿','顔色悪い'],
+  ['容姿','もう若くないんだから'],
+  ['容姿','そろそろ落ち着きなよ'],
+  ['容姿','歳考えて行動して'],
+  ['容姿','年相応に'],
+  ['容姿','若作り痛い'],
+  ['容姿','おじさんだね'],
+  ['容姿','髪薄くなった?'],
+  ['容姿','肌荒れてる'],
+
+  // 性別役割 (古臭い男性役割の押付け)
+  ['性役割','男ならもっと'],
+  ['性役割','やっぱり男はね'],
+  ['性役割','男のくせに'],
+  ['性役割','男のロマンってやつ?'],
+  ['性役割','もっと頼もしくして'],
+  ['性役割','頼りない'],
+  ['性役割','リードしてよ'],
+  ['性役割','出世しないと'],
+  ['性役割','ちゃんと稼げ'],
+  ['性役割','夫として情けない'],
+  ['性役割','父親なんだから'],
+  ['性役割','一家の大黒柱だろ'],
+  ['性役割','男泣きすんな'],
+  ['性役割','弱音吐くな男だろ'],
+  ['性役割','繊細すぎ、男なんだから'],
+
+  // 個性否定 (INFJ/B型核心)
+  ['個性否定','もっと素直になりなよ'],
+  ['個性否定','難しい人'],
+  ['個性否定','扱いづらい'],
+  ['個性否定','本心が見えない'],
+  ['個性否定','何考えてるかわかんない'],
+  ['個性否定','壁を感じる'],
+  ['個性否定','心開いてくれない'],
+  ['個性否定','もっと心開いて'],
+  ['個性否定','全部見せてよ'],
+  ['個性否定','秘密主義?'],
+  ['個性否定','{n}、変わってる(嘲)'],
+  ['個性否定','不思議ちゃん'],
+  ['個性否定','メンヘラ?'],
+  ['個性否定','こじらせてる'],
+  ['個性否定','面倒な性格してるよね'],
+
+  // マイペース否定
+  ['協調否定','自己中'],
+  ['協調否定','勝手'],
+  ['協調否定','わがまま'],
+  ['協調否定','協調性ない'],
+  ['協調否定','自分のことしか考えてない'],
+  ['協調否定','また自分の世界'],
+  ['協調否定','周りが見えてない'],
+  ['協調否定','空気読めないよ'],
+  ['協調否定','また独自路線?'],
+  ['協調否定','変わってる(否定的に)'],
+  ['協調否定','一人で何でもやろうとすんな'],
+  ['協調否定','チームで動いて'],
+  ['協調否定','和を乱す'],
+  ['協調否定','勝手に動くな'],
+  ['協調否定','話し合いって知ってる?'],
+
+  // 過去の蒸し返し
+  ['過去','あの時はさぁ'],
+  ['過去','前にも同じこと'],
+  ['過去','成長してないね'],
+  ['過去','また同じ失敗'],
+  ['過去','学習しないね'],
+  ['過去','ずっと変わらないね'],
+  ['過去','進歩ない'],
+  ['過去','あの頃の方がよかった'],
+  ['過去','若い頃の方がよかった'],
+  ['過去','昔の{n}の方が好き'],
+  ['過去','昔はもっと尖ってた'],
+  ['過去','丸くなったね'],
+  ['過去','つまんなくなった'],
+  ['過去','尖り消えた?'],
+  ['過去','変わったね(否定)'],
+
+  // 比較 (INFJ最大苦痛)
+  ['比較','○○はもっと'],
+  ['比較','○○ならこうするよ'],
+  ['比較','うちの家族はちゃんと'],
+  ['比較','他の人はちゃんとやってる'],
+  ['比較','他社は'],
+  ['比較','同期はもう'],
+  ['比較','出世早い人は違うよね'],
+  ['比較','誰々はすごいよ'],
+  ['比較','{n}じゃ無理だね'],
+  ['比較','そういうのは才能ある人だけ'],
+  ['比較','{n}より◯◯さんに頼んだ方が早い'],
+  ['比較','普通もっとできるよ'],
+  ['比較','他の人は文句言わないよ'],
+  ['比較','うちの夫/妻は'],
+  ['比較','{n}には期待してないから'],
+  // ---- 拡張: スロット強化版 ----
+  ['軽視','{n}って{t}人だよね、めんどい'],
+  ['軽視','{n}って{t}とこあるよね(嫌味)'],
+  ['普通','{n}も{t}考え捨てて、普通に生きなよ'],
+  ['普通','{k}言ってないで現実見て、{n}'],
+  ['結論','{n}の{t}思考は長い、要点だけ'],
+  ['協調','{n}は{t}顔しすぎ、もっと笑え'],
+  ['協調','{n}の{t}雰囲気、職場じゃ浮く'],
+  ['存在否定','{n}? どこの{n}?'],
+  ['努力否定','{n}の{t}努力って報われる?'],
+  ['容姿','{n}、{t}顔になったね(劣化指摘)'],
+  ['性役割','{n}は{t}男すぎ、もっと強くあれ'],
+  ['個性否定','{n}は{t}けど扱いづらい'],
+  ['個性否定','{n}の{t}所、わかる人いない'],
+  ['協調否定','{n}って{t}自己中だよね'],
+  ['協調否定','{n}の{t}マイペース、迷惑'],
+  ['過去','昔の{n}の{t}尖りが恋しい'],
+  ['過去','{n}も{t}丸くなったね(残念)'],
+  ['比較','◯◯さんの方が{n}より{t}'],
+  ['比較','{n}の{t}仕事、◯◯さんの足元にも'],
+  ['比較','{n}には{t}センス、ないよね'],
+];
+
+function fillSlots(template, seed, ctx) {
+  return template
+    .replace(/\{n\}/g,  NAME_VARS[seed % NAME_VARS.length])
+    .replace(/\{t\}/g,  TRAIT_VARS[(seed * 7) % TRAIT_VARS.length])
+    .replace(/\{k\}/g,  KIND_VARS[(seed * 3) % KIND_VARS.length])
+    .replace(/\{c\}/g,  ctx.color || '黄')
+    .replace(/\{i\}/g,  ctx.item  || 'コーヒー')
+    .replace(/\{s\}/g,  '七赤金星')
+    .replace(/\{z\}/g,  '牡牛座')
+    .replace(/\{tb\}/g, ctx.tongbian || '');
+}
+
+function instanceCountWords(arr) {
+  // 概算インスタンス数: スロット数 × (各スロット可能性)
+  let total = 0;
+  for (const [_, t] of arr) {
+    let v = 1;
+    if (t.includes('{n}')) v *= NAME_VARS.length;
+    if (t.includes('{t}')) v *= TRAIT_VARS.length;
+    if (t.includes('{k}')) v *= KIND_VARS.length;
+    if (t.includes('{c}')) v *= DAY_COLORS.length;
+    if (t.includes('{i}')) v *= DAY_ITEMS.length;
+    total += v;
+  }
+  return total;
+}
+
+function pickWords(arr, dateStr, n, ctx) {
+  const dt = parseDate(dateStr);
+  const k = dt.getUTCFullYear()*10000 + (dt.getUTCMonth()+1)*100 + dt.getUTCDate();
+  const seed = (k ^ Math.imul(hash('yoshida-words'), 2654435761)) >>> 0;
+  const rnd = lcgSeed(seed);
+  // shuffle indices
+  const idx = Array.from({length: arr.length}, (_,i) => i);
+  for (let i = idx.length-1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i+1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx.slice(0, n).map((i, k) => {
+    const [cat, tmpl] = arr[i];
+    const text = fillSlots(tmpl, i + Math.floor(rnd() * 100), ctx);
+    return { cat, text };
+  });
+}
+
+function renderWords(p, f) {
+  // 吉田中心のことば帳。誰のタブから開いても表示は吉田向け。
+  const yoshida = PEOPLE.find(x => x.id === 'yoshida') || PEOPLE.find(x => x.center) || PEOPLE[0];
+  const yF = runEngines(yoshida, f.dateStr, getViewer());
+  const ctx = {
+    color: yF.todayColor, item: yF.todayItem,
+    tongbian: yF.engines.todayTongbian,
+  };
+  // 大吉なら「背中を押す」テーマ優先、要注意なら「労う」優先
+  const moodHint = yF.total >= 75 ? '攻めの言葉が効く日' : yF.total >= 50 ? 'やわらかな言葉が効く日' : '労いの言葉が効く日';
+
+  const wantPick  = pickWords(WANT_WORDS,  f.dateStr, 8, ctx);
+  const avoidPick = pickWords(AVOID_WORDS, f.dateStr, 8, { ...ctx, n_override: true });
+
+  const wantTotal  = instanceCountWords(WANT_WORDS);
+  const avoidTotal = instanceCountWords(AVOID_WORDS);
+
+  // カテゴリ別ブラウズ用
+  const wantCats  = [...new Set(WANT_WORDS.map(x => x[0]))];
+  const avoidCats = [...new Set(AVOID_WORDS.map(x => x[0]))];
+
+  return `
+    <div class="words-hero">
+      <div class="wh-label">For Yoshida — Today</div>
+      <div class="wh-title">${f.dateStr} ・ ${yF.engines.curTerm.name} ・ ${moodHint}</div>
+      <div class="wh-sub">今日の吉田 (${KYUSEI[yF.engines.honmei].name} / ${yF.engines.dayP.ganzhi} / B型 / INFJ) に効く言葉</div>
+    </div>
+
+    <div class="words-cols">
+      <div class="words-col want">
+        <div class="wc-head">
+          <span>かけて欲しい言葉</span>
+          <span class="wc-mini">${wantTotal.toLocaleString()} 通り中 8選</span>
+        </div>
+        <div class="word-list">
+          ${wantPick.map(w => `
+            <div class="word-card want">
+              <span class="wc-quote-l">「</span>${w.text}<span class="wc-quote-r">」</span>
+              <span class="wc-cat">${w.cat}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="words-col avoid">
+        <div class="wc-head">
+          <span>かけられたくない言葉</span>
+          <span class="wc-mini">${avoidTotal.toLocaleString()} 通り中 8選</span>
+        </div>
+        <div class="word-list">
+          ${avoidPick.map(w => `
+            <div class="word-card avoid">
+              <span class="wc-quote-l">「</span>${w.text}<span class="wc-quote-r">」</span>
+              <span class="wc-cat">${w.cat}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="words-stats">
+      <div>ベースフレーズ: ${WANT_WORDS.length + AVOID_WORDS.length}</div>
+      <div>カテゴリ: ${wantCats.length + avoidCats.length}</div>
+      <div>差込みインスタンス総数: <b style="color:var(--fg)">${(wantTotal + avoidTotal).toLocaleString()}</b></div>
+      <div>日付シード: ${f.dateStr.replace(/-/g,'')}</div>
+    </div>
+
+    <div class="words-browse">
+      <div class="wb-head">カテゴリ別 — かけて欲しい</div>
+      ${wantCats.map(cat => {
+        const items = WANT_WORDS.filter(x => x[0] === cat);
+        return `<div style="margin-bottom:12px">
+          <span class="cat-chip active" style="margin-right:8px">${cat}</span>
+          <span style="font-size:11px;color:var(--muted)">${items.length}件</span>
+          <div style="margin-top:6px;font-size:12px;line-height:2;font-family:var(--serif)">
+            ${items.map(([_, t], i) => `「${fillSlots(t, i*13 + hash(cat), ctx)}」`).join('　/　')}
+          </div>
+        </div>`;
+      }).join('')}
+
+      <div class="wb-head">カテゴリ別 — かけられたくない</div>
+      ${avoidCats.map(cat => {
+        const items = AVOID_WORDS.filter(x => x[0] === cat);
+        return `<div style="margin-bottom:12px">
+          <span class="cat-chip active" style="margin-right:8px;background:var(--bad);color:var(--bg2);border-color:var(--bad)">${cat}</span>
+          <span style="font-size:11px;color:var(--muted)">${items.length}件</span>
+          <div style="margin-top:6px;font-size:12px;line-height:2;font-family:var(--serif);color:#5a5a55">
+            ${items.map(([_, t], i) => `「${fillSlots(t, i*13 + hash(cat), ctx)}」`).join('　/　')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
 }
 
 // ============================================================
