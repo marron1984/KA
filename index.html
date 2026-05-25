@@ -123,6 +123,47 @@
   .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  /* viewer-perspective chips */
+  .viewer-bar {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line2);
+  }
+  .viewer-bar .vlabel {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .viewer-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .vc-chip {
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line);
+    padding: 6px 12px; cursor: pointer;
+    font-family: var(--serif); font-size: 12px;
+    border-radius: 0; transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .vc-chip:hover { border-color: var(--fg); }
+  .vc-chip.active { background: var(--fg); color: var(--bg2); border-color: var(--fg); }
+  .vc-chip .vc-mini {
+    font-size: 9px; letter-spacing: 0.15em; opacity: 0.55;
+    font-family: var(--sans); margin-left: 4px; text-transform: uppercase;
+  }
+  /* compat matrix */
+  .compat-matrix {
+    display: grid; grid-template-columns: 1fr auto; gap: 1px;
+    background: var(--line); border: 1px solid var(--line);
+    margin-top: 14px;
+  }
+  .cm-row {
+    display: contents;
+  }
+  .cm-row .cm-name, .cm-row .cm-val {
+    background: var(--bg2); padding: 8px 12px;
+    font-size: 12px;
+  }
+  .cm-row .cm-val { text-align: right; font-family: var(--serif); font-size: 14px; }
+  .cm-row .cm-name .nm-sub { color: var(--muted); font-size: 10px; margin-left: 4px; letter-spacing: 0.05em; }
   .cards { display: flex; flex-direction: column; gap: 1px; max-height: 640px; overflow-y: auto; background: var(--line2); }
   .card {
     background: var(--bg2);
@@ -634,6 +675,10 @@
 <main>
   <section class="panel">
     <h2>RELATIONSHIP MAP</h2>
+    <div class="viewer-bar">
+      <span class="vlabel">Viewpoint 視点</span>
+      <div class="viewer-chips" id="viewerChips"></div>
+    </div>
     <div class="radial-wrap">
       <svg id="radial" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
@@ -641,8 +686,9 @@
       <div class="legend-item"><span class="legend-dot" style="background:var(--good)"></span>大吉 (80+)</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--mid)"></span>中吉 (50-79)</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--bad)"></span>要注意 (-49)</div>
-      <div class="legend-item">線の太さ・色 = 中心との相性</div>
+      <div class="legend-item">線の太さ・色 = 視点との相性</div>
     </div>
+    <div id="compatMatrix"></div>
   </section>
 
   <section class="panel">
@@ -1356,7 +1402,35 @@ const SYNTHESIS = {
 // ============================================================
 // AGGREGATE: ALL ENGINES per person × date
 // ============================================================
-function runEngines(person, dateStr) {
+// ============================================================
+// COMPAT (viewer perspective)
+// ============================================================
+function computeCompat(viewer, other, dateStr) {
+  if (!viewer || !other || viewer.id === other.id) return 99;
+  const seed = viewer.id + '|' + other.id + '|' + dateStr;
+  const vHon = honmeiStar(viewer.birth);
+  const oHon = honmeiStar(other.birth);
+  const rel = starRelation(oHon, vHon);
+  const vDay = dayPillar(viewer.birth);
+  const oDay = dayPillar(other.birth);
+  // viewer目線の通変 (viewerの日干 vs otherの日干)
+  const tbFromViewer = tongbianStar(vDay.stemIdx, oDay.stemIdx);
+  const tbBonus = ({'正官':20,'正財':18,'印綬':16,'食神':12,'偏財':10,'比肩':6,'偏官':4,'偏印':2,'傷官':-10,'劫財':-8})[tbFromViewer] || 0;
+  const blood = (BLOOD_COMPAT[viewer.blood]?.[other.blood]) || 6;
+  const v = Math.round(35 + rel.score * 4 + tbBonus + blood * 2 + ((hash(seed)%2000)/2000 - 0.5) * 15);
+  return Math.max(10, Math.min(99, v));
+}
+function compatDetails(viewer, other, dateStr) {
+  if (!viewer || !other || viewer.id === other.id) return null;
+  const vHon = honmeiStar(viewer.birth);
+  const oHon = honmeiStar(other.birth);
+  const rel = starRelation(oHon, vHon);
+  const tb = tongbianStar(dayPillar(viewer.birth).stemIdx, dayPillar(other.birth).stemIdx);
+  const blood = (BLOOD_COMPAT[viewer.blood]?.[other.blood]) || 6;
+  return { rel, tongbian: tb, tbInfo: TONGBIAN_INFO[tb] || {}, bloodScore: blood, score: computeCompat(viewer, other, dateStr) };
+}
+
+function runEngines(person, dateStr, viewerPerson) {
   const date = parseDate(dateStr);
   const yearP = yearPillar(person.birth);
   const monthP = monthPillar(person.birth);
@@ -1441,20 +1515,9 @@ function runEngines(person, dateStr) {
   const health  = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'h')%2000)/2000 - 0.5)*30 + bMod.health)));
   const money   = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'m')%2000)/2000 - 0.5)*30 + bMod.money)));
 
-  // 中心人物との相性
-  const center = PEOPLE.find(p => p.center) || PEOPLE[0];
-  let compatScore = 50;
-  if (center && person.id !== center.id) {
-    const cHon = honmeiStar(center.birth);
-    const rel = starRelation(honmei, cHon);
-    const cDay = dayPillar(center.birth);
-    const tbMutual = tongbianStar(cDay.stemIdx, dayP.stemIdx);
-    const tbBonus = ({'正官':20,'正財':18,'印綬':16,'食神':12,'偏財':10,'比肩':6,'偏官':4,'偏印':2,'傷官':-10,'劫財':-8})[tbMutual] || 0;
-    const blood = (BLOOD_COMPAT[person.blood]?.[center.blood]) || 6;
-    compatScore = Math.max(10, Math.min(99, Math.round(35 + rel.score * 4 + tbBonus + blood * 2 + ((hash(seed+'c')%2000)/2000 - 0.5) * 15)));
-  } else {
-    compatScore = 99;
-  }
+  // 視点 (viewer) との相性。viewer は引数で渡せるが、未指定なら中心人物
+  const viewer = (typeof viewerPerson !== 'undefined' && viewerPerson) ? viewerPerson : (PEOPLE.find(p => p.center) || PEOPLE[0]);
+  const compatScore = computeCompat(viewer, person, dateStr);
 
   return {
     person, date, dateStr,
@@ -1503,14 +1566,20 @@ const $svg  = document.getElementById('radial');
 const $cards = document.getElementById('cards');
 const $detailName = document.getElementById('detailName');
 let selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || 'yoshida';
+let viewerId   = selectedId;
 let activeTab = 'overview';
+
+function getViewer() { return PEOPLE.find(p => p.id === viewerId) || PEOPLE.find(p => p.center) || PEOPLE[0]; }
 
 function render() {
   const date = $date.value || todayStr();
+  const viewer = getViewer();
   const all = {};
-  PEOPLE.forEach(p => all[p.id] = runEngines(p, date));
+  PEOPLE.forEach(p => all[p.id] = runEngines(p, date, viewer));
+  drawViewerChips();
   drawRadial(date, all);
   drawCards(date, all);
+  drawCompatMatrix(date, all);
   drawDetail(date, all);
   const dt = parseDate(date);
   const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getUTCDay()];
@@ -1518,12 +1587,58 @@ function render() {
   if (hd) hd.textContent = `${date} · ${wd}`;
 }
 
+function drawViewerChips() {
+  const $vc = document.getElementById('viewerChips');
+  if (!$vc) return;
+  $vc.innerHTML = PEOPLE.map(p =>
+    `<button class="vc-chip${viewerId === p.id ? ' active' : ''}" data-id="${p.id}">${p.name}${p.center ? '<span class="vc-mini">center</span>' : ''}</button>`
+  ).join('');
+  $vc.querySelectorAll('.vc-chip').forEach(b => {
+    b.addEventListener('click', () => {
+      viewerId = b.dataset.id;
+      // 視点を切り替えると、選択も自動的に追従させる (詳細パネルも視点の人物に)
+      selectedId = viewerId;
+      render();
+    });
+  });
+}
+
+function drawCompatMatrix(date, all) {
+  const wrap = document.getElementById('compatMatrix');
+  if (!wrap) return;
+  const viewer = getViewer();
+  const others = PEOPLE.filter(p => p.id !== viewer.id);
+  if (!others.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px">
+      ${viewer.name} から見た相性
+    </div>
+    <div class="compat-matrix">
+      ${others.map(o => {
+        const det = compatDetails(viewer, o, date);
+        return `<div class="cm-row">
+          <div class="cm-name">${o.name}<span class="nm-sub">${det.rel.name} / 通変 ${det.tongbian}</span></div>
+          <div class="cm-val" style="color:${scoreColor(det.score)}">${det.score}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
 function drawRadial(date, all) {
   const NS = 'http://www.w3.org/2000/svg';
   const CX=300, CY=300, R=200;
   $svg.innerHTML = '';
   const center = PEOPLE.find(p => p.center) || PEOPLE[0];
+  const viewer = getViewer();
   const others = PEOPLE.filter(p => p.id !== center.id);
+
+  // 各人の位置を確定 (中心はCX,CY / その他は円周)
+  const positions = { [center.id]: { x: CX, y: CY, radius: 50, isCenter: true } };
+  others.forEach((p, i) => {
+    const angle = (-Math.PI/2) + (i / others.length) * Math.PI * 2;
+    positions[p.id] = { x: CX + Math.cos(angle)*R, y: CY + Math.sin(angle)*R, radius: 36, isCenter: false };
+  });
 
   // 七宝-inspired decorative rings (mono, slow rotation)
   const ringGroupCW = document.createElementNS(NS, 'g');
@@ -1550,35 +1665,46 @@ function drawRadial(date, all) {
   `;
   $svg.appendChild(cross);
 
-  others.forEach((p, i) => {
-    const angle = (-Math.PI/2) + (i / others.length) * Math.PI * 2;
-    const x = CX + Math.cos(angle)*R, y = CY + Math.sin(angle)*R;
+  // 視点ノードから他全員へラインを引く
+  const vPos = positions[viewer.id];
+  PEOPLE.forEach(p => {
+    if (p.id === viewer.id) return;
+    const oPos = positions[p.id];
     const c = all[p.id].compatScore;
     const link = document.createElementNS(NS, 'line');
-    link.setAttribute('x1', CX); link.setAttribute('y1', CY);
-    link.setAttribute('x2', x); link.setAttribute('y2', y);
+    link.setAttribute('x1', vPos.x); link.setAttribute('y1', vPos.y);
+    link.setAttribute('x2', oPos.x); link.setAttribute('y2', oPos.y);
     link.setAttribute('class', 'link flowing');
     link.setAttribute('stroke', scoreColor(c));
     link.setAttribute('stroke-width', 1 + (c/100)*3);
     link.setAttribute('opacity', 0.3 + (c/100)*0.5);
     link.style.animationDuration = (4 - (c/100)*2.5).toFixed(2) + 's';
     $svg.appendChild(link);
-    const mx = (CX+x)/2, my = (CY+y)/2;
+    const mx = (vPos.x + oPos.x)/2, my = (vPos.y + oPos.y)/2;
     const lbl = document.createElementNS(NS, 'text');
-    lbl.setAttribute('x', mx); lbl.setAttribute('y', my);
+    lbl.setAttribute('x', mx); lbl.setAttribute('y', my - 3);
     lbl.setAttribute('text-anchor', 'middle');
-    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('font-size', '11');
     lbl.setAttribute('fill', scoreColor(c));
-    lbl.setAttribute('font-weight', '700');
-    lbl.textContent = '相性 ' + c;
+    lbl.setAttribute('font-weight', '600');
+    lbl.style.fontFamily = "var(--serif)";
+    lbl.textContent = c;
     $svg.appendChild(lbl);
   });
 
-  drawNode(CX, CY, center, all[center.id], 50, true);
-  others.forEach((p, i) => {
-    const angle = (-Math.PI/2) + (i / others.length) * Math.PI * 2;
-    drawNode(CX + Math.cos(angle)*R, CY + Math.sin(angle)*R, p, all[p.id], 36, false);
+  // ノード描画
+  PEOPLE.forEach(p => {
+    const pos = positions[p.id];
+    drawNode(pos.x, pos.y, p, all[p.id], pos.radius, pos.isCenter);
   });
+
+  // 視点バッジ (viewerノードの上に "VIEWPOINT" ラベル)
+  const vBadge = document.createElementNS(NS, 'g');
+  vBadge.innerHTML = `
+    <rect x="${vPos.x - 42}" y="${vPos.y - vPos.radius - 28}" width="84" height="16" fill="#15151a"/>
+    <text x="${vPos.x}" y="${vPos.y - vPos.radius - 17}" text-anchor="middle" font-size="9" fill="#ebe9e4" style="letter-spacing:0.25em;font-family:var(--sans)">VIEWPOINT</text>
+  `;
+  $svg.appendChild(vBadge);
 }
 function drawNode(cx, cy, person, r, radius, isCenter) {
   const NS = 'http://www.w3.org/2000/svg';
@@ -1650,10 +1776,12 @@ function drawNode(cx, cy, person, r, radius, isCenter) {
 
 function drawCards(date, all) {
   $cards.innerHTML = '';
+  const viewer = getViewer();
   PEOPLE.forEach(p => {
     const f = all[p.id];
     const card = document.createElement('div');
     card.className = 'card' + (selectedId === p.id ? ' selected' : '');
+    const isViewer = p.id === viewer.id;
     card.innerHTML = `
       <div class="card-head">
         <div>
@@ -1667,6 +1795,7 @@ function drawCards(date, all) {
       </div>
       <div class="card-foot">
         ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
+        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `　<span style="margin-left:4px">${viewer.name}視点の相性 <b style="color:${scoreColor(f.compatScore)}">${f.compatScore}</b></span>`}
       </div>
     `;
     card.addEventListener('click', () => { selectedId = p.id; render(); });
@@ -1727,6 +1856,8 @@ function drawDetail(date, all) {
 
 function renderOverview(p, f) {
   const center = PEOPLE.find(x => x.center) || PEOPLE[0];
+  const viewer = getViewer();
+  const others = PEOPLE.filter(x => x.id !== p.id);
   return `
     <div class="grid-2">
       <div class="box">
@@ -1745,12 +1876,34 @@ function renderOverview(p, f) {
         <div class="bars" style="font-size:12px">
           ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
         </div>
-        ${p.id !== center.id ? `<div class="row" style="margin-top:10px"><span>${center.name}との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
+        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
         <div style="margin-top:10px">
           <span class="chip">日干通変: ${f.engines.todayTongbian} (${f.engines.todayInfo.rank})</span>
           <span class="chip">本命×日盤: ${f.engines.relation.name}</span>
         </div>
         <div class="advice">💡 ${f.advice}</div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:14px">
+      <h3>${p.name}から見た / への相性</h3>
+      <div class="grid-2">
+        <div>
+          <h4>${p.name} から見た相性</h4>
+          ${others.map(o => {
+            const d = compatDetails(p, o, f.dateStr);
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span><span style="color:${scoreColor(d.score)};font-weight:600">${d.score}</span></div>`;
+          }).join('')}
+        </div>
+        <div>
+          <h4>${p.name} へ向けられる相性</h4>
+          ${others.map(o => {
+            const d = compatDetails(o, p, f.dateStr);
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span><span style="color:${scoreColor(d.score)};font-weight:600">${d.score}</span></div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:0.05em">
+        ※ 通変は主体側日干→相手側日干の関係。相性スコアは主体目線の通変・血液型・本命星五行の合算。
       </div>
     </div>
     <div class="box" style="margin-top:14px">
@@ -1993,9 +2146,9 @@ function renderMBTI(p, f) {
         <div class="row"><span>挑戦的</span><span>${m[3].map(t=>`<span class="chip-mini">${t}</span>`).join(' ')}</span></div>
       </div>
       <div class="box">
-        <h3>ビジネス相性 (中心人物視点)</h3>
-        ${PEOPLE.filter(x => !x.center).map(other => {
-          const oF = runEngines(other, f.dateStr);
+        <h3>ビジネス相性 (${getViewer().name} 視点)</h3>
+        ${PEOPLE.filter(x => x.id !== getViewer().id).map(other => {
+          const oF = runEngines(other, f.dateStr, getViewer());
           return `<div class="row"><span>${other.name}</span><span style="color:${scoreColor(oF.compatScore)};font-weight:600">${oF.compatScore} (${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></div>`;
         }).join('')}
       </div>
@@ -2077,6 +2230,7 @@ $deleteBtn.addEventListener('click', () => {
   if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
   savePeople(); resetForm(); renderPeopleList();
   if (selectedId === id) selectedId = (PEOPLE[0]||{}).id || '';
+  if (viewerId === id) viewerId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
   render();
 });
 $resetAllBtn.addEventListener('click', () => {
