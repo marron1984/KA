@@ -4,22 +4,23 @@
 <meta charset="UTF-8">
 <title>吉田占いダッシュボード</title>
 <style>
-  /* === 4WIDE-inspired: 七宝文様 + monochrome + serif === */
+  /* === URANAI / Editorial — pure white + display sans === */
   :root {
-    --bg:     #ebe9e4;            /* base canvas (warm gray) */
-    --bg2:    #ffffff;            /* cards */
-    --bg3:    #f4f2ec;            /* nested */
-    --fg:     #15151a;            /* near black */
-    --fg2:    #2a2a30;
-    --muted:  #7a7a78;
-    --accent: #15151a;            /* monochrome accent */
-    --line:   #cfcdc6;
-    --line2:  #e4e1d9;
-    --good:   #3d5e44;            /* desaturated moss */
-    --mid:    #8a7240;            /* aged brass */
-    --bad:    #8c3a3a;            /* muted brick */
+    --bg:     #ffffff;
+    --bg2:    #ffffff;
+    --bg3:    #f6f6f3;
+    --fg:     #0a0a0a;
+    --fg2:    #1a1a1a;
+    --muted:  #8a8a86;
+    --accent: #facc15;            /* editorial yellow (1点アクセント) */
+    --line:   #0a0a0a;
+    --line2:  #e6e6e2;
+    --good:   #3d5e44;
+    --mid:    #8a7240;
+    --bad:    #8c3a3a;
     --serif:  "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Times New Roman", serif;
-    --sans:   -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+    --sans:   "Helvetica Neue", -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+    --display:"Helvetica Neue", "Arial Black", -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { background: var(--bg); }
@@ -28,61 +29,239 @@
     font-family: var(--sans);
     color: var(--fg);
     min-height: 100vh;
-    /* 七宝文様 SVG パターン (Shippō tsunagi) */
-    background-color: var(--bg);
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23c7c4bb' stroke-width='0.7'><circle cx='40' cy='40' r='28.28'/><circle cx='0' cy='0' r='28.28'/><circle cx='80' cy='0' r='28.28'/><circle cx='0' cy='80' r='28.28'/><circle cx='80' cy='80' r='28.28'/></g></svg>"),
-      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.5), transparent 60%);
-    background-size: 80px 80px, 100% 100%;
-    background-attachment: fixed, scroll;
-    letter-spacing: 0.01em;
+    background: var(--bg);
+    letter-spacing: 0.005em;
   }
-  header {
-    padding: 28px 40px 18px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+  /* ============== EDITORIAL HEADER (top nav) ============== */
+  header.ed-nav {
+    position: sticky; top: 0; z-index: 50;
+    padding: 18px 40px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 32px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
-    flex-wrap: wrap;
-    gap: 16px;
-    background: rgba(235,233,228,0.65);
-    backdrop-filter: blur(8px);
   }
-  h1 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: 32px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    line-height: 1.1;
+  .ed-brand { display: flex; align-items: baseline; gap: 18px; flex-wrap: nowrap; }
+  .ed-brand .ed-wordmark {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    line-height: 1;
   }
-  h1 .brand-mark {
-    display: inline-block;
-    font-size: 11px;
-    letter-spacing: 0.35em;
+  .ed-brand .ed-issue {
+    font-size: 10px;
     color: var(--muted);
-    font-family: var(--sans);
-    margin-bottom: 6px;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-  }
-  h1 .ja-sub {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
     font-family: var(--sans);
+    white-space: nowrap;
+  }
+  .ed-tabs {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .ed-tab {
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line2);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    font-family: var(--sans);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
     letter-spacing: 0.05em;
+  }
+  .ed-tab:hover { background: var(--fg); color: #fff; }
+  .ed-right { display: flex; gap: 8px; align-items: center; }
+  .ed-editorial {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    padding: 8px 18px 8px 12px;
+    font-size: 12px; font-family: var(--sans);
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+  .ed-editorial::before {
+    content: ''; width: 14px; height: 14px;
+    border-radius: 50%; border: 1px solid var(--fg);
+    display: inline-block;
   }
   .date-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .date-bar input[type=date] {
     background: var(--bg2); color: var(--fg);
-    border: 1px solid var(--line); border-radius: 0;
-    padding: 8px 10px; font-family: var(--sans);
+    border: 1px solid var(--line2); border-radius: 999px;
+    padding: 8px 14px; font-family: var(--sans);
     color-scheme: light; font-size: 12px;
+  }
+
+  /* ============== HERO (cover) ============== */
+  .ed-hero {
+    padding: 40px 60px 28px;
+    max-width: 1500px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .ed-hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+  }
+  .ed-date-pill {
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-family: var(--serif);
+    letter-spacing: 0.02em;
+  }
+  .ed-reading-tag {
+    background: var(--fg);
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: var(--sans);
+  }
+  .ed-reading-tag .light { opacity: 0.55; margin-left: 6px; font-weight: 400; }
+  .ed-headline {
+    position: relative;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(72px, 11vw, 168px);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    color: var(--fg);
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .ed-headline .hl-line { display: block; }
+  .ed-explore-stamp {
+    position: absolute;
+    top: 200px;
+    right: 80px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    animation: rotate360 28s linear infinite;
+  }
+  .ed-explore-stamp svg { width: 100%; height: 100%; overflow: visible; }
+  .ed-explore-stamp .star {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    animation: rotate360 28s linear infinite reverse;
+  }
+  .ed-explore-stamp .star-dot {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--fg);
+  }
+  @media (max-width: 720px) {
+    .ed-explore-stamp { width: 90px; height: 90px; top: 90px; right: 20px; }
+  }
+  .ed-tagline {
+    margin-top: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .ed-tagline .ja-tag {
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.6vw, 38px);
+    line-height: 1.5;
+    color: var(--fg);
+    letter-spacing: 0.01em;
+  }
+  .ed-tagline .ja-tag .greet {
+    display: block;
+    margin-top: 6px;
+  }
+  .ed-tagline .ja-side {
+    font-family: var(--sans);
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--fg);
+    letter-spacing: 0.12em;
+    text-align: right;
+  }
+  .ed-tagline .ja-side .en {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .ed-tagline .ja-side .ja {
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  /* ============== INFO STRIP (5 cards under hero) ============== */
+  .ed-strip {
+    padding: 0 60px 60px;
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 900px) {
+    .ed-strip { grid-template-columns: repeat(2, 1fr); }
+    .ed-hero { padding: 24px 20px 16px; }
+    .ed-strip { padding: 0 20px 28px; }
+  }
+  .ed-strip-cell {
+    padding: 20px 22px 26px;
+    border-right: 1px solid var(--line);
+    min-height: 110px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .ed-strip-cell:last-child { border-right: none; }
+  .ed-strip-cell .label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--fg);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .ed-strip-cell .label .ja { color: var(--muted); margin-left: 4px; font-weight: 500; letter-spacing: 0.08em; }
+  .ed-strip-cell .val {
+    font-family: var(--display);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 900;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    line-height: 1;
+  }
+  .ed-strip-cell .val.small { font-size: clamp(22px, 2.4vw, 32px); }
+  .ed-strip-cell .sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: auto;
   }
   .btn {
     background: var(--bg2); color: var(--fg);
-    border: 1px solid var(--line); border-radius: 0;
+    border: 1px solid var(--line2); border-radius: 0;
     padding: 8px 16px; cursor: pointer; font-family: var(--sans);
     font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
     transition: background 0.2s, color 0.2s;
@@ -96,16 +275,16 @@
     display: grid;
     grid-template-columns: minmax(440px, 1fr) 400px;
     gap: 24px;
-    padding: 28px 40px 80px;
+    padding: 40px 60px 80px;
     max-width: 1500px;
     margin: 0 auto;
   }
-  @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+  @media (max-width: 1000px) { main { grid-template-columns: 1fr; padding: 20px; } }
   .panel {
     background: var(--bg2);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     border-radius: 0;
-    padding: 24px;
+    padding: 28px;
   }
   .panel-wide { grid-column: 1 / -1; }
   .panel h2 {
@@ -138,7 +317,7 @@
   .viewer-chips { display: flex; flex-wrap: wrap; gap: 4px; }
   .vc-chip {
     background: var(--bg2); color: var(--fg);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     padding: 6px 12px; cursor: pointer;
     font-family: var(--serif); font-size: 12px;
     border-radius: 0; transition: background 0.2s, color 0.2s, border-color 0.2s;
@@ -152,7 +331,7 @@
   /* compat matrix */
   .compat-matrix {
     display: grid; grid-template-columns: 1fr auto; gap: 1px;
-    background: var(--line); border: 1px solid var(--line);
+    background: var(--line); border: 1px solid var(--line2);
     margin-top: 14px;
   }
   .cm-row {
@@ -190,6 +369,33 @@
   .bar-fill { height: 100%; border-radius: 0; transition: width 0.4s ease; }
   .bar-val { text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; font-family: var(--serif); }
   .card-foot { margin-top: 6px; font-size: 10px; color: var(--muted); letter-spacing: 0.05em; }
+  .card-oneliner {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--bg3);
+    border-left: 2px solid var(--accent);
+    font-family: var(--serif);
+    font-size: 13px;
+    line-height: 1.55;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 10px;
+  }
+  .card-oneliner .ol-arrow {
+    font-size: 9px; letter-spacing: 0.15em; color: var(--muted);
+    text-transform: uppercase; align-self: center;
+    font-family: var(--sans); font-weight: 700;
+  }
+  .card-oneliner .ol-text { color: var(--fg); }
+  .card-oneliner .ol-tone {
+    grid-column: 2;
+    font-size: 10px; color: var(--muted);
+    font-family: var(--sans); letter-spacing: 0.05em;
+  }
+  .card.selected .card-oneliner { background: rgba(255,255,255,0.08); border-left-color: var(--accent); }
+  .card.selected .card-oneliner .ol-text { color: rgba(255,255,255,0.95); }
+  .card.selected .card-oneliner .ol-tone { color: rgba(255,255,255,0.55); }
+  .card.selected .card-oneliner .ol-arrow { color: rgba(255,255,255,0.55); }
   /* Tabs */
   .tabs {
     display: flex; gap: 0;
@@ -218,7 +424,7 @@
   @media (max-width: 720px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
   .box {
     background: var(--bg2);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     border-radius: 0; padding: 22px;
   }
   .box h3 {
@@ -243,7 +449,7 @@
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 1px; margin: 14px 0;
     background: var(--line);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
   }
   .pillar-cell {
     background: var(--bg2); padding: 14px 6px; border-radius: 0;
@@ -275,7 +481,7 @@
     padding: 4px 12px; border-radius: 0;
     font-size: 10px; letter-spacing: 0.1em;
     display: inline-block; margin: 2px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
   }
   .chip-mini {
     background: var(--bg3); color: var(--fg);
@@ -298,7 +504,7 @@
     font-size: 13px; line-height: 1.85; color: var(--fg);
     background: var(--bg2);
     padding: 16px 18px; border-radius: 0;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     margin-bottom: 12px;
     font-family: var(--serif);
   }
@@ -347,7 +553,7 @@
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: var(--bg2); border: 1px solid var(--line);
+    background: var(--bg2); border: 1px solid var(--line2);
     border-radius: 0; padding: 32px;
     width: min(560px, 92vw); max-height: 88vh; overflow-y: auto;
   }
@@ -372,7 +578,7 @@
   }
   .form-grid input, .form-grid select {
     background: var(--bg2); color: var(--fg);
-    border: 1px solid var(--line); border-radius: 0;
+    border: 1px solid var(--line2); border-radius: 0;
     padding: 10px 12px; font-family: var(--sans);
     font-size: 14px; color-scheme: light;
     text-transform: none; letter-spacing: 0;
@@ -383,7 +589,7 @@
   .blood-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
   .blood-group input { display: none; }
   .blood-group label {
-    text-align: center; padding: 10px; border: 1px solid var(--line);
+    text-align: center; padding: 10px; border: 1px solid var(--line2);
     border-radius: 0; cursor: pointer; font-weight: 500;
     color: var(--fg); font-size: 13px;
     font-family: var(--serif);
@@ -405,7 +611,7 @@
   .person-row {
     display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;
     padding: 10px 12px; background: var(--bg3);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     border-radius: 0; font-size: 13px;
   }
   .person-row .meta { color: var(--muted); font-size: 10px; letter-spacing: 0.05em; }
@@ -459,12 +665,9 @@
   }
 
   /* ===================== Motion ===================== */
-  @keyframes bgDrift {
-    from { background-position: 0px 0px, 0 0; }
-    to   { background-position: 80px 80px, 0 0; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
-  body { animation: bgDrift 60s linear infinite; }
-  @media (prefers-reduced-motion: reduce) { body { animation: none; } }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(14px); }
@@ -624,7 +827,7 @@
   .word-list { display: flex; flex-direction: column; gap: 8px; }
   .word-card {
     background: var(--bg2);
-    border: 1px solid var(--line);
+    border: 1px solid var(--line2);
     padding: 12px 16px;
     font-family: var(--serif);
     font-size: 15px;
@@ -666,7 +869,7 @@
   }
   .cat-chip {
     background: var(--bg2); color: var(--fg);
-    border: 1px solid var(--line); padding: 5px 12px;
+    border: 1px solid var(--line2); padding: 5px 12px;
     font-size: 11px; cursor: pointer;
     font-family: var(--sans); letter-spacing: 0.05em;
     transition: background 0.2s, color 0.2s;
@@ -693,20 +896,63 @@
 </style>
 </head>
 <body>
-<div class="particles" id="particles" aria-hidden="true"></div>
-<header>
-  <h1>
-    <span class="brand-mark">KA — 吉田占断</span>
-    占いダッシュボード
-    <span class="ja-sub">Built with Stars &amp; Craft — 仕事仲間との今日の運勢</span>
-  </h1>
-  <div class="date-bar">
+<header class="ed-nav">
+  <div class="ed-brand">
+    <span class="ed-wordmark">URANAI</span>
+    <span class="ed-issue">私的占断 ／ <span id="edIssueNo">N°143</span></span>
+  </div>
+  <nav class="ed-tabs" id="edTabs">
+    <button class="ed-tab" data-anchor="#sec-astro">星占</button>
+    <button class="ed-tab" data-anchor="#sec-iching">塔羅</button>
+    <button class="ed-tab" data-anchor="#sec-num">数秘</button>
+    <button class="ed-tab" data-anchor="#sec-iching">易経</button>
+    <button class="ed-tab" data-anchor="#sec-shichu">四柱</button>
+    <button class="ed-tab" data-anchor="#sec-fengshui">風水</button>
+    <button class="ed-tab" data-anchor="#sec-mbti">MBTI</button>
+  </nav>
+  <div class="ed-right">
     <input type="date" id="dateInput">
-    <button class="btn" id="todayBtn">Today</button>
-    <button class="btn btn-primary" id="manageBtn">+ Register</button>
-    <button class="btn" id="syncBtn" title="PCとスマホでデータを同期">⇄ 同期</button>
+    <button class="btn" id="todayBtn" title="Today">●</button>
+    <button class="btn" id="manageBtn" title="人物管理">+</button>
+    <button class="btn" id="syncBtn" title="PCとスマホでデータを同期">⇄</button>
+    <span class="ed-editorial" id="edEditorial">エディトリアル ▾</span>
   </div>
 </header>
+
+<section class="ed-hero">
+  <div class="ed-hero-top">
+    <div class="ed-date-pill" id="edDatePill">—</div>
+    <div class="ed-reading-tag">TODAY'S READING <span class="light" id="edLP">(LP —)</span></div>
+  </div>
+  <h2 class="ed-headline" id="edHeadline">
+    <span class="hl-line">OFF TRACK,</span>
+    <span class="hl-line">ON PURPOSE,</span>
+    <span class="hl-line">IN LIFE</span>
+  </h2>
+  <div class="ed-explore-stamp" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <path id="circleText" d="M 100,100 m -78,0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" />
+      </defs>
+      <text font-family="Helvetica Neue, sans-serif" font-size="20" font-weight="700" letter-spacing="6" fill="#0a0a0a">
+        <textPath href="#circleText">EXPLORE · EXPLORE · EXPLORE · </textPath>
+      </text>
+    </svg>
+    <div class="star"><div class="star-dot">★</div></div>
+  </div>
+  <div class="ed-tagline">
+    <div class="ja-tag">
+      <span id="edJaTag">逸れても、道はある。</span>
+      <span class="greet" id="edGreet">おはようございます。</span>
+    </div>
+    <div class="ja-side">
+      <span class="en" id="edEnSide">FOLLOW INTUITION,<br>REDEFINE YOUR ROAD</span>
+      <span class="ja">本日の天・地・命を読み解きます。</span>
+    </div>
+  </div>
+</section>
+
+<section class="ed-strip" id="edStrip"></section>
 
 <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -796,7 +1042,7 @@
     <div class="cards" id="cards"></div>
   </section>
 
-  <section class="panel panel-wide">
+  <section class="panel panel-wide" id="sec-detail">
     <h2>DETAIL — <span id="detailName">—</span></h2>
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="overview">Overview</button>
@@ -818,17 +1064,6 @@
     <div id="tab-words"     class="tab-panel"></div>
   </section>
 
-  <div class="hero-foot">
-    <div class="hero-tag">
-      <span class="small">Daily Divination</span>
-      Read the<br>Stars &amp; Stems
-    </div>
-    <div class="hero-meta">
-      <div id="heroDate">—</div>
-      <div>七宝 / 24節気 / 64卦</div>
-      <div>+ Focus Mode</div>
-    </div>
-  </div>
 </main>
 
 <script>
@@ -1684,9 +1919,117 @@ function render() {
   drawCompatMatrix(date, all);
   drawDetail(date, all);
   const dt = parseDate(date);
-  const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getUTCDay()];
-  const hd = document.getElementById('heroDate');
-  if (hd) hd.textContent = `${date} · ${wd}`;
+  drawEditorialHero(date, all);
+}
+
+// ============================================================
+// EDITORIAL HERO + 5-CARD INFO STRIP
+// ============================================================
+const KUA_TRIGRAM = { 1:'坎', 2:'坤', 3:'震', 4:'巽', 6:'乾', 7:'兌', 8:'艮', 9:'離' };
+const WEEKDAYS_JA = ['日','月','火','水','木','金','土'];
+
+// ヘッドライン辞書: mood ごとに 3行の英文 + 日本語タグライン
+const HEADLINES = {
+  push: [
+    { en:['STEP FORWARD,','NO LOOKING BACK,','INTO MOTION'],   ja:'踏み出した足が、道になる。',  side:'TRUST THE MOMENTUM,\nOWN THE PACE' },
+    { en:['BREAK PATTERN,','BUILD MOMENTUM,','OWN THE DAY'],   ja:'今日は、攻めて、いい。',     side:'CHOOSE THE BOLD MOVE,\nLEAVE NO DOUBT' },
+    { en:['SHIP IT,','SAY IT,','MAKE IT REAL'],                ja:'迷う前に、出してしまえ。',    side:'ACT NOW,\nREFINE LATER' },
+    { en:['STAND TALL,','SPEAK CLEAR,','LEAD THE ROOM'],       ja:'声を出した人が、場をつくる。', side:'CARRY THE SIGNAL,\nDROP THE NOISE' },
+  ],
+  soft: [
+    { en:['OFF TRACK,','ON PURPOSE,','IN LIFE'],               ja:'逸れても、道はある。',       side:'FOLLOW INTUITION,\nREDEFINE YOUR ROAD' },
+    { en:['SLOW DOWN,','ZOOM IN,','BREATHE OUT'],              ja:'急がず、深く、見てみる。',    side:'PAY ATTENTION,\nLET IT UNFOLD' },
+    { en:['SOFT EDGES,','SHARP MIND,','OPEN DAY'],             ja:'やわらかく、よく視る一日。',  side:'KEEP IT GENTLE,\nKEEP IT TRUE' },
+    { en:['LISTEN FIRST,','ANSWER LATER,','TRUST THE GAP'],    ja:'答えは、間に宿る。',         side:'HOLD THE SILENCE,\nLET IT SPEAK' },
+  ],
+  rest: [
+    { en:['PAUSE,','REFLECT,','RECOVER'],                      ja:'止まることも、進むこと。',    side:'REST IS A STRATEGY,\nNOT A RETREAT' },
+    { en:['STAY STILL,','LOOK INWARD,','BEGIN AGAIN'],         ja:'今日は、自分を労う日。',     side:'BE KIND TO YOURSELF,\nTRY AGAIN TOMORROW' },
+    { en:['LESS DOING,','MORE BEING,','SOFTER STEPS'],         ja:'何もしない勇気を、許す。',    side:'GIVE YOURSELF SPACE,\nLET THE DAY PASS' },
+    { en:['SLEEP EARLY,','READ SLOWLY,','RELEASE EFFORT'],     ja:'力を抜く、それも仕事。',     side:'DROP THE WEIGHT,\nFIND YOUR FLOOR' },
+  ],
+};
+function moodFromScore(total) {
+  if (total >= 72) return 'push';
+  if (total <= 45) return 'rest';
+  return 'soft';
+}
+function generateHeadline(centerF) {
+  const mood = moodFromScore(centerF.total);
+  const pool = HEADLINES[mood];
+  const seed = hash(centerF.dateStr + '|' + centerF.person.id + '|hl');
+  const pick = pool[seed % pool.length];
+  return { mood, ...pick };
+}
+
+function daysSince(birthStr, dateStr) {
+  return Math.floor((parseDate(dateStr) - parseDate(birthStr)) / 86400000);
+}
+function firstNameJa(person) {
+  // 「吉田 駿成」→「駿成」/「しゅんすけ」を優先 (roleに含まれていれば)
+  const role = person.role || '';
+  const m = role.match(/しゅんすけ|[ぁ-ゖァ-ヺ一-龯々]{2,}(?=さん|くん)?/);
+  if (m && m[0] !== '本人' && m[0] !== '上司' && m[0] !== '同僚' && m[0] !== '部下' && m[0] !== '後輩' && m[0] !== '取引先') return m[0];
+  const parts = (person.name || '').split(/\s+/);
+  return parts[parts.length - 1] || person.name || '';
+}
+function greetingFor(dateStr, person) {
+  const h = new Date().getUTCHours() + 9; // JST approx
+  const head = (h < 11) ? 'おはようございます' : (h < 18) ? 'こんにちは' : 'こんばんは';
+  return `${head}、${firstNameJa(person)}さん。`;
+}
+
+function drawEditorialHero(dateStr, all) {
+  const center = PEOPLE.find(p => p.center) || PEOPLE[0];
+  if (!center) return;
+  const cf = all[center.id];
+  if (!cf) return;
+  const dt = parseDate(dateStr);
+  const wd = WEEKDAYS_JA[dt.getUTCDay()];
+
+  // date pill
+  const $dp = document.getElementById('edDatePill');
+  if ($dp) $dp.textContent = `${dt.getUTCFullYear()}年 ${dt.getUTCMonth()+1}月 ${dt.getUTCDate()}日（${wd}）`;
+  // LP
+  const $lp = document.getElementById('edLP');
+  if ($lp) $lp.textContent = `(LP ${cf.engines.lifePath})`;
+  // issue number — 中心人物の生年からの通算日 % 999 + 1
+  const issue = (daysSince(center.birth, dateStr) % 999) + 1;
+  const $iss = document.getElementById('edIssueNo');
+  if ($iss) $iss.textContent = `N°${String(issue).padStart(3,'0')}`;
+
+  // headline
+  const hl = generateHeadline(cf);
+  const $hl = document.getElementById('edHeadline');
+  if ($hl) $hl.innerHTML = hl.en.map(s => `<span class="hl-line">${s}</span>`).join('');
+  // tagline
+  const $jt = document.getElementById('edJaTag');
+  if ($jt) $jt.textContent = hl.ja;
+  const $greet = document.getElementById('edGreet');
+  if ($greet) $greet.textContent = greetingFor(dateStr, center);
+  const $en = document.getElementById('edEnSide');
+  if ($en) $en.innerHTML = hl.side.replace(/\n/g, '<br>');
+
+  // 5-card strip
+  const $strip = document.getElementById('edStrip');
+  if ($strip) {
+    const e = cf.engines;
+    const kuaName = KUA_TRIGRAM[e.kua.kua] || '—';
+    const cells = [
+      ['SUN', '太陽星座', e.sunSign, `${e.sunLon.toFixed(0)}°`, false],
+      ['STAR','本命星',   KYUSEI[e.honmei].name, `日盤 ${KYUSEI[e.dStar].name} ／ ${e.relation.name}`, true],
+      ['DAY', '日主',     e.dayP.stem, `${STEM_ELEMENTS[e.dayP.stemIdx]}${STEM_YINYANG[e.dayP.stemIdx]} ／ 今日 ${e.todayTongbian}`, false],
+      ['LP',  'ライフパス', e.lifePath, `Personal Day ${e.pday}`, false],
+      ['KUA', '本命卦',   kuaName, `卦${e.kua.kua} ／ ${e.kua.group}`, false],
+    ];
+    $strip.innerHTML = cells.map(([lbl, ja, v, sub, small]) =>
+      `<div class="ed-strip-cell">
+        <div class="label">${lbl} <span class="ja">／ ${ja}</span></div>
+        <div class="val${small ? ' small' : ''}">${v}</div>
+        <div class="sub">${sub}</div>
+      </div>`
+    ).join('');
+  }
 }
 
 function drawViewerChips() {
@@ -1899,6 +2242,16 @@ function drawCards(date, all) {
         ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
         ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `　<span style="margin-left:4px">${viewer.name}視点の相性 <b style="color:${scoreColor(f.compatScore)}">${f.compatScore}</b></span>`}
       </div>
+      ${(() => {
+        if (isViewer) return '';
+        const ol = cardOneLiner(p, f, viewer);
+        if (!ol) return '';
+        return `<div class="card-oneliner">
+          <span class="ol-arrow">${viewer.name} →</span>
+          <span class="ol-text">「${ol.text}」</span>
+          <span class="ol-tone">${ol.tone.note}</span>
+        </div>`;
+      })()}
     `;
     card.addEventListener('click', () => { selectedId = p.id; render(); });
     $cards.appendChild(card);
@@ -2978,26 +3331,79 @@ const AVOID_WORDS = [
   ['比較','{n}には{t}センス、ないよね'],
 ];
 
+// ============================================================
+// 言葉アルゴリズム (案B+C): 人物別 × 占術連動カテゴリ重み × 関係性トーン
+// ============================================================
+const TRAIT_POOLS = {
+  // 本命星元素ごとの形容詞 — その人「らしさ」を語る語彙
+  '水': ['静かな','深い','透明な','内省的な','遠くを見る','澄んだ'],
+  '木': ['しなやかな','伸びる','若々しい','まっすぐな','育てる','瑞々しい'],
+  '火': ['情熱的な','明るい','燃える','華やかな','閃く','率直な'],
+  '土': ['誠実な','安定した','穏やかな','根を張る','受け止める','地に足の付いた'],
+  '金': ['鋭い','磨かれた','凛とした','切れ味のある','洗練された','貫く'],
+};
+const KIND_POOLS = {
+  'gentle': ['やわらかな','まっすぐな','落ち着いた','信頼の','深い','静かな'],
+  'sharp':  ['率直な','本気の','研ぎ澄ました','迷いない','芯のある','責任ある'],
+  'warm':   ['あたたかい','寛いだ','親しい','じんわりとした','包む','迎える'],
+};
+// 五行 → トーンマッピング (viewer→target の関係)
+function toneFromRelation(rel) {
+  // rel.name: '相生(発展)','比和(調和)','洩気(消耗)','相剋(摩擦)','受剋(被害)'
+  if (rel.name.startsWith('相生')) return { tone:'育', kind:'warm',   note:'育てる声で' };
+  if (rel.name.startsWith('比和')) return { tone:'共', kind:'gentle', note:'対等な声で' };
+  if (rel.name.startsWith('洩気')) return { tone:'労', kind:'warm',   note:'労わる声で' };
+  if (rel.name.startsWith('相剋')) return { tone:'断', kind:'sharp',  note:'端的に' };
+  if (rel.name.startsWith('受剋')) return { tone:'敬', kind:'gentle', note:'敬意をもって' };
+  return { tone:'平', kind:'gentle', note:'自然に' };
+}
+
+function getPersonCtx(person, f) {
+  // 名前バリエーション (吉田はニックネーム含む、他は名字+さん)
+  const nameParts = (person.name || '').split(/\s+/);
+  const last = nameParts[0] || person.name || '';
+  const first = nameParts[nameParts.length - 1] || last;
+  let names;
+  if (person.id === 'yoshida') {
+    names = ['駿成','しゅんすけ','吉田くん','吉田','あなた','君'];
+  } else {
+    names = [last, last + 'さん', first, 'あなた'].filter((v, i, a) => v && a.indexOf(v) === i);
+  }
+  const el = KYUSEI[f.engines.honmei].el;
+  const traits = TRAIT_POOLS[el] || TRAIT_POOLS['土'];
+  return {
+    names, traits,
+    kinds: KIND_POOLS['gentle'],
+    color: f.todayColor, item: f.todayItem,
+    sunSign: f.engines.sunSign,
+    honmeiName: KYUSEI[f.engines.honmei].name,
+    tongbian: f.engines.todayTongbian,
+  };
+}
+
 function fillSlots(template, seed, ctx) {
+  const names  = ctx.names  || ['あなた'];
+  const traits = ctx.traits || TRAIT_POOLS['土'];
+  const kinds  = ctx.kinds  || KIND_POOLS['gentle'];
   return template
-    .replace(/\{n\}/g,  NAME_VARS[seed % NAME_VARS.length])
-    .replace(/\{t\}/g,  TRAIT_VARS[(seed * 7) % TRAIT_VARS.length])
-    .replace(/\{k\}/g,  KIND_VARS[(seed * 3) % KIND_VARS.length])
+    .replace(/\{n\}/g,  names[seed % names.length])
+    .replace(/\{t\}/g,  traits[(seed * 7) % traits.length])
+    .replace(/\{k\}/g,  kinds[(seed * 3) % kinds.length])
     .replace(/\{c\}/g,  ctx.color || '黄')
     .replace(/\{i\}/g,  ctx.item  || 'コーヒー')
-    .replace(/\{s\}/g,  '七赤金星')
-    .replace(/\{z\}/g,  '牡牛座')
+    .replace(/\{s\}/g,  ctx.honmeiName || '七赤金星')
+    .replace(/\{z\}/g,  ctx.sunSign || '牡牛座')
     .replace(/\{tb\}/g, ctx.tongbian || '');
 }
 
-function instanceCountWords(arr) {
-  // 概算インスタンス数: スロット数 × (各スロット可能性)
+function instanceCountWords(arr, ctx) {
+  ctx = ctx || { names: ['あなた'], traits: TRAIT_POOLS['土'], kinds: KIND_POOLS['gentle'] };
   let total = 0;
   for (const [_, t] of arr) {
     let v = 1;
-    if (t.includes('{n}')) v *= NAME_VARS.length;
-    if (t.includes('{t}')) v *= TRAIT_VARS.length;
-    if (t.includes('{k}')) v *= KIND_VARS.length;
+    if (t.includes('{n}')) v *= ctx.names.length;
+    if (t.includes('{t}')) v *= ctx.traits.length;
+    if (t.includes('{k}')) v *= ctx.kinds.length;
     if (t.includes('{c}')) v *= DAY_COLORS.length;
     if (t.includes('{i}')) v *= DAY_ITEMS.length;
     total += v;
@@ -3005,50 +3411,142 @@ function instanceCountWords(arr) {
   return total;
 }
 
-function pickWords(arr, dateStr, n, ctx) {
-  const dt = parseDate(dateStr);
-  const k = dt.getUTCFullYear()*10000 + (dt.getUTCMonth()+1)*100 + dt.getUTCDate();
-  const seed = (k ^ Math.imul(hash('yoshida-words'), 2654435761)) >>> 0;
-  const rnd = lcgSeed(seed);
-  // shuffle indices
-  const idx = Array.from({length: arr.length}, (_,i) => i);
-  for (let i = idx.length-1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i+1));
-    [idx[i], idx[j]] = [idx[j], idx[i]];
+// 案B: 占術プロファイル → カテゴリ重み
+function categoryWeights(person, f, viewer) {
+  const W = {
+    // WANT カテゴリ baseline = 1
+    want: { '存在':1,'直感':1,'労い':1,'理解':1,'創造':1,'過程':1,'実力':1,'未来':1,'役割':1,'関係':1 },
+    // AVOID カテゴリ baseline = 1
+    avoid:{ '軽視':1,'普通':1,'結論':1,'協調':1,'存在否定':1,'努力否定':1,'容姿':1,'性役割':1,'個性否定':1,'協調否定':1,'過去':1,'比較':1 },
+  };
+  const el = KYUSEI[f.engines.honmei].el;
+  const mbti = f.mbti || 'INFJ';
+  const blood = person.blood || 'O';
+  const tb = f.engines.todayTongbian;
+
+  // ---- 本命星の五行 ----
+  if (el === '水') { W.want['理解']*=2.0; W.want['労い']*=1.8; W.want['直感']*=1.6; W.avoid['結論']*=1.8; W.avoid['軽視']*=1.6; }
+  if (el === '木') { W.want['未来']*=1.8; W.want['過程']*=1.6; W.want['創造']*=1.4; W.avoid['過去']*=1.8; W.avoid['普通']*=1.6; }
+  if (el === '火') { W.want['創造']*=2.0; W.want['存在']*=1.6; W.want['実力']*=1.4; W.avoid['個性否定']*=1.8; W.avoid['容姿']*=1.6; }
+  if (el === '土') { W.want['役割']*=1.8; W.want['関係']*=1.6; W.want['過程']*=1.4; W.avoid['協調否定']*=1.6; W.avoid['性役割']*=1.4; }
+  if (el === '金') { W.want['実力']*=2.0; W.want['創造']*=1.6; W.want['直感']*=1.4; W.avoid['軽視']*=1.8; W.avoid['比較']*=1.6; }
+
+  // ---- 通変 (今日) ----
+  if (tb === '正官' || tb === '印綬') { W.want['役割']*=1.4; W.want['実力']*=1.3; }
+  if (tb === '食神')                  { W.want['創造']*=1.6; W.want['過程']*=1.3; }
+  if (tb === '比肩' || tb === '劫財') { W.want['存在']*=1.4; W.avoid['比較']*=1.5; }
+  if (tb === '傷官')                  { W.want['理解']*=1.6; W.avoid['軽視']*=1.5; W.avoid['結論']*=1.4; }
+  if (tb === '偏官')                  { W.want['実力']*=1.4; W.want['未来']*=1.3; }
+
+  // ---- MBTI ----
+  if (mbti.startsWith('IN')) { W.want['理解']*=1.5; W.want['直感']*=1.4; W.avoid['普通']*=1.4; }   // INTJ/INTP/INFJ/INFP
+  if (mbti.startsWith('EN')) { W.want['未来']*=1.3; W.want['創造']*=1.2; }
+  if (mbti.endsWith('FJ') || mbti.endsWith('FP')) { W.want['関係']*=1.3; W.avoid['個性否定']*=1.4; }
+  if (mbti.endsWith('TJ') || mbti.endsWith('TP')) { W.want['実力']*=1.3; W.avoid['結論']*=0.7; }
+  if (mbti.includes('SP')) { W.want['過程']*=1.3; W.want['存在']*=1.2; }
+
+  // ---- 血液型 ----
+  if (blood === 'A')  { W.want['理解']*=1.3; W.avoid['結論']*=1.3; }
+  if (blood === 'B')  { W.want['存在']*=1.4; W.want['労い']*=1.3; W.avoid['協調否定']*=1.5; W.avoid['普通']*=1.4; }
+  if (blood === 'O')  { W.want['実力']*=1.3; W.want['役割']*=1.2; }
+  if (blood === 'AB') { W.want['直感']*=1.3; W.avoid['軽視']*=1.3; }
+
+  // ---- 今日の総合運 ムード ----
+  if (f.total >= 75) { // 攻め
+    W.want['未来']*=2.5; W.want['実力']*=2.0; W.want['創造']*=1.5;
+    W.want['労い']*=0.4; W.want['理解']*=0.7;
+  } else if (f.total <= 45) { // 労い
+    W.want['労い']*=3.0; W.want['存在']*=2.0; W.want['理解']*=1.8;
+    W.want['実力']*=0.3; W.want['未来']*=0.4;
+  } else { // やわらか
+    W.want['過程']*=1.6; W.want['理解']*=1.5;
   }
-  return idx.slice(0, n).map((i, k) => {
-    const [cat, tmpl] = arr[i];
-    const text = fillSlots(tmpl, i + Math.floor(rnd() * 100), ctx);
-    return { cat, text };
-  });
+
+  // ---- 案C: viewer→person の五行関係でトーン色付け ----
+  if (viewer && viewer.id !== person.id) {
+    const vHon = honmeiStar(viewer.birth);
+    const rel = starRelation(vHon, f.engines.honmei);
+    const tone = toneFromRelation(rel);
+    if (tone.tone === '育') { W.want['未来']*=1.4; W.want['過程']*=1.3; }
+    if (tone.tone === '共') { W.want['関係']*=1.4; W.want['理解']*=1.2; }
+    if (tone.tone === '労') { W.want['労い']*=1.6; W.want['存在']*=1.2; }
+    if (tone.tone === '断') { W.want['実力']*=1.4; W.want['未来']*=1.2; }
+    if (tone.tone === '敬') { W.want['役割']*=1.3; W.want['理解']*=1.2; }
+  }
+
+  return W;
+}
+
+function pickWordsWeighted(arr, person, f, viewer, n, ctx, salt) {
+  const weights = categoryWeights(person, f, viewer);
+  const isWant = arr === WANT_WORDS;
+  const wmap = isWant ? weights.want : weights.avoid;
+  const seed = hash(person.id + '|' + f.dateStr + '|' + (salt || (isWant?'w':'a')));
+  const rnd = lcgSeed(seed);
+
+  const pool = arr.map(([cat, tmpl], i) => ({ i, cat, tmpl, w: wmap[cat] || 1 }));
+  const picks = [];
+  for (let k = 0; k < n && pool.length; k++) {
+    const total = pool.reduce((s, x) => s + x.w, 0);
+    if (total <= 0) break;
+    let r = rnd() * total;
+    let idx = 0;
+    for (; idx < pool.length - 1; idx++) { r -= pool[idx].w; if (r <= 0) break; }
+    const c = pool.splice(idx, 1)[0];
+    picks.push({ cat: c.cat, text: fillSlots(c.tmpl, c.i + Math.floor(rnd()*100), ctx), weight: c.w });
+  }
+  return picks;
+}
+
+// 各人カードの「今日 viewer がかける一言」
+function cardOneLiner(person, f, viewer) {
+  if (!viewer || viewer.id === person.id) return null;
+  const ctx = getPersonCtx(person, f);
+  // viewer→person の関係を ctx に反映
+  const vHon = honmeiStar(viewer.birth);
+  const rel = starRelation(vHon, f.engines.honmei);
+  const tone = toneFromRelation(rel);
+  ctx.kinds = KIND_POOLS[tone.kind] || ctx.kinds;
+  const top = pickWordsWeighted(WANT_WORDS, person, f, viewer, 1, ctx, 'oneliner');
+  if (!top.length) return null;
+  return { ...top[0], tone };
 }
 
 function renderWords(p, f) {
-  // 吉田中心のことば帳。誰のタブから開いても表示は吉田向け。
-  const yoshida = PEOPLE.find(x => x.id === 'yoshida') || PEOPLE.find(x => x.center) || PEOPLE[0];
-  const yF = runEngines(yoshida, f.dateStr, getViewer());
-  const ctx = {
-    color: yF.todayColor, item: yF.todayItem,
-    tongbian: yF.engines.todayTongbian,
-  };
-  // 大吉なら「背中を押す」テーマ優先、要注意なら「労う」優先
-  const moodHint = yF.total >= 75 ? '攻めの言葉が効く日' : yF.total >= 50 ? 'やわらかな言葉が効く日' : '労いの言葉が効く日';
+  // 選択中の人物向けの言葉帳。viewer (中心人物) との五行関係で語気が変わる。
+  const viewer = getViewer();
+  const ctx = getPersonCtx(p, f);
 
-  const wantPick  = pickWords(WANT_WORDS,  f.dateStr, 8, ctx);
-  const avoidPick = pickWords(AVOID_WORDS, f.dateStr, 8, { ...ctx, n_override: true });
+  // viewer→p の関係でトーン (案C)
+  let toneNote = '自分の言葉として';
+  if (viewer.id !== p.id) {
+    const vHon = honmeiStar(viewer.birth);
+    const rel = starRelation(vHon, f.engines.honmei);
+    const tone = toneFromRelation(rel);
+    ctx.kinds = KIND_POOLS[tone.kind] || ctx.kinds;
+    toneNote = `${viewer.name} → ${p.name} / ${rel.name} ／ ${tone.note}`;
+  }
+  const moodHint = f.total >= 72 ? '攻めの言葉が効く日' : f.total >= 50 ? 'やわらかな言葉が効く日' : '労いの言葉が効く日';
 
-  const wantTotal  = instanceCountWords(WANT_WORDS);
-  const avoidTotal = instanceCountWords(AVOID_WORDS);
+  const wantPick  = pickWordsWeighted(WANT_WORDS,  p, f, viewer, 8, ctx);
+  const avoidPick = pickWordsWeighted(AVOID_WORDS, p, f, viewer, 8, ctx);
+
+  const wantTotal  = instanceCountWords(WANT_WORDS, ctx);
+  const avoidTotal = instanceCountWords(AVOID_WORDS, ctx);
 
   // カテゴリ別ブラウズ用
   const wantCats  = [...new Set(WANT_WORDS.map(x => x[0]))];
   const avoidCats = [...new Set(AVOID_WORDS.map(x => x[0]))];
+  const weights = categoryWeights(p, f, viewer);
+  const topWantCats = Object.entries(weights.want).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} ×${v.toFixed(1)}`).join(' / ');
 
   return `
     <div class="words-hero">
-      <div class="wh-label">For Yoshida — Today</div>
-      <div class="wh-title">${f.dateStr} ・ ${yF.engines.curTerm.name} ・ ${moodHint}</div>
-      <div class="wh-sub">今日の吉田 (${KYUSEI[yF.engines.honmei].name} / ${yF.engines.dayP.ganzhi} / B型 / INFJ) に効く言葉</div>
+      <div class="wh-label">For ${p.name} — Today</div>
+      <div class="wh-title">${f.dateStr} ・ ${f.engines.curTerm.name} ・ ${moodHint}</div>
+      <div class="wh-sub">${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 / ${f.mbti} / 今日「${f.engines.todayTongbian}」</div>
+      <div class="wh-sub" style="margin-top:4px">語気: ${toneNote}</div>
+      <div class="wh-sub" style="margin-top:4px;color:var(--fg)">重み上位カテゴリ: ${topWantCats}</div>
     </div>
 
     <div class="words-cols">
@@ -3090,11 +3588,12 @@ function renderWords(p, f) {
     </div>
 
     <div class="words-browse">
-      <div class="wb-head">カテゴリ別 — かけて欲しい</div>
-      ${wantCats.map(cat => {
+      <div class="wb-head">カテゴリ別 — かけて欲しい (重みの高い順)</div>
+      ${[...wantCats].sort((a,b) => (weights.want[b]||1) - (weights.want[a]||1)).map(cat => {
         const items = WANT_WORDS.filter(x => x[0] === cat);
+        const w = (weights.want[cat]||1).toFixed(1);
         return `<div style="margin-bottom:12px">
-          <span class="cat-chip active" style="margin-right:8px">${cat}</span>
+          <span class="cat-chip active" style="margin-right:8px">${cat} ×${w}</span>
           <span style="font-size:11px;color:var(--muted)">${items.length}件</span>
           <div style="margin-top:6px;font-size:12px;line-height:2;font-family:var(--serif)">
             ${items.map(([_, t], i) => `「${fillSlots(t, i*13 + hash(cat), ctx)}」`).join('　/　')}
@@ -3102,11 +3601,12 @@ function renderWords(p, f) {
         </div>`;
       }).join('')}
 
-      <div class="wb-head">カテゴリ別 — かけられたくない</div>
-      ${avoidCats.map(cat => {
+      <div class="wb-head">カテゴリ別 — かけられたくない (重みの高い順)</div>
+      ${[...avoidCats].sort((a,b) => (weights.avoid[b]||1) - (weights.avoid[a]||1)).map(cat => {
         const items = AVOID_WORDS.filter(x => x[0] === cat);
+        const w = (weights.avoid[cat]||1).toFixed(1);
         return `<div style="margin-bottom:12px">
-          <span class="cat-chip active" style="margin-right:8px;background:var(--bad);color:var(--bg2);border-color:var(--bad)">${cat}</span>
+          <span class="cat-chip active" style="margin-right:8px;background:var(--bad);color:var(--bg2);border-color:var(--bad)">${cat} ×${w}</span>
           <span style="font-size:11px;color:var(--muted)">${items.length}件</span>
           <div style="margin-top:6px;font-size:12px;line-height:2;font-family:var(--serif);color:#5a5a55">
             ${items.map(([_, t], i) => `「${fillSlots(t, i*13 + hash(cat), ctx)}」`).join('　/　')}
@@ -3149,6 +3649,24 @@ function renderWords(p, f) {
 $date.value = todayStr();
 $date.addEventListener('change', render);
 document.getElementById('todayBtn').addEventListener('click', () => { $date.value = todayStr(); render(); });
+
+// 占術タブ (URANAI nav) → 該当する内部タブを開いて DETAIL までスクロール
+const NAV_TO_INNER = {
+  '星占': 'astro', '塔羅': 'iching', '数秘': 'num', '易経': 'iching',
+  '四柱': 'shichu', '風水': 'fengshui', 'MBTI': 'mbti',
+};
+document.getElementById('edTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.ed-tab'); if (!btn) return;
+  const inner = NAV_TO_INNER[btn.textContent.trim()];
+  if (inner) {
+    activeTab = inner;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === inner));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + inner));
+    render();
+  }
+  document.getElementById('sec-detail')?.scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
 if (!PEOPLE.find(p => p.id === selectedId)) selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
 render();
 </script>
