@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>吉田占いダッシュボード</title>
+<style>
+  :root {
+    --bg: #0f1228;
+    --bg2: #1a1f3a;
+    --fg: #e8ecf8;
+    --muted: #8b94b8;
+    --accent: #ffd166;
+    --good: #4ade80;
+    --mid: #fbbf24;
+    --bad: #f87171;
+    --line: #2a2f4f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background: radial-gradient(ellipse at top, #1b2050 0%, var(--bg) 70%);
+    color: var(--fg);
+    min-height: 100vh;
+  }
+  header {
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+  }
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+  }
+  h1 .ja-sub { font-size: 12px; color: var(--muted); margin-left: 8px; }
+  .date-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .date-bar input[type=date] {
+    background: var(--bg2);
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: inherit;
+    color-scheme: dark;
+  }
+  .date-bar button {
+    background: var(--accent);
+    color: #1a1830;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  main {
+    display: grid;
+    grid-template-columns: minmax(520px, 1fr) 420px;
+    gap: 24px;
+    padding: 24px 32px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1000px) {
+    main { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .panel h2 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .radial-wrap {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    position: relative;
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,209,102,0.15); }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .card-name { font-weight: 600; font-size: 15px; }
+  .card-role { font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .card-score {
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .bars { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .bar {
+    display: grid;
+    grid-template-columns: 56px 1fr 32px;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .bar-val { text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .detail {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg2);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+  .detail h3 { margin: 0 0 8px; font-size: 16px; }
+  .detail .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+  .detail .row span:first-child { color: var(--muted); }
+  .lucky { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    background: rgba(255,209,102,0.12);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+  }
+  .advice {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  /* Node label */
+  .node-label {
+    font-size: 12px;
+    fill: var(--fg);
+    text-anchor: middle;
+    pointer-events: none;
+    font-weight: 600;
+  }
+  .node-sub {
+    font-size: 9px;
+    fill: var(--muted);
+    text-anchor: middle;
+    pointer-events: none;
+  }
+  .node-score {
+    font-size: 14px;
+    font-weight: 700;
+    text-anchor: middle;
+    pointer-events: none;
+    fill: #fff;
+  }
+  .link {
+    fill: none;
+    stroke-width: 2;
+    opacity: 0.55;
+  }
+  .node-circle {
+    cursor: pointer;
+    transition: r 0.2s;
+  }
+  .node-circle.selected { stroke: var(--accent); stroke-width: 3; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🔮 吉田の占いダッシュボード <span class="ja-sub">— 仕事仲間との今日の運勢</span></h1>
+  <div class="date-bar">
+    <input type="date" id="dateInput">
+    <button id="todayBtn">今日</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>RELATIONSHIP MAP</h2>
+    <div class="radial-wrap">
+      <svg id="radial" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--good)"></span>大吉 (80+)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--mid)"></span>中吉 (50-79)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--bad)"></span>要注意 (-49)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#4ade80;opacity:0.7"></span>線の太さ・色 = 吉田との相性</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>TEAM FORECAST</h2>
+    <div class="cards" id="cards"></div>
+    <div class="detail" id="detail"></div>
+  </section>
+</main>
+
+<script>
+// ============================================================
+// People data (sample)
+// ============================================================
+const PEOPLE = [
+  { id: 'yoshida', name: '吉田',   role: '本人',         birth: '1985-07-14', center: true },
+  { id: 'sato',    name: '佐藤',   role: '上司 / 部長',   birth: '1972-03-22' },
+  { id: 'tanaka',  name: '田中',   role: '同僚 / 開発',   birth: '1990-11-08' },
+  { id: 'suzuki',  name: '鈴木',   role: '同僚 / 営業',   birth: '1988-05-30' },
+  { id: 'yamada',  name: '山田',   role: '後輩 / デザイナー', birth: '1995-09-17' },
+  { id: 'ito',     name: '伊藤',   role: '取引先 / PM',   birth: '1980-12-03' },
+];
+
+// ============================================================
+// Fortune calculation (九星気学 + 干支 + 西洋星座)
+// ============================================================
+const KYUSEI = [
+  null,
+  { name: '一白水星', el: 'water', color: '#3b82f6' },
+  { name: '二黒土星', el: 'earth', color: '#a16207' },
+  { name: '三碧木星', el: 'wood',  color: '#65a30d' },
+  { name: '四緑木星', el: 'wood',  color: '#84cc16' },
+  { name: '五黄土星', el: 'earth', color: '#ca8a04' },
+  { name: '六白金星', el: 'metal', color: '#cbd5e1' },
+  { name: '七赤金星', el: 'metal', color: '#f59e0b' },
+  { name: '八白土星', el: 'earth', color: '#92400e' },
+  { name: '九紫火星', el: 'fire',  color: '#ef4444' },
+];
+
+const ETO = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ETO_NAME = ['ね','うし','とら','う','たつ','み','うま','ひつじ','さる','とり','いぬ','い'];
+
+const ZODIAC = [
+  { name: '山羊座', from: [12,22], to: [ 1,19] },
+  { name: '水瓶座', from: [ 1,20], to: [ 2,18] },
+  { name: '魚座',   from: [ 2,19], to: [ 3,20] },
+  { name: '牡羊座', from: [ 3,21], to: [ 4,19] },
+  { name: '牡牛座', from: [ 4,20], to: [ 5,20] },
+  { name: '双子座', from: [ 5,21], to: [ 6,21] },
+  { name: '蟹座',   from: [ 6,22], to: [ 7,22] },
+  { name: '獅子座', from: [ 7,23], to: [ 8,22] },
+  { name: '乙女座', from: [ 8,23], to: [ 9,22] },
+  { name: '天秤座', from: [ 9,23], to: [10,23] },
+  { name: '蠍座',   from: [10,24], to: [11,22] },
+  { name: '射手座', from: [11,23], to: [12,21] },
+];
+
+function digitSum(n) { let s = 0; while (n > 0) { s += n % 10; n = (n - n % 10) / 10; } return s; }
+
+// 本命星 (節分2/4基準で年を補正)
+function honmeisei(birth) {
+  const d = new Date(birth);
+  let y = d.getFullYear();
+  const setsubun = new Date(y, 1, 4); // Feb 4
+  if (d < setsubun) y -= 1;
+  let s = digitSum(y);
+  while (s > 9) s = digitSum(s);
+  let star = 11 - s;
+  if (star > 9) star -= 9;
+  if (star <= 0) star += 9;
+  return star;
+}
+
+// 干支
+function eto(birth) {
+  const d = new Date(birth);
+  let y = d.getFullYear();
+  const setsubun = new Date(y, 1, 4);
+  if (d < setsubun) y -= 1;
+  return (y - 4) % 12;
+}
+
+function zodiac(birth) {
+  const d = new Date(birth);
+  const m = d.getMonth() + 1, day = d.getDate();
+  for (const z of ZODIAC) {
+    const [fm, fd] = z.from, [tm, td] = z.to;
+    if (fm > tm) { // wraps year
+      if ((m === fm && day >= fd) || (m === tm && day <= td)) return z.name;
+    } else {
+      if ((m === fm && day >= fd) || (m === tm && day <= td) || (m > fm && m < tm)) return z.name;
+    }
+  }
+  return ZODIAC[0].name;
+}
+
+// 日盤本命星 (簡易: ユリウス日 + 周期)
+function dayStar(date) {
+  const d = new Date(date);
+  const jd = Math.floor(d.getTime() / 86400000);
+  return ((jd % 9) + 9) % 9 + 1;
+}
+
+// 五行相性: 相生=+1, 比和=0, 相剋=-1
+const ELEMENTS = ['wood','fire','earth','metal','water'];
+function gogyo(a, b) {
+  const ia = ELEMENTS.indexOf(a), ib = ELEMENTS.indexOf(b);
+  if (ia === ib) return 0; // 比和
+  if ((ia + 1) % 5 === ib || (ib + 1) % 5 === ia) return 1; // 相生
+  return -1; // 相剋
+}
+
+// シード付き擬似乱数 (誕生日 + 日付 → 安定した0-1)
+function hash(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h * 16777619) >>> 0;
+  }
+  return h;
+}
+function rand(seed, idx) {
+  return (hash(seed + ':' + idx) % 10000) / 10000;
+}
+
+const ADVICES_GOOD = [
+  '新しい提案が通りやすい日。会議で発言を。',
+  '人脈拡大のチャンス。ランチに誘ってみよう。',
+  '集中力が高い。難しいタスクから着手すべし。',
+  '直感が冴える。意思決定はスピード重視で。',
+  '感謝を伝えると倍になって返ってくる日。',
+];
+const ADVICES_MID = [
+  '無理せず淡々と。ルーチン業務日和。',
+  '報連相を丁寧に。誤解が生まれやすい。',
+  '昼休みにしっかり休息を取ろう。',
+  '一歩引いて全体を俯瞰すると見えてくる。',
+];
+const ADVICES_BAD = [
+  '重要な意思決定は明日に回そう。',
+  '言葉選びは慎重に。短気は損気。',
+  '体調管理を最優先に。早めの帰宅を。',
+  '小さなミスに注意。ダブルチェック必須。',
+];
+
+const LUCKY_COLORS = ['赤','青','緑','黄','紫','白','黒','金','銀','桃'];
+const LUCKY_ITEMS = ['コーヒー','観葉植物','万年筆','ノート','ハンカチ','アロマ','チョコ','水晶','音楽','花'];
+
+// 個人 × 日 のフォーチュン
+function forecast(person, date) {
+  const star = honmeisei(person.birth);
+  const dStar = dayStar(date);
+  const compat = gogyo(KYUSEI[star].el, KYUSEI[dStar].el); // -1, 0, 1
+
+  const seed = person.id + '|' + date;
+  const baseNoise = rand(seed, 0) * 40; // 0-40
+  const compatBonus = (compat + 1) * 15; // 0,15,30
+  const dayMod = (Math.sin((new Date(date).getTime() / 86400000) * 0.7 + hash(person.id) % 100) + 1) * 7;
+
+  const total = Math.min(99, Math.max(15, Math.round(30 + baseNoise + compatBonus + dayMod)));
+
+  const work    = Math.min(99, Math.max(10, Math.round(total + (rand(seed,1) - 0.5) * 30)));
+  const social  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,2) - 0.5) * 30)));
+  const health  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,3) - 0.5) * 30)));
+  const money   = Math.min(99, Math.max(10, Math.round(total + (rand(seed,4) - 0.5) * 30)));
+
+  // 吉田との相性 (吉田の本命星と本人の本命星)
+  const yoshida = PEOPLE.find(p => p.id === 'yoshida');
+  const yStar = honmeisei(yoshida.birth);
+  const yCompat = gogyo(KYUSEI[star].el, KYUSEI[yStar].el);
+  // さらに当日の揺らぎ
+  const compatScore = Math.round(50 + yCompat * 25 + (rand(seed, 'y') - 0.5) * 20);
+
+  const adv = total >= 75 ? ADVICES_GOOD : total >= 50 ? ADVICES_MID : ADVICES_BAD;
+  const advice = adv[hash(seed) % adv.length];
+  const luckyColor = LUCKY_COLORS[hash(seed + 'c') % LUCKY_COLORS.length];
+  const luckyItem  = LUCKY_ITEMS[hash(seed + 'i') % LUCKY_ITEMS.length];
+  const luckyNum   = (hash(seed + 'n') % 9) + 1;
+
+  return {
+    total, work, social, health, money,
+    star, dStar, compat, compatScore: Math.max(10, Math.min(99, compatScore)),
+    advice, luckyColor, luckyItem, luckyNum,
+    eto: eto(person.birth), zodiac: zodiac(person.birth),
+  };
+}
+
+function scoreColor(s) {
+  if (s >= 80) return '#4ade80';
+  if (s >= 65) return '#a3e635';
+  if (s >= 50) return '#fbbf24';
+  if (s >= 35) return '#fb923c';
+  return '#f87171';
+}
+
+// ============================================================
+// Rendering
+// ============================================================
+const $date = document.getElementById('dateInput');
+const $svg  = document.getElementById('radial');
+const $cards = document.getElementById('cards');
+const $detail = document.getElementById('detail');
+let selectedId = 'yoshida';
+
+function fmtDate(d) {
+  const dt = new Date(d);
+  return dt.toISOString().slice(0, 10);
+}
+function todayStr() { return fmtDate(new Date()); }
+
+function render() {
+  const date = $date.value || todayStr();
+  const forecasts = {};
+  PEOPLE.forEach(p => forecasts[p.id] = forecast(p, date));
+  drawRadial(date, forecasts);
+  drawCards(date, forecasts);
+  drawDetail(date, forecasts);
+}
+
+function drawRadial(date, fs) {
+  const W = 600, H = 600, CX = 300, CY = 300, R = 200;
+  $svg.innerHTML = '';
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const center = PEOPLE.find(p => p.center);
+  const others = PEOPLE.filter(p => !p.center);
+
+  // outer rings (decorative)
+  for (let i = 0; i < 3; i++) {
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('cx', CX); ring.setAttribute('cy', CY);
+    ring.setAttribute('r', 80 + i * 60);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', 'rgba(255,255,255,0.04)');
+    ring.setAttribute('stroke-dasharray', '4 6');
+    $svg.appendChild(ring);
+  }
+
+  // links
+  others.forEach((p, i) => {
+    const angle = (-Math.PI / 2) + (i / others.length) * Math.PI * 2;
+    const x = CX + Math.cos(angle) * R;
+    const y = CY + Math.sin(angle) * R;
+    const c = fs[p.id].compatScore;
+    const link = document.createElementNS(NS, 'line');
+    link.setAttribute('x1', CX); link.setAttribute('y1', CY);
+    link.setAttribute('x2', x);  link.setAttribute('y2', y);
+    link.setAttribute('class', 'link');
+    link.setAttribute('stroke', scoreColor(c));
+    link.setAttribute('stroke-width', 1 + (c / 100) * 4);
+    link.setAttribute('opacity', 0.3 + (c / 100) * 0.5);
+    $svg.appendChild(link);
+
+    // compat score label on link
+    const mx = (CX + x) / 2, my = (CY + y) / 2;
+    const lbl = document.createElementNS(NS, 'text');
+    lbl.setAttribute('x', mx); lbl.setAttribute('y', my);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('fill', scoreColor(c));
+    lbl.setAttribute('font-weight', '700');
+    lbl.textContent = '相性 ' + c;
+    $svg.appendChild(lbl);
+  });
+
+  // central node
+  drawNode(CX, CY, center, fs[center.id], 50, true);
+
+  // outer nodes
+  others.forEach((p, i) => {
+    const angle = (-Math.PI / 2) + (i / others.length) * Math.PI * 2;
+    const x = CX + Math.cos(angle) * R;
+    const y = CY + Math.sin(angle) * R;
+    drawNode(x, y, p, fs[p.id], 36, false);
+  });
+}
+
+function drawNode(cx, cy, person, f, r, isCenter) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(NS, 'g');
+
+  // outer glow ring (score)
+  const ring = document.createElementNS(NS, 'circle');
+  ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
+  ring.setAttribute('r', r + 6);
+  ring.setAttribute('fill', 'none');
+  ring.setAttribute('stroke', scoreColor(f.total));
+  ring.setAttribute('stroke-width', 3);
+  ring.setAttribute('opacity', 0.7);
+  g.appendChild(ring);
+
+  // main circle
+  const c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', cx); c.setAttribute('cy', cy);
+  c.setAttribute('r', r);
+  c.setAttribute('fill', KYUSEI[f.star].color);
+  c.setAttribute('fill-opacity', 0.25);
+  c.setAttribute('stroke', KYUSEI[f.star].color);
+  c.setAttribute('stroke-width', 2);
+  c.setAttribute('class', 'node-circle' + (selectedId === person.id ? ' selected' : ''));
+  c.addEventListener('click', () => { selectedId = person.id; render(); });
+  g.appendChild(c);
+
+  // score number
+  const score = document.createElementNS(NS, 'text');
+  score.setAttribute('x', cx); score.setAttribute('y', cy + 5);
+  score.setAttribute('class', 'node-score');
+  score.style.fontSize = (isCenter ? 22 : 16) + 'px';
+  score.textContent = f.total;
+  g.appendChild(score);
+
+  // name below
+  const name = document.createElementNS(NS, 'text');
+  name.setAttribute('x', cx); name.setAttribute('y', cy + r + 22);
+  name.setAttribute('class', 'node-label');
+  name.textContent = person.name + (isCenter ? '（本人）' : '');
+  g.appendChild(name);
+
+  // star info
+  const sub = document.createElementNS(NS, 'text');
+  sub.setAttribute('x', cx); sub.setAttribute('y', cy + r + 36);
+  sub.setAttribute('class', 'node-sub');
+  sub.textContent = KYUSEI[f.star].name + ' / ' + ETO[f.eto];
+  g.appendChild(sub);
+
+  $svg.appendChild(g);
+}
+
+function drawCards(date, fs) {
+  $cards.innerHTML = '';
+  PEOPLE.forEach(p => {
+    const f = fs[p.id];
+    const card = document.createElement('div');
+    card.className = 'card' + (selectedId === p.id ? ' selected' : '');
+    card.innerHTML = `
+      <div class="card-head">
+        <div>
+          <span class="card-name">${p.name}</span>
+          <span class="card-role">${p.role}</span>
+        </div>
+        <div class="card-score" style="color:${scoreColor(f.total)}">${f.total}</div>
+      </div>
+      <div class="bars">
+        ${bar('仕事', f.work)}
+        ${bar('対人', f.social)}
+        ${bar('健康', f.health)}
+        ${bar('金運', f.money)}
+      </div>
+    `;
+    card.addEventListener('click', () => { selectedId = p.id; render(); });
+    $cards.appendChild(card);
+  });
+}
+
+function bar(label, v) {
+  return `<div class="bar">
+    <span>${label}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+    <span class="bar-val">${v}</span>
+  </div>`;
+}
+
+function drawDetail(date, fs) {
+  const p = PEOPLE.find(x => x.id === selectedId);
+  const f = fs[selectedId];
+  const yf = fs['yoshida'];
+  const compatLabel = f.compat > 0 ? '相生（吉）' : f.compat === 0 ? '比和（穏）' : '相剋（注意）';
+
+  $detail.innerHTML = `
+    <h3>${p.name} <span style="font-size:12px;color:var(--muted);font-weight:normal">— ${p.role}</span></h3>
+    <div class="row"><span>生年月日</span><span>${p.birth}</span></div>
+    <div class="row"><span>本命星</span><span style="color:${KYUSEI[f.star].color}">${KYUSEI[f.star].name}</span></div>
+    <div class="row"><span>干支 / 星座</span><span>${ETO[f.eto]}（${ETO_NAME[f.eto]}）/ ${f.zodiac}</span></div>
+    <div class="row"><span>今日の日盤</span><span>${KYUSEI[f.dStar].name}（${compatLabel}）</span></div>
+    ${p.id !== 'yoshida' ? `<div class="row"><span>吉田との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
+    <div class="lucky">
+      <span class="chip">ラッキーカラー: ${f.luckyColor}</span>
+      <span class="chip">アイテム: ${f.luckyItem}</span>
+      <span class="chip">数字: ${f.luckyNum}</span>
+    </div>
+    <div class="advice">💡 ${f.advice}</div>
+  `;
+}
+
+// ============================================================
+// Init
+// ============================================================
+$date.value = todayStr();
+$date.addEventListener('change', render);
+document.getElementById('todayBtn').addEventListener('click', () => {
+  $date.value = todayStr();
+  render();
+});
+render();
+</script>
+</body>
+</html>
