@@ -183,6 +183,138 @@
     font-size: 13px;
     line-height: 1.6;
   }
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,8,20,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    width: min(560px, 92vw);
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .modal h2 { margin: 0 0 16px; font-size: 18px; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h3 {
+    font-size: 12px; color: var(--muted); margin: 0 0 10px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+  }
+  .form-grid label.full { grid-column: 1 / -1; }
+  .form-grid label {
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: 12px; color: var(--muted);
+  }
+  .form-grid input, .form-grid select {
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 14px;
+    color-scheme: dark;
+  }
+  .form-grid input:focus, .form-grid select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .blood-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .blood-group input { display: none; }
+  .blood-group label {
+    text-align: center;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--fg);
+    font-size: 14px;
+  }
+  .blood-group input:checked + label {
+    background: var(--accent);
+    color: #1a1830;
+    border-color: var(--accent);
+  }
+  .check-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .modal-actions .left, .modal-actions .right {
+    display: flex; gap: 8px;
+  }
+  .btn {
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .btn:hover { border-color: var(--muted); }
+  .btn-primary { background: var(--accent); color: #1a1830; border-color: var(--accent); font-weight: 600; }
+  .btn-danger { color: var(--bad); border-color: rgba(248,113,113,0.4); }
+  .people-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 240px; overflow-y: auto;
+  }
+  .person-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .person-row .meta { color: var(--muted); font-size: 11px; }
+  .person-row .ico-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+  }
+  .person-row .ico-btn:hover { color: var(--fg); background: rgba(255,255,255,0.06); }
+  .center-badge {
+    display: inline-block;
+    background: rgba(255,209,102,0.15);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-left: 4px;
+  }
   /* Node label */
   .node-label {
     font-size: 12px;
@@ -222,8 +354,72 @@
   <div class="date-bar">
     <input type="date" id="dateInput">
     <button id="todayBtn">今日</button>
+    <button id="manageBtn" class="btn-primary" style="background:var(--accent);color:#1a1830;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;">＋ 登録 / 編集</button>
   </div>
 </header>
+
+<!-- Registration modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modalTitle">人物の登録</h2>
+
+    <div class="modal-section">
+      <h3>新規登録 / 編集</h3>
+      <form id="regForm">
+        <input type="hidden" id="fId">
+        <div class="form-grid">
+          <label class="full">
+            名前
+            <input type="text" id="fName" required maxlength="20" placeholder="例: 山田 太郎">
+          </label>
+          <label class="full">
+            役割・関係
+            <input type="text" id="fRole" maxlength="30" placeholder="例: 同僚 / 開発">
+          </label>
+          <label>
+            生年月日
+            <input type="date" id="fBirth" required min="1900-01-01" max="2025-12-31">
+          </label>
+          <label>
+            血液型
+            <div class="blood-group">
+              <input type="radio" name="blood" id="bA" value="A"><label for="bA">A型</label>
+              <input type="radio" name="blood" id="bB" value="B"><label for="bB">B型</label>
+              <input type="radio" name="blood" id="bO" value="O"><label for="bO">O型</label>
+              <input type="radio" name="blood" id="bAB" value="AB"><label for="bAB">AB型</label>
+            </div>
+          </label>
+          <label class="full check-row">
+            <input type="checkbox" id="fCenter"> 中心人物にする（占いの基準）
+          </label>
+        </div>
+        <div class="modal-actions">
+          <div class="left">
+            <button type="button" class="btn btn-danger" id="deleteBtn" style="display:none">削除</button>
+          </div>
+          <div class="right">
+            <button type="button" class="btn" id="resetFormBtn">クリア</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">登録する</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-section">
+      <h3>登録済み</h3>
+      <div class="people-list" id="peopleList"></div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="left">
+        <button type="button" class="btn btn-danger" id="resetAllBtn">全リセット</button>
+      </div>
+      <div class="right">
+        <button type="button" class="btn btn-primary" id="closeBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main>
   <section class="panel">
@@ -248,16 +444,33 @@
 
 <script>
 // ============================================================
-// People data (sample)
+// People data (localStorage persisted, with sample defaults)
 // ============================================================
-const PEOPLE = [
-  { id: 'yoshida', name: '吉田',   role: '本人',         birth: '1985-07-14', center: true },
-  { id: 'sato',    name: '佐藤',   role: '上司 / 部長',   birth: '1972-03-22' },
-  { id: 'tanaka',  name: '田中',   role: '同僚 / 開発',   birth: '1990-11-08' },
-  { id: 'suzuki',  name: '鈴木',   role: '同僚 / 営業',   birth: '1988-05-30' },
-  { id: 'yamada',  name: '山田',   role: '後輩 / デザイナー', birth: '1995-09-17' },
-  { id: 'ito',     name: '伊藤',   role: '取引先 / PM',   birth: '1980-12-03' },
+const DEFAULT_PEOPLE = [
+  { id: 'yoshida', name: '吉田',   role: '本人',              birth: '1985-07-14', blood: 'A',  center: true },
+  { id: 'sato',    name: '佐藤',   role: '上司 / 部長',        birth: '1972-03-22', blood: 'O' },
+  { id: 'tanaka',  name: '田中',   role: '同僚 / 開発',        birth: '1990-11-08', blood: 'B' },
+  { id: 'suzuki',  name: '鈴木',   role: '同僚 / 営業',        birth: '1988-05-30', blood: 'A' },
+  { id: 'yamada',  name: '山田',   role: '後輩 / デザイナー',   birth: '1995-09-17', blood: 'AB' },
+  { id: 'ito',     name: '伊藤',   role: '取引先 / PM',        birth: '1980-12-03', blood: 'O' },
 ];
+const STORAGE_KEY = 'yoshida_fortune_people_v1';
+function loadPeople() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch {}
+  return DEFAULT_PEOPLE.slice();
+}
+function savePeople() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(PEOPLE)); } catch {}
+}
+let PEOPLE = loadPeople();
+// ensure one center
+if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
 
 // ============================================================
 // Fortune calculation (九星気学 + 干支 + 西洋星座)
@@ -384,6 +597,21 @@ const ADVICES_BAD = [
 const LUCKY_COLORS = ['赤','青','緑','黄','紫','白','黒','金','銀','桃'];
 const LUCKY_ITEMS = ['コーヒー','観葉植物','万年筆','ノート','ハンカチ','アロマ','チョコ','水晶','音楽','花'];
 
+// 血液型: 各項目への係数 (work, social, health, money) と 相性マップ
+const BLOOD = {
+  'A':  { mod: { work:+4, social:-2, health:+1, money:+2 }, trait: '几帳面・慎重' },
+  'B':  { mod: { work:-1, social:+4, health:+2, money:-1 }, trait: '自由・マイペース' },
+  'O':  { mod: { work:+2, social:+3, health:+3, money:+1 }, trait: 'おおらか・積極的' },
+  'AB': { mod: { work:+3, social:-1, health:-1, money:+3 }, trait: '合理的・二面性' },
+};
+// A=0,B=1,O=2,AB=3 → 相性スコア (10点満点)
+const BLOOD_COMPAT = {
+  'A':  { 'A':7, 'B':4, 'O':8, 'AB':6 },
+  'B':  { 'A':4, 'B':6, 'O':7, 'AB':8 },
+  'O':  { 'A':8, 'B':7, 'O':6, 'AB':5 },
+  'AB': { 'A':6, 'B':8, 'O':5, 'AB':7 },
+};
+
 // 個人 × 日 のフォーチュン
 function forecast(person, date) {
   const star = honmeisei(person.birth);
@@ -395,19 +623,20 @@ function forecast(person, date) {
   const compatBonus = (compat + 1) * 15; // 0,15,30
   const dayMod = (Math.sin((new Date(date).getTime() / 86400000) * 0.7 + hash(person.id) % 100) + 1) * 7;
 
+  const bMod = (BLOOD[person.blood] || BLOOD['O']).mod;
   const total = Math.min(99, Math.max(15, Math.round(30 + baseNoise + compatBonus + dayMod)));
 
-  const work    = Math.min(99, Math.max(10, Math.round(total + (rand(seed,1) - 0.5) * 30)));
-  const social  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,2) - 0.5) * 30)));
-  const health  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,3) - 0.5) * 30)));
-  const money   = Math.min(99, Math.max(10, Math.round(total + (rand(seed,4) - 0.5) * 30)));
+  const work    = Math.min(99, Math.max(10, Math.round(total + (rand(seed,1) - 0.5) * 30 + bMod.work)));
+  const social  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,2) - 0.5) * 30 + bMod.social)));
+  const health  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,3) - 0.5) * 30 + bMod.health)));
+  const money   = Math.min(99, Math.max(10, Math.round(total + (rand(seed,4) - 0.5) * 30 + bMod.money)));
 
-  // 吉田との相性 (吉田の本命星と本人の本命星)
-  const yoshida = PEOPLE.find(p => p.id === 'yoshida');
-  const yStar = honmeisei(yoshida.birth);
+  // 中心人物との相性 (本命星 + 血液型)
+  const center = PEOPLE.find(p => p.center) || PEOPLE[0];
+  const yStar = honmeisei(center.birth);
   const yCompat = gogyo(KYUSEI[star].el, KYUSEI[yStar].el);
-  // さらに当日の揺らぎ
-  const compatScore = Math.round(50 + yCompat * 25 + (rand(seed, 'y') - 0.5) * 20);
+  const bloodC = (BLOOD_COMPAT[person.blood] && BLOOD_COMPAT[person.blood][center.blood]) || 6;
+  const compatScore = Math.round(40 + yCompat * 20 + bloodC * 2.5 + (rand(seed, 'y') - 0.5) * 20);
 
   const adv = total >= 75 ? ADVICES_GOOD : total >= 50 ? ADVICES_MID : ADVICES_BAD;
   const advice = adv[hash(seed) % adv.length];
@@ -420,6 +649,7 @@ function forecast(person, date) {
     star, dStar, compat, compatScore: Math.max(10, Math.min(99, compatScore)),
     advice, luckyColor, luckyItem, luckyNum,
     eto: eto(person.birth), zodiac: zodiac(person.birth),
+    bloodTrait: (BLOOD[person.blood] || {}).trait || '—',
   };
 }
 
@@ -551,7 +781,7 @@ function drawNode(cx, cy, person, f, r, isCenter) {
   const name = document.createElementNS(NS, 'text');
   name.setAttribute('x', cx); name.setAttribute('y', cy + r + 22);
   name.setAttribute('class', 'node-label');
-  name.textContent = person.name + (isCenter ? '（本人）' : '');
+  name.textContent = person.name + (isCenter ? '（中心）' : '');
   g.appendChild(name);
 
   // star info
@@ -607,10 +837,11 @@ function drawDetail(date, fs) {
   $detail.innerHTML = `
     <h3>${p.name} <span style="font-size:12px;color:var(--muted);font-weight:normal">— ${p.role}</span></h3>
     <div class="row"><span>生年月日</span><span>${p.birth}</span></div>
+    <div class="row"><span>血液型</span><span>${p.blood || '—'}型 <span style="color:var(--muted);font-size:11px">（${f.bloodTrait}）</span></span></div>
     <div class="row"><span>本命星</span><span style="color:${KYUSEI[f.star].color}">${KYUSEI[f.star].name}</span></div>
     <div class="row"><span>干支 / 星座</span><span>${ETO[f.eto]}（${ETO_NAME[f.eto]}）/ ${f.zodiac}</span></div>
     <div class="row"><span>今日の日盤</span><span>${KYUSEI[f.dStar].name}（${compatLabel}）</span></div>
-    ${p.id !== 'yoshida' ? `<div class="row"><span>吉田との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
+    ${!p.center ? `<div class="row"><span>中心人物との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
     <div class="lucky">
       <span class="chip">ラッキーカラー: ${f.luckyColor}</span>
       <span class="chip">アイテム: ${f.luckyItem}</span>
@@ -618,6 +849,133 @@ function drawDetail(date, fs) {
     </div>
     <div class="advice">💡 ${f.advice}</div>
   `;
+}
+
+// ============================================================
+// Registration modal
+// ============================================================
+const $modal = document.getElementById('modal');
+const $manageBtn = document.getElementById('manageBtn');
+const $closeBtn = document.getElementById('closeBtn');
+const $form = document.getElementById('regForm');
+const $fId = document.getElementById('fId');
+const $fName = document.getElementById('fName');
+const $fRole = document.getElementById('fRole');
+const $fBirth = document.getElementById('fBirth');
+const $fCenter = document.getElementById('fCenter');
+const $modalTitle = document.getElementById('modalTitle');
+const $submitBtn = document.getElementById('submitBtn');
+const $deleteBtn = document.getElementById('deleteBtn');
+const $resetFormBtn = document.getElementById('resetFormBtn');
+const $resetAllBtn = document.getElementById('resetAllBtn');
+const $peopleList = document.getElementById('peopleList');
+
+function openModal() { $modal.classList.add('open'); resetForm(); renderPeopleList(); }
+function closeModal() { $modal.classList.remove('open'); }
+$manageBtn.addEventListener('click', openModal);
+$closeBtn.addEventListener('click', closeModal);
+$modal.addEventListener('click', (e) => { if (e.target === $modal) closeModal(); });
+
+function resetForm() {
+  $fId.value = '';
+  $fName.value = '';
+  $fRole.value = '';
+  $fBirth.value = '';
+  $fCenter.checked = false;
+  document.querySelectorAll('input[name=blood]').forEach(r => r.checked = false);
+  $modalTitle.textContent = '人物の登録';
+  $submitBtn.textContent = '登録する';
+  $deleteBtn.style.display = 'none';
+}
+$resetFormBtn.addEventListener('click', resetForm);
+
+function loadForm(p) {
+  $fId.value = p.id;
+  $fName.value = p.name;
+  $fRole.value = p.role || '';
+  $fBirth.value = p.birth;
+  $fCenter.checked = !!p.center;
+  document.querySelectorAll('input[name=blood]').forEach(r => r.checked = (r.value === p.blood));
+  $modalTitle.textContent = `「${p.name}」を編集`;
+  $submitBtn.textContent = '更新する';
+  $deleteBtn.style.display = '';
+}
+
+$form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = $fName.value.trim();
+  const birth = $fBirth.value;
+  if (!name || !birth) return;
+  const blood = (document.querySelector('input[name=blood]:checked') || {}).value || 'O';
+  const id = $fId.value || ('p' + Date.now().toString(36));
+  const isCenter = $fCenter.checked;
+  const data = { id, name, role: $fRole.value.trim(), birth, blood, center: isCenter };
+
+  const idx = PEOPLE.findIndex(p => p.id === id);
+  if (idx >= 0) PEOPLE[idx] = data; else PEOPLE.push(data);
+
+  if (isCenter) PEOPLE.forEach(p => { if (p.id !== id) p.center = false; });
+  if (!PEOPLE.some(p => p.center)) PEOPLE[0].center = true;
+
+  savePeople();
+  resetForm();
+  renderPeopleList();
+  selectedId = id;
+  render();
+});
+
+$deleteBtn.addEventListener('click', () => {
+  const id = $fId.value;
+  if (!id) return;
+  if (!confirm('この人物を削除しますか？')) return;
+  PEOPLE = PEOPLE.filter(p => p.id !== id);
+  if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
+  savePeople();
+  resetForm();
+  renderPeopleList();
+  if (selectedId === id) selectedId = (PEOPLE[0] || {}).id || '';
+  render();
+});
+
+$resetAllBtn.addEventListener('click', () => {
+  if (!confirm('全データをサンプルに戻しますか？')) return;
+  PEOPLE = DEFAULT_PEOPLE.slice();
+  savePeople();
+  resetForm();
+  renderPeopleList();
+  selectedId = 'yoshida';
+  render();
+});
+
+function renderPeopleList() {
+  $peopleList.innerHTML = '';
+  if (!PEOPLE.length) {
+    $peopleList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px">登録された人物はいません</div>';
+    return;
+  }
+  PEOPLE.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'person-row';
+    row.innerHTML = `
+      <div>
+        <div>${p.name} ${p.center ? '<span class="center-badge">中心</span>' : ''}</div>
+        <div class="meta">${p.role || '—'} ・ ${p.birth} ・ ${p.blood || '?'}型</div>
+      </div>
+      <button class="ico-btn" data-act="edit" title="編集">✎</button>
+      <button class="ico-btn" data-act="del"  title="削除">🗑</button>
+    `;
+    row.querySelector('[data-act=edit]').addEventListener('click', () => loadForm(p));
+    row.querySelector('[data-act=del]').addEventListener('click', () => {
+      if (!confirm(`「${p.name}」を削除しますか？`)) return;
+      PEOPLE = PEOPLE.filter(x => x.id !== p.id);
+      if (!PEOPLE.some(x => x.center) && PEOPLE.length) PEOPLE[0].center = true;
+      savePeople();
+      renderPeopleList();
+      if (selectedId === p.id) selectedId = (PEOPLE[0] || {}).id || '';
+      render();
+    });
+    $peopleList.appendChild(row);
+  });
 }
 
 // ============================================================
@@ -629,6 +987,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
   $date.value = todayStr();
   render();
 });
+if (!PEOPLE.find(p => p.id === selectedId)) selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
 render();
 </script>
 </body>
