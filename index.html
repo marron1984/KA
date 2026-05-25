@@ -7,6 +7,7 @@
   :root {
     --bg: #0f1228;
     --bg2: #1a1f3a;
+    --bg3: #232950;
     --fg: #e8ecf8;
     --muted: #8b94b8;
     --accent: #ffd166;
@@ -24,364 +25,255 @@
     min-height: 100vh;
   }
   header {
-    padding: 20px 32px;
+    padding: 16px 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--line);
     backdrop-filter: blur(8px);
-  }
-  h1 {
-    margin: 0;
-    font-size: 20px;
-    letter-spacing: 0.05em;
-  }
-  h1 .ja-sub { font-size: 12px; color: var(--muted); margin-left: 8px; }
-  .date-bar {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-  .date-bar input[type=date] {
-    background: var(--bg2);
-    color: var(--fg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-family: inherit;
-    color-scheme: dark;
-  }
-  .date-bar button {
-    background: var(--accent);
-    color: #1a1830;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  main {
-    display: grid;
-    grid-template-columns: minmax(520px, 1fr) 420px;
-    gap: 24px;
-    padding: 24px 32px 48px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  @media (max-width: 1000px) {
-    main { grid-template-columns: 1fr; }
-  }
-  .panel {
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 20px;
-  }
-  .panel h2 {
-    margin: 0 0 12px;
-    font-size: 13px;
-    color: var(--muted);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .radial-wrap {
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    position: relative;
-  }
-  svg { width: 100%; height: 100%; display: block; }
-  .legend {
-    display: flex;
-    gap: 16px;
     flex-wrap: wrap;
-    margin-top: 12px;
-    font-size: 12px;
-    color: var(--muted);
+    gap: 12px;
   }
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  .legend-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    display: inline-block;
-  }
-  .cards {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-  }
-  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,209,102,0.15); }
-  .card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
-  }
-  .card-name { font-weight: 600; font-size: 15px; }
-  .card-role { font-size: 11px; color: var(--muted); margin-left: 6px; }
-  .card-score {
-    font-size: 22px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .bars { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-  .bar {
-    display: grid;
-    grid-template-columns: 56px 1fr 32px;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .bar-track {
-    height: 6px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-  .bar-val { text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; }
-  .detail {
-    margin-top: 16px;
-    padding: 16px;
-    background: var(--bg2);
-    border-radius: 12px;
-    border: 1px solid var(--line);
-  }
-  .detail h3 { margin: 0 0 8px; font-size: 16px; }
-  .detail .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
-  .detail .row span:first-child { color: var(--muted); }
-  .lucky { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .chip {
-    background: rgba(255,209,102,0.12);
-    color: var(--accent);
-    padding: 3px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-  }
-  .advice {
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(255,255,255,0.04);
-    border-left: 3px solid var(--accent);
-    border-radius: 4px;
-    font-size: 13px;
-    line-height: 1.6;
-  }
-  /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(5,8,20,0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--bg2);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 24px;
-    width: min(560px, 92vw);
-    max-height: 88vh;
-    overflow-y: auto;
-  }
-  .modal h2 { margin: 0 0 16px; font-size: 18px; }
-  .modal-section { margin-bottom: 20px; }
-  .modal-section h3 {
-    font-size: 12px; color: var(--muted); margin: 0 0 10px;
-    text-transform: uppercase; letter-spacing: 0.1em;
-  }
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 12px;
-  }
-  .form-grid label.full { grid-column: 1 / -1; }
-  .form-grid label {
-    display: flex; flex-direction: column; gap: 4px;
-    font-size: 12px; color: var(--muted);
-  }
-  .form-grid input, .form-grid select {
-    background: var(--bg);
-    color: var(--fg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-family: inherit;
-    font-size: 14px;
-    color-scheme: dark;
-  }
-  .form-grid input:focus, .form-grid select:focus {
-    outline: none; border-color: var(--accent);
-  }
-  .blood-group {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-  }
-  .blood-group input { display: none; }
-  .blood-group label {
-    text-align: center;
-    padding: 8px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--fg);
-    font-size: 14px;
-  }
-  .blood-group input:checked + label {
-    background: var(--accent);
-    color: #1a1830;
-    border-color: var(--accent);
-  }
-  .check-row {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px;
-    margin-top: 4px;
-  }
-  .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .modal-actions .left, .modal-actions .right {
-    display: flex; gap: 8px;
+  h1 { margin: 0; font-size: 19px; letter-spacing: 0.04em; }
+  h1 .ja-sub { font-size: 12px; color: var(--muted); margin-left: 8px; }
+  .date-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .date-bar input[type=date] {
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 6px 10px; font-family: inherit; color-scheme: dark;
   }
   .btn {
-    background: var(--bg);
-    color: var(--fg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 13px;
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 13px;
   }
   .btn:hover { border-color: var(--muted); }
   .btn-primary { background: var(--accent); color: #1a1830; border-color: var(--accent); font-weight: 600; }
-  .btn-danger { color: var(--bad); border-color: rgba(248,113,113,0.4); }
-  .people-list {
-    display: flex; flex-direction: column; gap: 6px;
-    max-height: 240px; overflow-y: auto;
-  }
-  .person-row {
+  .btn-danger  { color: var(--bad); border-color: rgba(248,113,113,0.4); }
+  main {
     display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 8px;
-    align-items: center;
-    padding: 8px 10px;
-    background: var(--bg);
+    grid-template-columns: minmax(440px, 1fr) 400px;
+    gap: 20px;
+    padding: 20px 28px 40px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
     border: 1px solid var(--line);
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .panel-wide { grid-column: 1 / -1; }
+  .panel h2 {
+    margin: 0 0 10px; font-size: 12px; color: var(--muted);
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .radial-wrap { aspect-ratio: 1 / 1; width: 100%; }
+  svg { width: 100%; height: 100%; display: block; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--muted); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .cards { display: flex; flex-direction: column; gap: 8px; max-height: 600px; overflow-y: auto; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px; cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,209,102,0.15); }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .card-name { font-weight: 600; font-size: 14px; }
+  .card-role { font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .card-score { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bars { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+  .bar { display: grid; grid-template-columns: 44px 1fr 28px; align-items: center; gap: 6px; font-size: 10px; color: var(--muted); }
+  .bar-track { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+  .bar-val { text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; }
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    background: none; border: none; color: var(--muted);
+    padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 13px;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--fg); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  /* Grid layouts within tabs */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 720px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .box {
+    background: var(--bg2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px;
+  }
+  .box h3 { margin: 0 0 10px; font-size: 13px; color: var(--accent); letter-spacing: 0.05em; }
+  .box h4 { margin: 12px 0 6px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; gap: 8px; }
+  .row > span:first-child { color: var(--muted); flex-shrink: 0; }
+  .row > span:last-child { text-align: right; }
+  .pillar-table {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0;
+  }
+  .pillar-cell {
+    background: var(--bg3); padding: 8px 4px; border-radius: 6px;
+    text-align: center; font-size: 12px;
+  }
+  .pillar-cell .pillar-label { color: var(--muted); font-size: 10px; }
+  .pillar-cell .pillar-stem { font-size: 22px; font-weight: 700; color: var(--accent); display: block; margin-top: 4px; }
+  .pillar-cell .pillar-branch { font-size: 22px; font-weight: 700; color: #88ccff; display: block; }
+  .pillar-cell .pillar-meta { font-size: 9px; color: var(--muted); margin-top: 4px; line-height: 1.3; }
+  .chip {
+    background: rgba(255,209,102,0.12); color: var(--accent);
+    padding: 3px 10px; border-radius: 999px; font-size: 11px;
+    display: inline-block; margin: 2px;
+  }
+  .chip-mini {
+    background: var(--bg3); color: var(--fg);
+    padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px;
+    display: inline-block;
+  }
+  .advice {
+    margin-top: 10px; padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--accent); border-radius: 4px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .narrative {
+    font-size: 13px; line-height: 1.7; color: var(--fg);
+    background: rgba(255,255,255,0.02);
+    padding: 12px 14px; border-radius: 8px;
+    border: 1px solid var(--line); margin-bottom: 10px;
+  }
+  .narrative h4 { margin: 0 0 6px; color: var(--accent); font-size: 13px; text-transform: none; letter-spacing: 0; }
+  /* Hexagram lines */
+  .hex { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; }
+  .hex-line {
+    width: 80px; height: 10px; background: var(--fg); border-radius: 2px;
+    position: relative;
+  }
+  .hex-line.yin {
+    background: transparent;
+    box-shadow: -22px 0 0 var(--fg), 22px 0 0 var(--fg);
+    width: 36px; height: 10px;
+  }
+  .hex-line.changing { background: var(--bad); }
+  .hex-line.yin.changing { box-shadow: -22px 0 0 var(--bad), 22px 0 0 var(--bad); }
+  /* Tarot */
+  .tarot-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .tarot-card {
+    background: linear-gradient(135deg, #2a1f5e, #1a1248);
+    border: 1px solid #5d3aa8; border-radius: 8px;
+    width: 110px; padding: 10px 8px;
+    text-align: center; font-size: 11px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .tarot-card.reversed { transform: rotate(180deg); }
+  .tarot-card .pos { color: var(--accent); font-size: 10px; margin-bottom: 4px; }
+  .tarot-card .name { font-size: 13px; font-weight: 600; margin: 6px 0; }
+  .tarot-card .suit { color: var(--muted); font-size: 10px; }
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(5,8,20,0.7);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px;
+    width: min(540px, 92vw); max-height: 88vh; overflow-y: auto;
+  }
+  .modal h2 { margin: 0 0 14px; font-size: 17px; }
+  .modal-section { margin-bottom: 18px; }
+  .modal-section h3 {
+    font-size: 11px; color: var(--muted); margin: 0 0 8px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  .form-grid label.full { grid-column: 1 / -1; }
+  .form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .form-grid input, .form-grid select {
+    background: var(--bg); color: var(--fg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 10px; font-family: inherit; font-size: 14px; color-scheme: dark;
+  }
+  .form-grid input:focus, .form-grid select:focus { outline: none; border-color: var(--accent); }
+  .blood-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .blood-group input { display: none; }
+  .blood-group label {
+    text-align: center; padding: 8px; border: 1px solid var(--line);
+    border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--fg); font-size: 14px;
+  }
+  .blood-group input:checked + label { background: var(--accent); color: #1a1830; border-color: var(--accent); }
+  .check-row { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 4px; }
+  .modal-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+  .modal-actions .left, .modal-actions .right { display: flex; gap: 8px; }
+  .people-list { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
+  .person-row {
+    display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;
+    padding: 8px 10px; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 8px; font-size: 13px;
   }
   .person-row .meta { color: var(--muted); font-size: 11px; }
   .person-row .ico-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 4px 8px;
-    font-size: 13px;
-    border-radius: 4px;
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 4px 8px; font-size: 13px; border-radius: 4px;
   }
   .person-row .ico-btn:hover { color: var(--fg); background: rgba(255,255,255,0.06); }
   .center-badge {
-    display: inline-block;
-    background: rgba(255,209,102,0.15);
-    color: var(--accent);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    margin-left: 4px;
+    display: inline-block; background: rgba(255,209,102,0.15); color: var(--accent);
+    padding: 1px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;
   }
-  /* Node label */
-  .node-label {
-    font-size: 12px;
-    fill: var(--fg);
-    text-anchor: middle;
-    pointer-events: none;
-    font-weight: 600;
-  }
-  .node-sub {
-    font-size: 9px;
-    fill: var(--muted);
-    text-anchor: middle;
-    pointer-events: none;
-  }
-  .node-score {
-    font-size: 14px;
-    font-weight: 700;
-    text-anchor: middle;
-    pointer-events: none;
-    fill: #fff;
-  }
-  .link {
-    fill: none;
-    stroke-width: 2;
-    opacity: 0.55;
-  }
-  .node-circle {
-    cursor: pointer;
-    transition: r 0.2s;
-  }
+  /* SVG text */
+  .node-label { font-size: 12px; fill: var(--fg); text-anchor: middle; pointer-events: none; font-weight: 600; }
+  .node-sub { font-size: 9px; fill: var(--muted); text-anchor: middle; pointer-events: none; }
+  .node-score { font-size: 14px; font-weight: 700; text-anchor: middle; pointer-events: none; fill: #fff; }
+  .link { fill: none; stroke-width: 2; opacity: 0.55; }
+  .node-circle { cursor: pointer; transition: r 0.2s; }
   .node-circle.selected { stroke: var(--accent); stroke-width: 3; }
 </style>
 </head>
 <body>
 <header>
-  <h1>🔮 吉田の占いダッシュボード <span class="ja-sub">— 仕事仲間との今日の運勢</span></h1>
+  <h1>🔮 吉田占いダッシュボード <span class="ja-sub">— 仕事仲間との今日の運勢</span></h1>
   <div class="date-bar">
     <input type="date" id="dateInput">
-    <button id="todayBtn">今日</button>
-    <button id="manageBtn" class="btn-primary" style="background:var(--accent);color:#1a1830;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;">＋ 登録 / 編集</button>
+    <button class="btn" id="todayBtn">今日</button>
+    <button class="btn btn-primary" id="manageBtn">＋ 登録 / 編集</button>
   </div>
 </header>
 
-<!-- Registration modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h2 id="modalTitle">人物の登録</h2>
-
     <div class="modal-section">
       <h3>新規登録 / 編集</h3>
       <form id="regForm">
         <input type="hidden" id="fId">
         <div class="form-grid">
-          <label class="full">
-            名前
-            <input type="text" id="fName" required maxlength="20" placeholder="例: 山田 太郎">
+          <label class="full">名前
+            <input type="text" id="fName" required maxlength="30" placeholder="例: 山田 太郎">
           </label>
-          <label class="full">
-            役割・関係
-            <input type="text" id="fRole" maxlength="30" placeholder="例: 同僚 / 開発">
+          <label class="full">役割・関係
+            <input type="text" id="fRole" maxlength="40" placeholder="例: 同僚 / 開発">
           </label>
-          <label>
-            生年月日
+          <label>生年月日
             <input type="date" id="fBirth" required min="1900-01-01" max="2025-12-31">
           </label>
-          <label>
-            血液型
+          <label>出生時刻 (任意)
+            <input type="number" id="fHour" min="0" max="23" step="1" placeholder="0-23">
+          </label>
+          <label>性別
+            <select id="fGender">
+              <option value="male">男性</option>
+              <option value="female">女性</option>
+            </select>
+          </label>
+          <label>血液型
             <div class="blood-group">
               <input type="radio" name="blood" id="bA" value="A"><label for="bA">A型</label>
               <input type="radio" name="blood" id="bB" value="B"><label for="bB">B型</label>
@@ -404,12 +296,10 @@
         </div>
       </form>
     </div>
-
     <div class="modal-section">
       <h3>登録済み</h3>
       <div class="people-list" id="peopleList"></div>
     </div>
-
     <div class="modal-actions">
       <div class="left">
         <button type="button" class="btn btn-danger" id="resetAllBtn">全リセット</button>
@@ -431,226 +321,838 @@
       <div class="legend-item"><span class="legend-dot" style="background:var(--good)"></span>大吉 (80+)</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--mid)"></span>中吉 (50-79)</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--bad)"></span>要注意 (-49)</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#4ade80;opacity:0.7"></span>線の太さ・色 = 吉田との相性</div>
+      <div class="legend-item">線の太さ・色 = 中心との相性</div>
     </div>
   </section>
 
   <section class="panel">
     <h2>TEAM FORECAST</h2>
     <div class="cards" id="cards"></div>
-    <div class="detail" id="detail"></div>
+  </section>
+
+  <section class="panel panel-wide">
+    <h2>DETAIL — <span id="detailName">—</span></h2>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="overview">🔮 概要</button>
+      <button class="tab" data-tab="shichu">🀄 四柱推命</button>
+      <button class="tab" data-tab="astro">⭐ 占星術・天体</button>
+      <button class="tab" data-tab="num">🔢 数秘・カード</button>
+      <button class="tab" data-tab="fengshui">🧭 風水</button>
+      <button class="tab" data-tab="iching">☯ 易・タロット</button>
+      <button class="tab" data-tab="mbti">🎭 MBTI・統合</button>
+    </div>
+    <div id="tab-overview"  class="tab-panel active"></div>
+    <div id="tab-shichu"    class="tab-panel"></div>
+    <div id="tab-astro"     class="tab-panel"></div>
+    <div id="tab-num"       class="tab-panel"></div>
+    <div id="tab-fengshui"  class="tab-panel"></div>
+    <div id="tab-iching"    class="tab-panel"></div>
+    <div id="tab-mbti"      class="tab-panel"></div>
   </section>
 </main>
 
 <script>
+'use strict';
 // ============================================================
-// People data (localStorage persisted, with sample defaults)
+// CONSTANTS
+// ============================================================
+const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const BRANCH_NAMES = ['ね','うし','とら','う','たつ','み','うま','ひつじ','さる','とり','いぬ','い'];
+const STEM_ELEMENTS = ['木','木','火','火','土','土','金','金','水','水'];
+const STEM_YINYANG  = ['陽','陰','陽','陰','陽','陰','陽','陰','陽','陰'];
+const BRANCH_ELEMENTS = ['水','土','木','木','土','火','火','土','金','金','土','水'];
+const BRANCH_YINYANG  = ['陽','陰','陽','陰','陽','陰','陽','陰','陽','陰','陽','陰'];
+const ELEMENTS = ['木','火','土','金','水'];
+
+const KYUSEI = [
+  null,
+  { name: '一白水星', el: '水', color: '#3b82f6' },
+  { name: '二黒土星', el: '土', color: '#a16207' },
+  { name: '三碧木星', el: '木', color: '#65a30d' },
+  { name: '四緑木星', el: '木', color: '#84cc16' },
+  { name: '五黄土星', el: '土', color: '#ca8a04' },
+  { name: '六白金星', el: '金', color: '#cbd5e1' },
+  { name: '七赤金星', el: '金', color: '#f59e0b' },
+  { name: '八白土星', el: '土', color: '#92400e' },
+  { name: '九紫火星', el: '火', color: '#ef4444' },
+];
+
+const ZODIAC = [
+  ['山羊座', 12,22,  1,19], ['水瓶座',  1,20,  2,18], ['魚座',    2,19,  3,20],
+  ['牡羊座',  3,21,  4,19], ['牡牛座',  4,20,  5,20], ['双子座',  5,21,  6,21],
+  ['蟹座',    6,22,  7,22], ['獅子座',  7,23,  8,22], ['乙女座',  8,23,  9,22],
+  ['天秤座',  9,23, 10,23], ['蠍座',   10,24, 11,22], ['射手座', 11,23, 12,21],
+];
+
+// 60干支
+const SEXAGENARY = (() => { const a=[]; for (let i=0;i<60;i++) a.push(STEMS[i%10]+BRANCHES[i%12]); return a; })();
+
+// 24節気
+const SOLAR_TERMS = [
+  [315,'立春','main'],[330,'雨水',''],[345,'啓蟄','main'],[0,'春分',''],
+  [15,'清明','main'],[30,'穀雨',''],[45,'立夏','main'],[60,'小満',''],
+  [75,'芒種','main'],[90,'夏至',''],[105,'小暑','main'],[120,'大暑',''],
+  [135,'立秋','main'],[150,'処暑',''],[165,'白露','main'],[180,'秋分',''],
+  [195,'寒露','main'],[210,'霜降',''],[225,'立冬','main'],[240,'小雪',''],
+  [255,'大雪','main'],[270,'冬至',''],[285,'小寒','main'],[300,'大寒','']
+];
+
+// 月相
+const MOON_PHASES = [
+  [0.964,1.036,'新月','🌑'],[0.036,0.214,'三日月','🌒'],[0.214,0.286,'上弦の月','🌓'],
+  [0.286,0.464,'十三夜（満ちゆく月）','🌔'],[0.464,0.536,'満月','🌕'],
+  [0.536,0.714,'十六夜（欠けゆく月）','🌖'],[0.714,0.786,'下弦の月','🌗'],
+  [0.786,0.964,'晦月','🌘']
+];
+
+// 通変星
+const TONGBIAN_INFO = {
+  '比肩': { rank:'中吉', desc:'自分のペース・独立' },
+  '劫財': { rank:'注意', desc:'出費・競合' },
+  '食神': { rank:'吉',   desc:'創造性と楽しみ' },
+  '傷官': { rank:'注意', desc:'言葉と対人衝突' },
+  '偏財': { rank:'中吉', desc:'流動的利益' },
+  '正財': { rank:'吉',   desc:'堅実な収入' },
+  '偏官': { rank:'中吉', desc:'決断と挑戦' },
+  '正官': { rank:'大吉', desc:'規律と評価' },
+  '偏印': { rank:'中吉', desc:'独自アイデア' },
+  '印綬': { rank:'大吉', desc:'学び・人徳・名誉' },
+};
+
+// 十二運
+const TWELVE_STAGES = ['長生','沐浴','冠帯','建禄','帝旺','衰','病','死','墓','絶','胎','養'];
+const LONG_LIFE_START = {
+  '甲':['亥',true ],'乙':['午',false],'丙':['寅',true ],'丁':['酉',false],
+  '戊':['寅',true ],'己':['酉',false],'庚':['巳',true ],'辛':['子',false],
+  '壬':['申',true ],'癸':['卯',false],
+};
+
+// 五虎遁
+const WUGOLUEN = {'甲':'丙','己':'丙','乙':'戊','庚':'戊','丙':'庚','辛':'庚','丁':'壬','壬':'壬','戊':'甲','癸':'甲'};
+// 五鼠遁 (正規)
+const WUSHUTEN = {'甲':'甲','己':'甲','乙':'丙','庚':'丙','丙':'戊','辛':'戊','丁':'庚','壬':'庚','戊':'壬','癸':'壬'};
+
+// 8方位の吉凶 (本命卦ごと)
+const FENGSHUI_DIR = {
+  1:{ '北':'伏位','東北':'禍害','東':'天医','東南':'生気','南':'延年','西南':'絶命','西':'禍害','西北':'六殺' },
+  2:{ '北':'絶命','東北':'生気','東':'禍害','東南':'五鬼','南':'六殺','西南':'伏位','西':'天医','西北':'延年' },
+  3:{ '北':'天医','東北':'六殺','東':'伏位','東南':'延年','南':'生気','西南':'禍害','西':'絶命','西北':'五鬼' },
+  4:{ '北':'生気','東北':'絶命','東':'延年','東南':'伏位','南':'天医','西南':'五鬼','西':'六殺','西北':'禍害' },
+  6:{ '北':'六殺','東北':'天医','東':'五鬼','東南':'禍害','南':'絶命','西南':'延年','西':'生気','西北':'伏位' },
+  7:{ '北':'禍害','東北':'延年','東':'絶命','東南':'六殺','南':'五鬼','西南':'天医','西':'伏位','西北':'生気' },
+  8:{ '北':'五鬼','東北':'伏位','東':'六殺','東南':'絶命','南':'禍害','西南':'生気','西':'延年','西北':'天医' },
+  9:{ '北':'延年','東北':'五鬼','東':'生気','東南':'天医','南':'伏位','西南':'六殺','西':'禍害','西北':'絶命' },
+};
+const DIR_RANK = {
+  '生気':['大吉','#22c55e','発展・財運'],
+  '天医':['吉','#86efac','健康・回復'],
+  '延年':['吉','#86efac','長寿・関係'],
+  '伏位':['小吉','#fde68a','安定'],
+  '禍害':['小凶','#fdba74','軽い消耗'],
+  '六殺':['中凶','#fb923c','災い・対立'],
+  '五鬼':['大凶','#f87171','損失・病'],
+  '絶命':['最大凶','#dc2626','重大な不運'],
+};
+
+// 64卦 King Wen
+const TRIGRAMS = [['坤','☷'],['震','☳'],['坎','☵'],['兌','☱'],['艮','☶'],['離','☲'],['巽','☴'],['乾','☰']];
+// KING_WEN_TABLE[lower][upper] -> hex num 1-64
+const KING_WEN_TABLE = (() => {
+  const t = Array.from({length:8}, () => Array(8).fill(0));
+  // [lower][upper] = hex
+  const set = (l,u,h) => { t[l][u] = h; };
+  set(7,7,1);  set(0,0,2);  set(1,2,3);  set(2,4,4);  set(7,2,5);  set(2,7,6);
+  set(2,0,7);  set(0,2,8);  set(7,6,9);  set(3,7,10); set(7,0,11); set(0,7,12);
+  set(5,7,13); set(7,5,14); set(4,0,15); set(0,1,16); set(1,3,17); set(6,4,18);
+  set(3,0,19); set(0,6,20); set(1,5,21); set(5,4,22); set(0,4,23); set(1,0,24);
+  set(1,7,25); set(7,4,26); set(1,4,27); set(6,3,28); set(2,2,29); set(5,5,30);
+  set(4,3,31); set(6,1,32); set(4,7,33); set(7,1,34); set(0,5,35); set(5,0,36);
+  set(5,6,37); set(3,5,38); set(4,2,39); set(2,1,40); set(3,4,41); set(1,6,42);
+  set(7,3,43); set(6,7,44); set(0,3,45); set(6,0,46); set(2,3,47); set(6,2,48);
+  set(5,3,49); set(6,5,50); set(1,1,51); set(4,4,52); set(4,6,53); set(3,1,54);
+  set(5,1,55); set(4,5,56); set(6,6,57); set(3,3,58); set(2,6,59); set(3,2,60);
+  set(3,6,61); set(4,1,62); set(5,2,63); set(2,5,64);
+  return t;
+})();
+const HEX_NAMES = [
+  '','乾為天','坤為地','水雷屯','山水蒙','水天需','天水訟','地水師','水地比',
+  '風天小畜','天澤履','地天泰','天地否','天火同人','火天大有','地山謙','雷地豫',
+  '澤雷随','山風蠱','地澤臨','風地観','火雷噬嗑','山火賁','山地剝','地雷復',
+  '天雷無妄','山天大畜','山雷頤','澤風大過','坎為水','離為火','澤山咸','雷風恒',
+  '天山遯','雷天大壮','火地晋','地火明夷','風火家人','火澤睽','水山蹇','雷水解',
+  '山澤損','風雷益','澤天夬','天風姤','澤地萃','地風升','澤水困','水風井',
+  '澤火革','火風鼎','震為雷','艮為山','風山漸','雷澤帰妹','雷火豐','火山旅',
+  '巽為風','兌為澤','風水渙','水澤節','風澤中孚','雷山小過','水火既濟','火水未濟'
+];
+const HEX_MEANING = {
+  1:'創造・剛健・天の力',2:'受容・大地・包容',3:'産みの苦しみ・始動の困難',4:'未熟・教えを請う',
+  5:'待つ時・忍耐',6:'争い・訴訟',7:'軍勢・統率',8:'親しむ・協力',9:'小さな蓄え・準備',10:'踏み行う・礼節',
+  11:'安泰・調和',12:'閉塞・停滞',13:'同志・仲間',14:'豊かさ',15:'謙虚',16:'喜び・備え',17:'随順',18:'腐敗の刷新',
+  19:'臨む・拡大',20:'観察・展望',21:'噛み合う・障害除去',22:'装飾・修飾',23:'剝落・転換期',24:'復活',25:'天真・素直',26:'大きな蓄積',
+  27:'養い・口の道',28:'過大の重荷',29:'重なる険難',30:'付き従う・光',31:'感応・出会い',32:'恒常',33:'退く時',34:'勢いの過剰',
+  35:'進む光',36:'光を傷つけられる',37:'家族',38:'背き合う',39:'進めない困難',40:'解決・解放',41:'損して益す',42:'益・恵み',
+  43:'決断',44:'思いがけぬ出会い',45:'集う',46:'のぼる',47:'困窮',48:'井戸・恵みの源',49:'革新',50:'鼎・新秩序',
+  51:'雷・震撼',52:'山・止まる',53:'漸進',54:'帰り嫁ぐ・順序',55:'豊大',56:'旅・寄る辺なし',57:'入り込む・浸透',58:'喜び・悦楽',
+  59:'散る・離散',60:'節度',61:'誠・中孚',62:'小さな過ち',63:'既に成る',64:'未だ成らず'
+};
+
+// Tarot - 大アルカナ
+const MAJOR_ARCANA = [
+  ['愚者','新たな旅立ち・無垢','停滞・無計画'],
+  ['魔術師','創造・スキル・実現力','迷い・自信喪失'],
+  ['女教皇','直感・内省・秘密','感情の閉塞'],
+  ['女帝','豊穣・母性・繁栄','過保護・依存'],
+  ['皇帝','安定・権威・統制','頑固・支配'],
+  ['教皇','伝統・教え・指導','形式に囚われる'],
+  ['恋人','選択・愛・結合','迷い・別れ'],
+  ['戦車','勝利・前進・意志','暴走・脱線'],
+  ['力','勇気・受容・忍耐','弱気・自己嫌悪'],
+  ['隠者','内省・探求・孤独','孤立・閉鎖'],
+  ['運命の輪','転機・好機','停滞・悪循環'],
+  ['正義','公正・決断・バランス','偏り・不公平'],
+  ['吊るされた男','試練・受容・視点転換','自己犠牲・無駄'],
+  ['死神','終焉・再生','停滞・拒絶'],
+  ['節制','調和・調整・統合','過剰・不調和'],
+  ['悪魔','執着・束縛・欲望','解放・覚醒'],
+  ['塔','破壊・突発的変化','遅延・必要な崩壊'],
+  ['星','希望・霊感・癒し','失望・先行き不明'],
+  ['月','不安・幻想・無意識','明晰さ・解放'],
+  ['太陽','成功・喜び・活力','停滞・楽観過剰'],
+  ['審判','復活・覚醒・召命','後悔・停滞'],
+  ['世界','完成・統合・達成','未完成・遅れ'],
+];
+
+// Suit context
+const SUITS = {
+  'ワンド':   ['火','情熱・行動・創造','#f87171'],
+  'カップ':   ['水','感情・関係・霊性','#60a5fa'],
+  'ソード':   ['風','知性・思考・葛藤','#cbd5e1'],
+  'ペンタクル':['地','物質・お金・実務','#a3e635'],
+};
+const MINOR_RANKS = ['エース','2','3','4','5','6','7','8','9','10','ペイジ','ナイト','クイーン','キング'];
+
+// MBTI
+const MBTI_PROFILES = {
+  'INTJ':['建築家','戦略的・独立・長期思考',['ENFP','ENTP'],['ESFP','ESFJ']],
+  'INTP':['論理学者','分析的・好奇心・独創',['ENFJ','ENTJ'],['ESFJ','ESTJ']],
+  'ENTJ':['指揮官','決断的・リーダー・効率',['INFP','INTP'],['ISFP','INFP']],
+  'ENTP':['討論者','機知・刺激・実験',['INFJ','INTJ'],['ISFJ','ISTJ']],
+  'INFJ':['提唱者','洞察・理想・共感',['ENFP','ENTP'],['ESTP','ESTJ']],
+  'INFP':['仲介者','理想主義・繊細・創造',['ENFJ','ENTJ'],['ESTJ','ESFJ']],
+  'ENFJ':['主人公','カリスマ・調和・励まし',['INFP','ISFP'],['ISTP','ISTJ']],
+  'ENFP':['広報運動家','熱意・自由・人脈',['INTJ','INFJ'],['ISTJ','ISTP']],
+  'ISTJ':['管理者','責任感・実直・伝統',['ESFP','ESTP'],['ENFP','ENTP']],
+  'ISFJ':['擁護者','献身・温和・配慮',['ESTP','ESFP'],['ENTP','ENFJ']],
+  'ESTJ':['幹部','秩序・実務・統率',['ISFP','ISTP'],['INFP','INTP']],
+  'ESFJ':['領事官','社交的・調和・献身',['ISFP','ISTP'],['INTP','INTJ']],
+  'ISTP':['巨匠','合理的・職人・冷静',['ESFJ','ENFJ'],['ENFJ','ESFJ']],
+  'ISFP':['冒険家','繊細・芸術・柔軟',['ESTJ','ENFJ'],['ENTJ','ESTJ']],
+  'ESTP':['起業家','行動力・現実的・刺激',['ISFJ','ISTJ'],['INFJ','INTJ']],
+  'ESFP':['エンターテイナー','陽気・社交・即興',['ISTJ','ISFJ'],['INTJ','INFJ']],
+};
+
+const BLOOD = {
+  'A':  { mod:{ work:+4, social:-2, health:+1, money:+2 }, trait:'几帳面・慎重' },
+  'B':  { mod:{ work:-1, social:+4, health:+2, money:-1 }, trait:'自由・マイペース' },
+  'O':  { mod:{ work:+2, social:+3, health:+3, money:+1 }, trait:'おおらか・積極的' },
+  'AB': { mod:{ work:+3, social:-1, health:-1, money:+3 }, trait:'合理的・二面性' },
+};
+const BLOOD_COMPAT = {
+  'A':  { 'A':7,'B':4,'O':8,'AB':6 }, 'B': { 'A':4,'B':6,'O':7,'AB':8 },
+  'O':  { 'A':8,'B':7,'O':6,'AB':5 }, 'AB':{ 'A':6,'B':8,'O':5,'AB':7 },
+};
+
+const PERSONAL_DAY_VARIANTS = [
+  '①始まりの日。新規着手に向く。','②協調の日。誰かと組むと吉。','③表現の日。発信・創造に最適。',
+  '④基盤の日。整理整頓・計画立て。','⑤変化の日。柔軟に動こう。','⑥愛情の日。家庭や仲間との時間。',
+  '⑦内省の日。一人で深く考える。','⑧達成の日。仕事で結果を出せる。','⑨完結の日。手放しと振り返り。',
+];
+const DAY_COLORS  = ['赤','青','緑','黄','紫','白','黒','金','銀','桃'];
+const DAY_CAUTIONS = ['遅刻','言葉遣い','財布の置き忘れ','早とちり','睡眠不足','スマホ依存','飲み過ぎ','姿勢の崩れ','SNSの愚痴','即決'];
+const DAY_FOODS  = ['和定食','カレー','蕎麦','寿司','イタリアン','スープ','ラーメン','焼き魚','サラダ','フルーツ'];
+const DAY_ITEMS  = ['コーヒー','観葉植物','万年筆','ノート','ハンカチ','アロマ','チョコ','水晶','音楽','花'];
+const SHADOW_BLESSINGS = [
+  '弱さを認めることで強くなれる日。','過去の自分に感謝を。','失敗から学ぶことが今日のテーマ。',
+  '人に頼ることで道が開ける。','涙の後に虹が出る一日。','停滞は次の飛躍への助走。'
+];
+
+// ============================================================
+// DATA (localStorage)
 // ============================================================
 const DEFAULT_PEOPLE = [
-  { id: 'yoshida', name: '吉田',   role: '本人',              birth: '1985-07-14', blood: 'A',  center: true },
-  { id: 'sato',    name: '佐藤',   role: '上司 / 部長',        birth: '1972-03-22', blood: 'O' },
-  { id: 'tanaka',  name: '田中',   role: '同僚 / 開発',        birth: '1990-11-08', blood: 'B' },
-  { id: 'suzuki',  name: '鈴木',   role: '同僚 / 営業',        birth: '1988-05-30', blood: 'A' },
-  { id: 'yamada',  name: '山田',   role: '後輩 / デザイナー',   birth: '1995-09-17', blood: 'AB' },
-  { id: 'ito',     name: '伊藤',   role: '取引先 / PM',        birth: '1980-12-03', blood: 'O' },
+  { id:'yoshida', name:'吉田 駿成', role:'本人 / しゅんすけ', birth:'1984-05-02', hour:13, gender:'male', blood:'B', center:true },
+  { id:'sato',    name:'佐藤',     role:'上司 / 部長',       birth:'1972-03-22', hour:9,  gender:'male',   blood:'O' },
+  { id:'tanaka',  name:'田中',     role:'同僚 / 開発',       birth:'1990-11-08', hour:7,  gender:'male',   blood:'B' },
+  { id:'suzuki',  name:'鈴木',     role:'同僚 / 営業',       birth:'1988-05-30', hour:14, gender:'female', blood:'A' },
+  { id:'yamada',  name:'山田',     role:'後輩 / デザイナー',  birth:'1995-09-17', hour:18, gender:'female', blood:'AB' },
+  { id:'ito',     name:'伊藤',     role:'取引先 / PM',       birth:'1980-12-03', hour:10, gender:'male',   blood:'O' },
 ];
-const STORAGE_KEY = 'yoshida_fortune_people_v1';
+const STORAGE_KEY = 'yoshida_fortune_people_v3';
 function loadPeople() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length) return parsed;
-    }
+    if (raw) { const p = JSON.parse(raw); if (Array.isArray(p) && p.length) return p; }
   } catch {}
   return DEFAULT_PEOPLE.slice();
 }
-function savePeople() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(PEOPLE)); } catch {}
-}
+function savePeople() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(PEOPLE)); } catch {} }
 let PEOPLE = loadPeople();
-// ensure one center
 if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
 
 // ============================================================
-// Fortune calculation (九星気学 + 干支 + 西洋星座)
+// UTIL
 // ============================================================
-const KYUSEI = [
-  null,
-  { name: '一白水星', el: 'water', color: '#3b82f6' },
-  { name: '二黒土星', el: 'earth', color: '#a16207' },
-  { name: '三碧木星', el: 'wood',  color: '#65a30d' },
-  { name: '四緑木星', el: 'wood',  color: '#84cc16' },
-  { name: '五黄土星', el: 'earth', color: '#ca8a04' },
-  { name: '六白金星', el: 'metal', color: '#cbd5e1' },
-  { name: '七赤金星', el: 'metal', color: '#f59e0b' },
-  { name: '八白土星', el: 'earth', color: '#92400e' },
-  { name: '九紫火星', el: 'fire',  color: '#ef4444' },
-];
+function parseDate(s) { const [y,m,d] = s.split('-').map(Number); return new Date(Date.UTC(y, m-1, d)); }
+function fmtDate(d) { const dt = new Date(d); return dt.toISOString().slice(0,10); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function digitSum(n) { let s=0; while(n>0){ s += n%10; n=(n-n%10)/10; } return s; }
+function reduce1to9(n) { while (n > 9) n = digitSum(n); return n; }
+function reduceKeepMaster(n) { while (n > 9 && n !== 11 && n !== 22 && n !== 33) n = digitSum(n); return n; }
+function hash(str) { let h=2166136261; for (let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = (h*16777619)>>>0; } return h; }
+function lcgSeed(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0xffffffff; }; }
 
-const ETO = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-const ETO_NAME = ['ね','うし','とら','う','たつ','み','うま','ひつじ','さる','とり','いぬ','い'];
-
-const ZODIAC = [
-  { name: '山羊座', from: [12,22], to: [ 1,19] },
-  { name: '水瓶座', from: [ 1,20], to: [ 2,18] },
-  { name: '魚座',   from: [ 2,19], to: [ 3,20] },
-  { name: '牡羊座', from: [ 3,21], to: [ 4,19] },
-  { name: '牡牛座', from: [ 4,20], to: [ 5,20] },
-  { name: '双子座', from: [ 5,21], to: [ 6,21] },
-  { name: '蟹座',   from: [ 6,22], to: [ 7,22] },
-  { name: '獅子座', from: [ 7,23], to: [ 8,22] },
-  { name: '乙女座', from: [ 8,23], to: [ 9,22] },
-  { name: '天秤座', from: [ 9,23], to: [10,23] },
-  { name: '蠍座',   from: [10,24], to: [11,22] },
-  { name: '射手座', from: [11,23], to: [12,21] },
-];
-
-function digitSum(n) { let s = 0; while (n > 0) { s += n % 10; n = (n - n % 10) / 10; } return s; }
-
-// 本命星 (節分2/4基準で年を補正)
-function honmeisei(birth) {
-  const d = new Date(birth);
-  let y = d.getFullYear();
-  const setsubun = new Date(y, 1, 4); // Feb 4
-  if (d < setsubun) y -= 1;
-  let s = digitSum(y);
-  while (s > 9) s = digitSum(s);
-  let star = 11 - s;
-  if (star > 9) star -= 9;
-  if (star <= 0) star += 9;
-  return star;
-}
-
-// 干支
-function eto(birth) {
-  const d = new Date(birth);
-  let y = d.getFullYear();
-  const setsubun = new Date(y, 1, 4);
-  if (d < setsubun) y -= 1;
-  return (y - 4) % 12;
-}
-
-function zodiac(birth) {
-  const d = new Date(birth);
-  const m = d.getMonth() + 1, day = d.getDate();
-  for (const z of ZODIAC) {
-    const [fm, fd] = z.from, [tm, td] = z.to;
-    if (fm > tm) { // wraps year
-      if ((m === fm && day >= fd) || (m === tm && day <= td)) return z.name;
-    } else {
-      if ((m === fm && day >= fd) || (m === tm && day <= td) || (m > fm && m < tm)) return z.name;
-    }
-  }
-  return ZODIAC[0].name;
-}
-
-// 日盤本命星 (簡易: ユリウス日 + 周期)
-function dayStar(date) {
+// julianDay (Meeus)
+function julianDay(date) {
   const d = new Date(date);
-  const jd = Math.floor(d.getTime() / 86400000);
+  let Y = d.getUTCFullYear(), M = d.getUTCMonth()+1;
+  const D = d.getUTCDate() + (d.getUTCHours() + d.getUTCMinutes()/60)/24;
+  if (M <= 2) { Y -= 1; M += 12; }
+  const A = Math.floor(Y/100), B = 2 - A + Math.floor(A/4);
+  return Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + D + B - 1524.5;
+}
+
+function rad(d) { return d * Math.PI / 180; }
+function deg(r) { return r * 180 / Math.PI; }
+function mod360(x) { return ((x % 360) + 360) % 360; }
+
+// 太陽黄経 (Meeus)
+function sunLongitude(date) {
+  const JD = julianDay(date);
+  const T = (JD - 2451545.0) / 36525;
+  const L0 = mod360(280.46646 + 36000.76983*T + 0.0003032*T*T);
+  const M  = mod360(357.52911 + 35999.05029*T - 0.0001537*T*T);
+  const C = (1.914602 - 0.004817*T - 0.000014*T*T) * Math.sin(rad(M))
+          + (0.019993 - 0.000101*T) * Math.sin(rad(2*M))
+          + 0.000289 * Math.sin(rad(3*M));
+  return mod360(L0 + C);
+}
+
+// 月黄経 (ELP2000 簡易)
+function moonLongitude(date) {
+  const JD = julianDay(date);
+  const T = (JD - 2451545.0) / 36525;
+  const Lp = mod360(218.3164477 + 481267.88123421*T - 0.0015786*T*T);
+  const D  = mod360(297.8501921 + 445267.1114034*T - 0.0018819*T*T);
+  const M  = mod360(357.5291092 + 35999.0502909*T - 0.0001536*T*T);
+  const Mp = mod360(134.9633964 + 477198.8675055*T + 0.0087414*T*T);
+  const F  = mod360(93.2720950  + 483202.0175233*T - 0.0036539*T*T);
+  let sum = 0;
+  sum += 6.288774 * Math.sin(rad(Mp));
+  sum += 1.274027 * Math.sin(rad(2*D - Mp));
+  sum += 0.658314 * Math.sin(rad(2*D));
+  sum += 0.213618 * Math.sin(rad(2*Mp));
+  sum -= 0.185116 * Math.sin(rad(M));
+  sum -= 0.114332 * Math.sin(rad(2*F));
+  sum += 0.058793 * Math.sin(rad(2*D - 2*Mp));
+  sum += 0.057066 * Math.sin(rad(2*D - M - Mp));
+  sum += 0.053322 * Math.sin(rad(2*D + Mp));
+  sum += 0.045758 * Math.sin(rad(2*D - M));
+  sum -= 0.040923 * Math.sin(rad(M - Mp));
+  sum -= 0.034720 * Math.sin(rad(D));
+  return mod360(Lp + sum);
+}
+
+function moonPhase(date) {
+  const diff = mod360(moonLongitude(date) - sunLongitude(date));
+  const phase = diff / 360;
+  const age = phase * 29.530589;
+  let label = '十六夜（欠けゆく月）', emoji = '🌖';
+  for (const [a,b,n,e] of MOON_PHASES) {
+    if (a > b) { if (phase >= a || phase < b) { label=n; emoji=e; break; } }
+    else { if (phase >= a && phase < b) { label=n; emoji=e; break; } }
+  }
+  return { phase, age, label, emoji, diff };
+}
+
+// 24節気 (bisection)
+function findSolarTermDate(year, lon) {
+  const target = mod360(lon);
+  let lo = new Date(Date.UTC(year - 1, 11, 15));
+  let hi = new Date(Date.UTC(year + 1, 0, 31));
+  for (let i = 0; i < 40; i++) {
+    const mid = new Date((lo.getTime() + hi.getTime()) / 2);
+    const ml = sunLongitude(mid);
+    const diff = mod360(ml - target);
+    if (diff > 180) lo = mid; else hi = mid;
+  }
+  return new Date((lo.getTime() + hi.getTime()) / 2);
+}
+function solarTermsOfYear(year) {
+  return SOLAR_TERMS.map(([lon, name, m]) => ({ lon, name, main: m === 'main', date: findSolarTermDate(year, lon) }));
+}
+
+// ============================================================
+// 西洋星座
+// ============================================================
+function getSunSign(month, day) {
+  for (const [n, fm, fd, tm, td] of ZODIAC) {
+    if (fm > tm) { if ((month === fm && day >= fd) || (month === tm && day <= td)) return n; }
+    else if ((month === fm && day >= fd) || (month === tm && day <= td) || (month > fm && month < tm)) return n;
+  }
+  return ZODIAC[0][0];
+}
+
+// ============================================================
+// 九星
+// ============================================================
+function effectiveYear(birth) {
+  const d = parseDate(birth);
+  let y = d.getUTCFullYear();
+  const setsubun = new Date(Date.UTC(y, 1, 4));
+  if (d < setsubun) y -= 1;
+  return y;
+}
+function honmeiStar(birth) {
+  const y = effectiveYear(birth);
+  let s = digitSum(y); while (s > 9) s = digitSum(s);
+  let h = 11 - s; if (h > 9) h -= 9; if (h <= 0) h += 9; return h;
+}
+// 月命星 (本命星 + 節入り月で簡易計算: 男女共通テーブル)
+const GETSUMEI_TABLE = {
+  // 本命星 → [立春-清明前(寅卯辰月), 清明-小暑前(巳午未月), 小暑-寒露前(申酉戌月), 寒露-立春前(亥子丑月)]
+  // 簡易: 寅月起点で 1→8→2→5→8→2→5→8→2→5→8→2 をベース
+  // 実用上は本命星別に12月ぶんあるが、ここでは月支から決定する簡易版
+};
+// より単純な実装: 月支(寅=0)から月命星
+function getsumeiStar(honmei, monthBranchIdx) {
+  // 寅月起点で 本命1→8,4,7;  2/5/8→2,5,8;  3/6/9→3,6,9 と循環するパターン
+  // 実装: テーブル参照
+  const TBL = {
+    // [寅,卯,辰,巳,午,未,申,酉,戌,亥,子,丑]
+    1:[8,7,6,5,4,3,2,1,9,8,7,6],
+    4:[8,7,6,5,4,3,2,1,9,8,7,6], 7:[8,7,6,5,4,3,2,1,9,8,7,6],
+    2:[2,1,9,8,7,6,5,4,3,2,1,9],
+    5:[2,1,9,8,7,6,5,4,3,2,1,9], 8:[2,1,9,8,7,6,5,4,3,2,1,9],
+    3:[5,4,3,2,1,9,8,7,6,5,4,3],
+    6:[5,4,3,2,1,9,8,7,6,5,4,3], 9:[5,4,3,2,1,9,8,7,6,5,4,3],
+  };
+  return (TBL[honmei] || TBL[1])[monthBranchIdx];
+}
+// 日盤
+function dayStar(date) {
+  const d = (date instanceof Date) ? date : parseDate(date);
+  const jd = Math.floor((d - Date.UTC(1970,0,1)) / 86400000);
+  // anchor: 1970-01-01 was day-star ... use spec formula mod 9
   return ((jd % 9) + 9) % 9 + 1;
 }
-
-// 五行相性: 相生=+1, 比和=0, 相剋=-1
-const ELEMENTS = ['wood','fire','earth','metal','water'];
-function gogyo(a, b) {
-  const ia = ELEMENTS.indexOf(a), ib = ELEMENTS.indexOf(b);
-  if (ia === ib) return 0; // 比和
-  if ((ia + 1) % 5 === ib || (ib + 1) % 5 === ia) return 1; // 相生
-  return -1; // 相剋
+function starRelation(a, b) {
+  const ea = KYUSEI[a].el, eb = KYUSEI[b].el;
+  const order = ['木','火','土','金','水'];
+  const ia = order.indexOf(ea), ib = order.indexOf(eb);
+  if (ia === ib) return { name:'比和(調和)', score:4 };
+  if ((ia + 1) % 5 === ib) return { name:'洩気(消耗)', score:3 };
+  if ((ib + 1) % 5 === ia) return { name:'相生(発展)', score:5 };
+  if ((ia + 2) % 5 === ib) return { name:'相剋(摩擦)', score:2 };
+  return { name:'受剋(被害)', score:1 };
 }
 
-// シード付き擬似乱数 (誕生日 + 日付 → 安定した0-1)
-function hash(str) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = (h * 16777619) >>> 0;
+// ============================================================
+// 四柱推命
+// ============================================================
+function daysSince1900(date) {
+  return Math.floor((date - Date.UTC(1900,0,1)) / 86400000);
+}
+// 年柱: 立春前は前年扱い
+function yearPillar(birth) {
+  const y = effectiveYear(birth);
+  const stemIdx = ((y - 4) % 10 + 10) % 10;
+  const branchIdx = ((y - 4) % 12 + 12) % 12;
+  return { stem: STEMS[stemIdx], branch: BRANCHES[branchIdx], stemIdx, branchIdx, ganzhi: STEMS[stemIdx]+BRANCHES[branchIdx] };
+}
+// 月柱: 節入り (簡易: 各月の節入り日を-2/3/4近辺で判定)
+const SETSU_DAYS = [
+  // [月支index from 寅=0, 月開始(月,日)]
+  [10, 1, 5],  // 子月: 大雪 12/7頃
+  [11, 1,  20], // 子→丑は小寒 1/5頃 ※下のloopで
+];
+// より正確: 各節気日と月支対応
+// 月支マッピング (節気main12): 立春→寅, 啓蟄→卯, 清明→辰, 立夏→巳, 芒種→午, 小暑→未, 立秋→申, 白露→酉, 寒露→戌, 立冬→亥, 大雪→子, 小寒→丑
+const MONTH_BRANCH_FROM_TERM = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+function monthPillar(birth) {
+  const d = parseDate(birth);
+  const year = d.getUTCFullYear();
+  // 節入り (main 12) のリストを当年と前年で取得
+  const allTerms = [];
+  [year-1, year, year+1].forEach(y => {
+    SOLAR_TERMS.forEach(([lon, name, m]) => {
+      if (m === 'main') allTerms.push({ year:y, lon, name, date: findSolarTermDate(y, lon) });
+    });
+  });
+  allTerms.sort((a,b) => a.date - b.date);
+  // 月支マッピング順: 立春=寅, 啓蟄=卯, 清明=辰, ..., 小寒=丑
+  const TERM_TO_BRANCH = { '立春':'寅','啓蟄':'卯','清明':'辰','立夏':'巳','芒種':'午','小暑':'未','立秋':'申','白露':'酉','寒露':'戌','立冬':'亥','大雪':'子','小寒':'丑' };
+  // 出生日以前の最後のmain節気
+  let last = allTerms[0];
+  for (const t of allTerms) { if (t.date <= d) last = t; else break; }
+  const monthBranch = TERM_TO_BRANCH[last.name];
+  const branchIdx = BRANCHES.indexOf(monthBranch);
+  // 月干: 五虎遁
+  const yp = yearPillar(birth);
+  const tigerStem = WUGOLUEN[yp.stem]; // 寅月の月干
+  const tigerStemIdx = STEMS.indexOf(tigerStem);
+  // 寅=0番目, 月支index in MONTH_BRANCH_FROM_TERM
+  const monthOrder = MONTH_BRANCH_FROM_TERM.indexOf(monthBranch);
+  const stemIdx = (tigerStemIdx + monthOrder) % 10;
+  return { stem: STEMS[stemIdx], branch: monthBranch, stemIdx, branchIdx, ganzhi: STEMS[stemIdx]+monthBranch, termName: last.name };
+}
+// 日柱
+function dayPillar(birth) {
+  const d = parseDate(birth);
+  const days = daysSince1900(d);
+  const stemIdx = ((2 + days) % 10 + 10) % 10;
+  const branchIdx = ((10 + days) % 12 + 12) % 12;
+  return { stem: STEMS[stemIdx], branch: BRANCHES[branchIdx], stemIdx, branchIdx, ganzhi: STEMS[stemIdx]+BRANCHES[branchIdx] };
+}
+// 時柱
+function hourPillar(dayStem, hour) {
+  if (hour == null) return null;
+  // 時支: 子=23-1, 丑=1-3, ... 亥=21-23
+  let bIdx;
+  if (hour >= 23 || hour < 1) bIdx = 0;
+  else bIdx = Math.floor((hour + 1) / 2);
+  const zeroStem = WUSHUTEN[dayStem]; // 子時の干
+  const zeroIdx = STEMS.indexOf(zeroStem);
+  const stemIdx = (zeroIdx + bIdx) % 10;
+  return { stem: STEMS[stemIdx], branch: BRANCHES[bIdx], stemIdx, branchIdx: bIdx, ganzhi: STEMS[stemIdx]+BRANCHES[bIdx] };
+}
+// 通変星
+function tongbianStar(dayStemIdx, otherStemIdx) {
+  if (otherStemIdx == null) return '';
+  const eOrder = ['木','火','土','金','水'];
+  const eA = STEM_ELEMENTS[dayStemIdx], eB = STEM_ELEMENTS[otherStemIdx];
+  const yA = STEM_YINYANG[dayStemIdx], yB = STEM_YINYANG[otherStemIdx];
+  const same = yA === yB;
+  const iA = eOrder.indexOf(eA), iB = eOrder.indexOf(eB);
+  if (iA === iB) return same ? '比肩' : '劫財';
+  if ((iA + 1) % 5 === iB) return same ? '食神' : '傷官';       // 日干生
+  if ((iA + 2) % 5 === iB) return same ? '偏財' : '正財';       // 日干剋
+  if ((iB + 1) % 5 === iA) return same ? '偏印' : '印綬';       // 被生
+  return same ? '偏官' : '正官';                                  // 被剋
+}
+// 十二運
+function twelveStage(dayStem, branch) {
+  const [start, forward] = LONG_LIFE_START[dayStem];
+  const startIdx = BRANCHES.indexOf(start), bIdx = BRANCHES.indexOf(branch);
+  const diff = forward ? (bIdx - startIdx + 12) % 12 : (startIdx - bIdx + 12) % 12;
+  return TWELVE_STAGES[diff];
+}
+// 大運
+function calcDaiun(birth, gender, monthP, yearP) {
+  const yangStem = STEM_YINYANG[yearP.stemIdx] === '陽';
+  const forward = (gender === 'male' && yangStem) || (gender === 'female' && !yangStem);
+  const arr = [];
+  let stemIdx = monthP.stemIdx, branchIdx = monthP.branchIdx;
+  for (let i = 0; i < 8; i++) {
+    if (i > 0) {
+      if (forward) { stemIdx = (stemIdx + 1) % 10; branchIdx = (branchIdx + 1) % 12; }
+      else { stemIdx = (stemIdx + 9) % 10; branchIdx = (branchIdx + 11) % 12; }
+    }
+    arr.push({
+      age: `${i * 10 + 1}-${(i + 1) * 10}`,
+      ganzhi: STEMS[stemIdx] + BRANCHES[branchIdx],
+      stem: STEMS[stemIdx], branch: BRANCHES[branchIdx],
+    });
   }
-  return h;
-}
-function rand(seed, idx) {
-  return (hash(seed + ':' + idx) % 10000) / 10000;
+  return arr;
 }
 
-const ADVICES_GOOD = [
-  '新しい提案が通りやすい日。会議で発言を。',
-  '人脈拡大のチャンス。ランチに誘ってみよう。',
-  '集中力が高い。難しいタスクから着手すべし。',
-  '直感が冴える。意思決定はスピード重視で。',
-  '感謝を伝えると倍になって返ってくる日。',
-];
-const ADVICES_MID = [
-  '無理せず淡々と。ルーチン業務日和。',
-  '報連相を丁寧に。誤解が生まれやすい。',
-  '昼休みにしっかり休息を取ろう。',
-  '一歩引いて全体を俯瞰すると見えてくる。',
-];
-const ADVICES_BAD = [
-  '重要な意思決定は明日に回そう。',
-  '言葉選びは慎重に。短気は損気。',
-  '体調管理を最優先に。早めの帰宅を。',
-  '小さなミスに注意。ダブルチェック必須。',
-];
+// ============================================================
+// 数秘
+// ============================================================
+function lifePathNumber(birth) {
+  const digits = birth.replace(/-/g, '').split('').map(Number);
+  let sum = digits.reduce((a,b) => a+b, 0);
+  return reduceKeepMaster(sum);
+}
+function birthdayNumber(birth) {
+  const day = +birth.slice(8);
+  return reduceKeepMaster(day);
+}
+function personalYear(birth, year) {
+  const [_, m, d] = birth.split('-').map(Number);
+  const sum = digitSum(m) + digitSum(d) + digitSum(year);
+  return reduce1to9(sum);
+}
+function personalMonth(py, month) { return reduce1to9(py + month); }
+function personalDay(py, month, day) { return reduce1to9(personalMonth(py, month) + day); }
 
-const LUCKY_COLORS = ['赤','青','緑','黄','紫','白','黒','金','銀','桃'];
-const LUCKY_ITEMS = ['コーヒー','観葉植物','万年筆','ノート','ハンカチ','アロマ','チョコ','水晶','音楽','花'];
+// ============================================================
+// バースカード (11/2)
+// ============================================================
+const BIRTHCARD_NAMES = ['','魔術師','女教皇','女帝','皇帝','教皇','恋人','戦車','力','隠者','運命の輪','正義','吊るされた男','死神','節制','悪魔','塔','星','月','太陽','審判','世界','愚者'];
+function birthCards(birth) {
+  const digits = birth.replace(/-/g, '').split('').map(Number);
+  let sum = digits.reduce((a,b) => a+b, 0);
+  while (sum > 22) sum = digitSum(sum);
+  const personality = sum;
+  let soul = sum; while (soul > 9) soul = digitSum(soul);
+  return {
+    sum: digits.reduce((a,b) => a+b, 0),
+    personality, soul,
+    personalityCard: BIRTHCARD_NAMES[personality] || `(${personality})`,
+    soulCard: BIRTHCARD_NAMES[soul] || `(${soul})`,
+  };
+}
 
-// 血液型: 各項目への係数 (work, social, health, money) と 相性マップ
-const BLOOD = {
-  'A':  { mod: { work:+4, social:-2, health:+1, money:+2 }, trait: '几帳面・慎重' },
-  'B':  { mod: { work:-1, social:+4, health:+2, money:-1 }, trait: '自由・マイペース' },
-  'O':  { mod: { work:+2, social:+3, health:+3, money:+1 }, trait: 'おおらか・積極的' },
-  'AB': { mod: { work:+3, social:-1, health:-1, money:+3 }, trait: '合理的・二面性' },
+// ============================================================
+// 風水
+// ============================================================
+function calcKua(birth, gender) {
+  const y = effectiveYear(birth);
+  const yy = y % 100;
+  let k;
+  if (gender === 'male') { k = ((100 - yy) % 9 + 9) % 9; if (k === 0) k = 9; if (k === 5) k = 2; }
+  else { k = ((yy + 5) % 9 + 9) % 9; if (k === 0) k = 9; if (k === 5) k = 8; }
+  const group = [1,3,4,9].includes(k) ? '東四命' : '西四命';
+  return { kua: k, group };
+}
+function dirRatings(kua) { return FENGSHUI_DIR[kua] || FENGSHUI_DIR[1]; }
+
+// ============================================================
+// 易経
+// ============================================================
+function castYao(rnd) {
+  // 3 coins: heads=3, tails=2; sum 6-9
+  let sum = 0; for (let i = 0; i < 3; i++) sum += (rnd() < 0.5 ? 2 : 3);
+  return sum;
+}
+function trigramFromYaos(y1, y2, y3) {
+  // y1=初爻, y2=2爻, y3=3爻; bit0=y1, bit1=y2, bit2=y3 (陽=1, 陰=0); 6,8=陰 / 7,9=陽
+  const b = (y1 % 2) | ((y2 % 2) << 1) | ((y3 % 2) << 2);
+  return b;
+}
+function hexagramFromYaos(yaos) {
+  const lower = trigramFromYaos(yaos[0], yaos[1], yaos[2]);
+  const upper = trigramFromYaos(yaos[3], yaos[4], yaos[5]);
+  return { num: KING_WEN_TABLE[lower][upper], lower, upper };
+}
+function todayPersonalHexagram(birth, date) {
+  const dt = (date instanceof Date) ? date : parseDate(date);
+  const birthSeed = hash(birth);
+  const dateSeed = dt.getUTCFullYear()*10000 + (dt.getUTCMonth()+1)*100 + dt.getUTCDate();
+  const seed = (birthSeed ^ Math.imul(dateSeed, 2654435761)) >>> 0;
+  const rnd = lcgSeed(seed);
+  const yaos = [];
+  for (let i = 0; i < 6; i++) yaos.push(castYao(rnd));
+  const hex = hexagramFromYaos(yaos);
+  return { ...hex, yaos };
+}
+
+// ============================================================
+// タロット
+// ============================================================
+function buildDeck() {
+  const deck = [];
+  for (let i = 0; i < 22; i++) deck.push({ type:'major', id: i, name: MAJOR_ARCANA[i][0], meaning: MAJOR_ARCANA[i][1], reversed: MAJOR_ARCANA[i][2] });
+  for (const [suit, info] of Object.entries(SUITS)) {
+    for (let i = 0; i < 14; i++) {
+      deck.push({ type:'minor', suit, rank: MINOR_RANKS[i], name: `${suit}の${MINOR_RANKS[i]}`, element: info[0], domain: info[1], color: info[2] });
+    }
+  }
+  return deck;
+}
+function drawCardsSeeded(n, seed, positions) {
+  const deck = buildDeck();
+  const rnd = lcgSeed(seed >>> 0);
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  const picks = deck.slice(0, n);
+  return picks.map((c, i) => ({ ...c, reversedDraw: rnd() < 0.5, position: positions ? positions[i] : '' }));
+}
+
+// ============================================================
+// pickByDate
+// ============================================================
+function pickByDate(arr, date, salt) {
+  const dt = (date instanceof Date) ? date : parseDate(date);
+  const k = dt.getUTCFullYear()*10000 + (dt.getUTCMonth()+1)*100 + dt.getUTCDate();
+  const seed = (k ^ Math.imul(salt, 2654435761)) >>> 0;
+  return arr[seed % arr.length];
+}
+
+// ============================================================
+// 12時辰盤
+// ============================================================
+function todayHourlyChart(date, dayP) {
+  // 各時辰の通変星: 当日の時干と日干の通変
+  const out = [];
+  for (let bIdx = 0; bIdx < 12; bIdx++) {
+    const zeroStem = WUSHUTEN[dayP.stem];
+    const stemIdx = (STEMS.indexOf(zeroStem) + bIdx) % 10;
+    const tb = tongbianStar(dayP.stemIdx, stemIdx);
+    out.push({ branch: BRANCHES[bIdx], stem: STEMS[stemIdx], tongbian: tb, info: TONGBIAN_INFO[tb] || { rank:'-', desc:'' } });
+  }
+  return out;
+}
+
+// ============================================================
+// 統合占断 (静的)
+// ============================================================
+const SYNTHESIS = {
+  HERO_SYNTHESIS: { title:'核となる本質', text: p => `${p.name}の中核には、本命星「${KYUSEI[p.engines.honmei].name}」(${KYUSEI[p.engines.honmei].el}性)の力が宿り、日干「${p.engines.dayP.stem}」(${STEM_ELEMENTS[p.engines.dayP.stemIdx]}・${STEM_YINYANG[p.engines.dayP.stemIdx]})の理性で世界を捉える。ライフパス${p.engines.lifePath}が示す道は「使命と理想の統合」。` },
+  PERSONALITY_CORE: { title:'人格の核', text: p => `バースカード「${p.engines.bcards.personalityCard}」のペルソナを纏い、ソウル「${p.engines.bcards.soulCard}」の内面性を秘める。MBTI「${p.mbti||'INFJ'}」の${MBTI_PROFILES[p.mbti||'INFJ'][1]}という気質と響き合う。` },
+  CAREER_DEEP: { title:'仕事の深層', text: p => `月柱「${p.engines.monthP.ganzhi}」が表すキャリアの土壌は通変「${tongbianStar(p.engines.dayP.stemIdx, p.engines.monthP.stemIdx)}」。${TONGBIAN_INFO[tongbianStar(p.engines.dayP.stemIdx, p.engines.monthP.stemIdx)]?.desc || '中立な仕事観'}。大運の流れに乗ることで開花する。` },
+  WEALTH_CORE: { title:'富の根源', text: p => `${STEM_ELEMENTS[p.engines.dayP.stemIdx]}の日干にとって財星は「${['金','水','木','火','土'][ELEMENTS.indexOf(STEM_ELEMENTS[p.engines.dayP.stemIdx])]}」。金運のリズムは時間と血液型「${p.blood}型」の特性${BLOOD[p.blood]?.trait || ''}とも関連する。` },
+  HEALTH_CORE: { title:'体の構成', text: p => `日干「${p.engines.dayP.stem}」(${STEM_ELEMENTS[p.engines.dayP.stemIdx]})は${['肝胆','心小腸','脾胃','肺大腸','腎膀胱'][ELEMENTS.indexOf(STEM_ELEMENTS[p.engines.dayP.stemIdx])]}に対応。十二運「${p.engines.dayStage}」は今日の体調傾向を表す。` },
+  FENGSHUI_HOME: { title:'住まいの気', text: p => `本命卦${p.engines.kua.kua}「${p.engines.kua.group}」。生気方位${Object.entries(p.engines.dirs).find(([k,v]) => v==='生気')?.[0]||'-'}に書斎、絶命方位${Object.entries(p.engines.dirs).find(([k,v]) => v==='絶命')?.[0]||'-'}にトイレを置くのが理想。` },
+  SPIRITUAL_THEME: { title:'霊性のテーマ', text: p => `ソウルナンバー${p.engines.bcards.soul}「${p.engines.bcards.soulCard}」が示すのは、現世における学びの主題。${p.engines.bcards.soul===2?'関係性のなかで自己を見出すこと':'内なる光を発見し共有すること'}が本道。` },
+  COMMUNICATION_STYLE: { title:'対話の様式', text: p => `${MBTI_PROFILES[p.mbti||'INFJ'][1]}のフィルター越しに世界を見、血液型${p.blood}型「${BLOOD[p.blood]?.trait}」の流儀で言葉を選ぶ。沈黙より文脈、結論より物語を好む傾向。` },
+  DECISION_STYLE: { title:'決断のスタイル', text: p => `日干${p.engines.dayP.stem}は${STEM_YINYANG[p.engines.dayP.stemIdx]==='陽'?'外向的・即決':'内向的・熟考'}型。月柱との通変「${tongbianStar(p.engines.dayP.stemIdx, p.engines.monthP.stemIdx)}」が状況判断の癖を作る。` },
+  LEADERSHIP_STYLE: { title:'統率のスタイル', text: p => `年柱「${p.engines.yearP.ganzhi}」の社会的役割と${MBTI_PROFILES[p.mbti||'INFJ'][0]}の気質が掛け合わさり、${p.engines.yearP.stemIdx<5?'伝統的な権威':'革新的なビジョン'}でチームを動かす。` },
+  CONFLICT_PATTERN: { title:'葛藤のパターン', text: p => `相剋関係の本命星「${KYUSEI[(p.engines.honmei+2-1)%9+1]?.name||''}」を持つ相手と摩擦を生みやすい。意識的に${KYUSEI[(p.engines.honmei+1-1)%9+1]?.name||''}の人と関わることでバランスが取れる。` },
+  MONEY_PSYCHOLOGY: { title:'お金の心理', text: p => `バースカード「${p.engines.bcards.personalityCard}」の物質観に、血液型${p.blood}型の${BLOOD[p.blood]?.mod.money > 0 ? '蓄財傾向':'消費傾向'}が加わる。財布の中身より「価値観の明確さ」が金運の鍵。` },
+  BODY_CONSTITUTION: { title:'体質と養生', text: p => `${STEM_ELEMENTS[p.engines.dayP.stemIdx]}性の体質は${['酸味と緑','苦味と赤','甘味と黄','辛味と白','塩味と黒'][ELEMENTS.indexOf(STEM_ELEMENTS[p.engines.dayP.stemIdx])]}の食事で整う。十二運「${p.engines.dayStage}」期は${{'長生':'回復力','沐浴':'浄化','冠帯':'発展','建禄':'活力','帝旺':'勢い','衰':'保守','病':'休息','死':'静養','墓':'整理','絶':'断捨離','胎':'孕み','養':'育成'}[p.engines.dayStage]||'バランス'}を意識。` },
+  MENTAL_PATTERNS: { title:'思考のクセ', text: p => `MBTI「${p.mbti||'INFJ'}」の${MBTI_PROFILES[p.mbti||'INFJ'][1]}という認知傾向と、本命星${p.engines.honmei}の${KYUSEI[p.engines.honmei].el}性の感受性が、独自の世界の見方を作る。` },
+  SPIRITUAL_PRACTICE: { title:'霊性の実践', text: p => `朝の${p.engines.kua.group==='東四命'?'東向き':'西向き'}の祈り、満月の浄化、節気の節目の禊が効く。今日のラッキーアイテム「${p.todayItem}」を瞑想の触媒に。` },
+  PARENT_RELATIONSHIPS: { title:'親との関係', text: p => `年柱「${p.engines.yearP.ganzhi}」と日柱「${p.engines.dayP.ganzhi}」の通変は「${tongbianStar(p.engines.dayP.stemIdx, p.engines.yearP.stemIdx)}」。親から受け継いだものは${(TONGBIAN_INFO[tongbianStar(p.engines.dayP.stemIdx, p.engines.yearP.stemIdx)]?.desc)||'静かな伝統'}。` },
+  FAMILY_CARE: { title:'家族への配慮', text: p => `日柱「${p.engines.dayP.ganzhi}」の家庭観: ${BRANCH_YINYANG[p.engines.dayP.branchIdx]==='陽'?'活発で開かれた家':'静かで内密な家'}を作りやすい。家庭運は本命卦${p.engines.kua.kua}の${Object.entries(p.engines.dirs).find(([k,v])=>v==='延年')?.[0]||'西南'}方位に居場所を作ると安定。` },
 };
-// A=0,B=1,O=2,AB=3 → 相性スコア (10点満点)
-const BLOOD_COMPAT = {
-  'A':  { 'A':7, 'B':4, 'O':8, 'AB':6 },
-  'B':  { 'A':4, 'B':6, 'O':7, 'AB':8 },
-  'O':  { 'A':8, 'B':7, 'O':6, 'AB':5 },
-  'AB': { 'A':6, 'B':8, 'O':5, 'AB':7 },
-};
 
-// 個人 × 日 のフォーチュン
-function forecast(person, date) {
-  const star = honmeisei(person.birth);
+// ============================================================
+// AGGREGATE: ALL ENGINES per person × date
+// ============================================================
+function runEngines(person, dateStr) {
+  const date = parseDate(dateStr);
+  const yearP = yearPillar(person.birth);
+  const monthP = monthPillar(person.birth);
+  const dayP = dayPillar(person.birth);
+  const hourP = (person.hour != null && person.hour !== '') ? hourPillar(dayP.stem, +person.hour) : null;
+
+  const honmei = honmeiStar(person.birth);
+  const getsumei = getsumeiStar(honmei, monthP.branchIdx);
   const dStar = dayStar(date);
-  const compat = gogyo(KYUSEI[star].el, KYUSEI[dStar].el); // -1, 0, 1
+  const relation = starRelation(honmei, dStar);
 
-  const seed = person.id + '|' + date;
-  const baseNoise = rand(seed, 0) * 40; // 0-40
-  const compatBonus = (compat + 1) * 15; // 0,15,30
-  const dayMod = (Math.sin((new Date(date).getTime() / 86400000) * 0.7 + hash(person.id) % 100) + 1) * 7;
+  const lifePath = lifePathNumber(person.birth);
+  const bday = birthdayNumber(person.birth);
+  const py = personalYear(person.birth, date.getUTCFullYear());
+  const pday = personalDay(py, date.getUTCMonth()+1, date.getUTCDate());
 
+  const bcards = birthCards(person.birth);
+  const kua = calcKua(person.birth, person.gender || 'male');
+  const dirs = dirRatings(kua.kua);
+
+  const [m, d] = [date.getUTCMonth()+1, date.getUTCDate()];
+  const sunSign = getSunSign(+person.birth.slice(5,7), +person.birth.slice(8,10));
+  const sunLon = sunLongitude(date);
+  const moon = moonPhase(date);
+
+  // 今日の節気
+  const yearTerms = solarTermsOfYear(date.getUTCFullYear());
+  const prevYearTerms = solarTermsOfYear(date.getUTCFullYear()-1);
+  const allTerms = [...prevYearTerms, ...yearTerms];
+  let curTerm = allTerms[0];
+  for (const t of allTerms) { if (t.date <= date) curTerm = t; else break; }
+  const nextTerm = allTerms.find(t => t.date > date) || allTerms[allTerms.length-1];
+
+  const todayDayP = dayPillar(dateStr);
+  const dayStage = twelveStage(dayP.stem, todayDayP.branch);
+
+  // 今日の干支×本人の通変 (運勢)
+  const todayTongbian = tongbianStar(dayP.stemIdx, todayDayP.stemIdx);
+  const todayInfo = TONGBIAN_INFO[todayTongbian] || { rank:'中吉', desc:'-' };
+
+  // 大運 (現在何運か)
+  const ageNow = date.getUTCFullYear() - parseDate(person.birth).getUTCFullYear();
+  const daiun = calcDaiun(person.birth, person.gender || 'male', monthP, yearP);
+  daiun.forEach(d => {
+    const [a, b] = d.age.split('-').map(Number);
+    d.current = ageNow >= a && ageNow <= b;
+    d.tongbian = tongbianStar(dayP.stemIdx, STEMS.indexOf(d.stem));
+  });
+
+  // 12時辰
+  const hourly = todayHourlyChart(date, todayDayP);
+
+  // 易経 (today personal)
+  const hex = todayPersonalHexagram(person.birth, date);
+
+  // タロット 3 枚 (過去-現在-未来)
+  const tarotSeed = hash(person.id + '|' + dateStr);
+  const tarot = drawCardsSeeded(3, tarotSeed, ['過去','現在','未来']);
+
+  // pickByDate
+  const pdVariant = pickByDate(PERSONAL_DAY_VARIANTS, date, 101);
+  const dColor    = pickByDate(DAY_COLORS,    date, 201);
+  const dCaution  = pickByDate(DAY_CAUTIONS,  date, 301);
+  const dFood     = pickByDate(DAY_FOODS,     date, 401);
+  const dItem     = pickByDate(DAY_ITEMS,     date, 501);
+  const dShadow   = pickByDate(SHADOW_BLESSINGS, date, 601);
+
+  // MBTI: 人物固定 or 推定
+  const mbti = person.mbti || (person.id === 'yoshida' ? 'INFJ' : inferMBTI(person));
+
+  // スコア算出 (各種要素の総和)
   const bMod = (BLOOD[person.blood] || BLOOD['O']).mod;
-  const total = Math.min(99, Math.max(15, Math.round(30 + baseNoise + compatBonus + dayMod)));
+  const seed = person.id + '|' + dateStr;
+  const baseRng = ((hash(seed) % 10000) / 10000) * 40;
+  const compatBonus = relation.score * 6;            // 6-30
+  const tongbianBonus = ({'大吉':18,'吉':12,'中吉':6,'注意':-6,'-':0})[todayInfo.rank] || 0;
+  const moonBonus = (Math.sin(moon.phase * Math.PI * 2)) * 6;
+  const total = Math.max(15, Math.min(99, Math.round(40 + baseRng + compatBonus + tongbianBonus + moonBonus)));
 
-  const work    = Math.min(99, Math.max(10, Math.round(total + (rand(seed,1) - 0.5) * 30 + bMod.work)));
-  const social  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,2) - 0.5) * 30 + bMod.social)));
-  const health  = Math.min(99, Math.max(10, Math.round(total + (rand(seed,3) - 0.5) * 30 + bMod.health)));
-  const money   = Math.min(99, Math.max(10, Math.round(total + (rand(seed,4) - 0.5) * 30 + bMod.money)));
+  const work    = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'w')%2000)/2000 - 0.5)*30 + bMod.work)));
+  const social  = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'s')%2000)/2000 - 0.5)*30 + bMod.social)));
+  const health  = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'h')%2000)/2000 - 0.5)*30 + bMod.health)));
+  const money   = Math.max(10, Math.min(99, Math.round(total + ((hash(seed+'m')%2000)/2000 - 0.5)*30 + bMod.money)));
 
-  // 中心人物との相性 (本命星 + 血液型)
+  // 中心人物との相性
   const center = PEOPLE.find(p => p.center) || PEOPLE[0];
-  const yStar = honmeisei(center.birth);
-  const yCompat = gogyo(KYUSEI[star].el, KYUSEI[yStar].el);
-  const bloodC = (BLOOD_COMPAT[person.blood] && BLOOD_COMPAT[person.blood][center.blood]) || 6;
-  const compatScore = Math.round(40 + yCompat * 20 + bloodC * 2.5 + (rand(seed, 'y') - 0.5) * 20);
-
-  const adv = total >= 75 ? ADVICES_GOOD : total >= 50 ? ADVICES_MID : ADVICES_BAD;
-  const advice = adv[hash(seed) % adv.length];
-  const luckyColor = LUCKY_COLORS[hash(seed + 'c') % LUCKY_COLORS.length];
-  const luckyItem  = LUCKY_ITEMS[hash(seed + 'i') % LUCKY_ITEMS.length];
-  const luckyNum   = (hash(seed + 'n') % 9) + 1;
+  let compatScore = 50;
+  if (center && person.id !== center.id) {
+    const cHon = honmeiStar(center.birth);
+    const rel = starRelation(honmei, cHon);
+    const cDay = dayPillar(center.birth);
+    const tbMutual = tongbianStar(cDay.stemIdx, dayP.stemIdx);
+    const tbBonus = ({'正官':20,'正財':18,'印綬':16,'食神':12,'偏財':10,'比肩':6,'偏官':4,'偏印':2,'傷官':-10,'劫財':-8})[tbMutual] || 0;
+    const blood = (BLOOD_COMPAT[person.blood]?.[center.blood]) || 6;
+    compatScore = Math.max(10, Math.min(99, Math.round(35 + rel.score * 4 + tbBonus + blood * 2 + ((hash(seed+'c')%2000)/2000 - 0.5) * 15)));
+  } else {
+    compatScore = 99;
+  }
 
   return {
-    total, work, social, health, money,
-    star, dStar, compat, compatScore: Math.max(10, Math.min(99, compatScore)),
-    advice, luckyColor, luckyItem, luckyNum,
-    eto: eto(person.birth), zodiac: zodiac(person.birth),
-    bloodTrait: (BLOOD[person.blood] || {}).trait || '—',
+    person, date, dateStr,
+    total, work, social, health, money, compatScore,
+    engines: {
+      yearP, monthP, dayP, hourP,
+      honmei, getsumei, dStar, relation,
+      lifePath, bday, py, pday,
+      bcards, kua, dirs,
+      sunSign, sunLon, moon, curTerm, nextTerm,
+      dayStage, todayTongbian, todayInfo,
+      daiun, hourly, hex, tarot,
+    },
+    mbti,
+    todayVariant: pdVariant, todayColor: dColor, todayCaution: dCaution,
+    todayFood: dFood, todayItem: dItem, shadowBlessing: dShadow,
+    advice: chooseAdvice(total, todayInfo.rank),
   };
+}
+
+function inferMBTI(person) {
+  const types = Object.keys(MBTI_PROFILES);
+  return types[hash(person.id) % types.length];
+}
+function chooseAdvice(total, rank) {
+  if (total >= 80 || rank === '大吉') return '今日は大胆に行動してよい。新規提案や重要な打診のチャンス。';
+  if (total >= 65) return '集中力が高い日。難しいタスクから着手しよう。';
+  if (total >= 50) return '無理せず淡々と。報連相を丁寧に。';
+  if (total >= 35) return '一歩引いて全体を俯瞰すると見えてくる。';
+  return '重要な意思決定は明日に回そう。体調管理を最優先に。';
 }
 
 function scoreColor(s) {
@@ -662,65 +1164,55 @@ function scoreColor(s) {
 }
 
 // ============================================================
-// Rendering
+// RENDER
 // ============================================================
 const $date = document.getElementById('dateInput');
 const $svg  = document.getElementById('radial');
 const $cards = document.getElementById('cards');
-const $detail = document.getElementById('detail');
-let selectedId = 'yoshida';
-
-function fmtDate(d) {
-  const dt = new Date(d);
-  return dt.toISOString().slice(0, 10);
-}
-function todayStr() { return fmtDate(new Date()); }
+const $detailName = document.getElementById('detailName');
+let selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || 'yoshida';
+let activeTab = 'overview';
 
 function render() {
   const date = $date.value || todayStr();
-  const forecasts = {};
-  PEOPLE.forEach(p => forecasts[p.id] = forecast(p, date));
-  drawRadial(date, forecasts);
-  drawCards(date, forecasts);
-  drawDetail(date, forecasts);
+  const all = {};
+  PEOPLE.forEach(p => all[p.id] = runEngines(p, date));
+  drawRadial(date, all);
+  drawCards(date, all);
+  drawDetail(date, all);
 }
 
-function drawRadial(date, fs) {
-  const W = 600, H = 600, CX = 300, CY = 300, R = 200;
-  $svg.innerHTML = '';
-
+function drawRadial(date, all) {
   const NS = 'http://www.w3.org/2000/svg';
-  const center = PEOPLE.find(p => p.center);
-  const others = PEOPLE.filter(p => !p.center);
+  const CX=300, CY=300, R=200;
+  $svg.innerHTML = '';
+  const center = PEOPLE.find(p => p.center) || PEOPLE[0];
+  const others = PEOPLE.filter(p => p.id !== center.id);
 
-  // outer rings (decorative)
+  // rings
   for (let i = 0; i < 3; i++) {
     const ring = document.createElementNS(NS, 'circle');
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY);
-    ring.setAttribute('r', 80 + i * 60);
+    ring.setAttribute('r', 80 + i*60);
     ring.setAttribute('fill', 'none');
     ring.setAttribute('stroke', 'rgba(255,255,255,0.04)');
     ring.setAttribute('stroke-dasharray', '4 6');
     $svg.appendChild(ring);
   }
 
-  // links
   others.forEach((p, i) => {
-    const angle = (-Math.PI / 2) + (i / others.length) * Math.PI * 2;
-    const x = CX + Math.cos(angle) * R;
-    const y = CY + Math.sin(angle) * R;
-    const c = fs[p.id].compatScore;
+    const angle = (-Math.PI/2) + (i / others.length) * Math.PI * 2;
+    const x = CX + Math.cos(angle)*R, y = CY + Math.sin(angle)*R;
+    const c = all[p.id].compatScore;
     const link = document.createElementNS(NS, 'line');
     link.setAttribute('x1', CX); link.setAttribute('y1', CY);
-    link.setAttribute('x2', x);  link.setAttribute('y2', y);
+    link.setAttribute('x2', x); link.setAttribute('y2', y);
     link.setAttribute('class', 'link');
     link.setAttribute('stroke', scoreColor(c));
-    link.setAttribute('stroke-width', 1 + (c / 100) * 4);
-    link.setAttribute('opacity', 0.3 + (c / 100) * 0.5);
+    link.setAttribute('stroke-width', 1 + (c/100)*4);
+    link.setAttribute('opacity', 0.3 + (c/100)*0.5);
     $svg.appendChild(link);
-
-    // compat score label on link
-    const mx = (CX + x) / 2, my = (CY + y) / 2;
+    const mx = (CX+x)/2, my = (CY+y)/2;
     const lbl = document.createElementNS(NS, 'text');
     lbl.setAttribute('x', mx); lbl.setAttribute('y', my);
     lbl.setAttribute('text-anchor', 'middle');
@@ -731,128 +1223,385 @@ function drawRadial(date, fs) {
     $svg.appendChild(lbl);
   });
 
-  // central node
-  drawNode(CX, CY, center, fs[center.id], 50, true);
-
-  // outer nodes
+  drawNode(CX, CY, center, all[center.id], 50, true);
   others.forEach((p, i) => {
-    const angle = (-Math.PI / 2) + (i / others.length) * Math.PI * 2;
-    const x = CX + Math.cos(angle) * R;
-    const y = CY + Math.sin(angle) * R;
-    drawNode(x, y, p, fs[p.id], 36, false);
+    const angle = (-Math.PI/2) + (i / others.length) * Math.PI * 2;
+    drawNode(CX + Math.cos(angle)*R, CY + Math.sin(angle)*R, p, all[p.id], 36, false);
   });
 }
-
-function drawNode(cx, cy, person, f, r, isCenter) {
+function drawNode(cx, cy, person, r, radius, isCenter) {
   const NS = 'http://www.w3.org/2000/svg';
-  const g = document.createElementNS(NS, 'g');
-
-  // outer glow ring (score)
+  const f = r;
   const ring = document.createElementNS(NS, 'circle');
   ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
-  ring.setAttribute('r', r + 6);
+  ring.setAttribute('r', radius + 6);
   ring.setAttribute('fill', 'none');
   ring.setAttribute('stroke', scoreColor(f.total));
   ring.setAttribute('stroke-width', 3);
   ring.setAttribute('opacity', 0.7);
-  g.appendChild(ring);
+  $svg.appendChild(ring);
 
-  // main circle
   const c = document.createElementNS(NS, 'circle');
   c.setAttribute('cx', cx); c.setAttribute('cy', cy);
-  c.setAttribute('r', r);
-  c.setAttribute('fill', KYUSEI[f.star].color);
+  c.setAttribute('r', radius);
+  c.setAttribute('fill', KYUSEI[f.engines.honmei].color);
   c.setAttribute('fill-opacity', 0.25);
-  c.setAttribute('stroke', KYUSEI[f.star].color);
+  c.setAttribute('stroke', KYUSEI[f.engines.honmei].color);
   c.setAttribute('stroke-width', 2);
   c.setAttribute('class', 'node-circle' + (selectedId === person.id ? ' selected' : ''));
   c.addEventListener('click', () => { selectedId = person.id; render(); });
-  g.appendChild(c);
+  $svg.appendChild(c);
 
-  // score number
   const score = document.createElementNS(NS, 'text');
   score.setAttribute('x', cx); score.setAttribute('y', cy + 5);
   score.setAttribute('class', 'node-score');
   score.style.fontSize = (isCenter ? 22 : 16) + 'px';
   score.textContent = f.total;
-  g.appendChild(score);
+  $svg.appendChild(score);
 
-  // name below
   const name = document.createElementNS(NS, 'text');
-  name.setAttribute('x', cx); name.setAttribute('y', cy + r + 22);
+  name.setAttribute('x', cx); name.setAttribute('y', cy + radius + 22);
   name.setAttribute('class', 'node-label');
   name.textContent = person.name + (isCenter ? '（中心）' : '');
-  g.appendChild(name);
+  $svg.appendChild(name);
 
-  // star info
   const sub = document.createElementNS(NS, 'text');
-  sub.setAttribute('x', cx); sub.setAttribute('y', cy + r + 36);
+  sub.setAttribute('x', cx); sub.setAttribute('y', cy + radius + 36);
   sub.setAttribute('class', 'node-sub');
-  sub.textContent = KYUSEI[f.star].name + ' / ' + ETO[f.eto];
-  g.appendChild(sub);
-
-  $svg.appendChild(g);
+  sub.textContent = KYUSEI[f.engines.honmei].name + ' / ' + f.engines.dayP.ganzhi;
+  $svg.appendChild(sub);
 }
 
-function drawCards(date, fs) {
+function drawCards(date, all) {
   $cards.innerHTML = '';
   PEOPLE.forEach(p => {
-    const f = fs[p.id];
+    const f = all[p.id];
     const card = document.createElement('div');
     card.className = 'card' + (selectedId === p.id ? ' selected' : '');
     card.innerHTML = `
       <div class="card-head">
         <div>
           <span class="card-name">${p.name}</span>
-          <span class="card-role">${p.role}</span>
+          <span class="card-role">${p.role || ''}</span>
         </div>
         <div class="card-score" style="color:${scoreColor(f.total)}">${f.total}</div>
       </div>
       <div class="bars">
-        ${bar('仕事', f.work)}
-        ${bar('対人', f.social)}
-        ${bar('健康', f.health)}
-        ${bar('金運', f.money)}
+        ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--muted)">
+        ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
       </div>
     `;
     card.addEventListener('click', () => { selectedId = p.id; render(); });
     $cards.appendChild(card);
   });
 }
-
 function bar(label, v) {
-  return `<div class="bar">
-    <span>${label}</span>
-    <div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
-    <span class="bar-val">${v}</span>
-  </div>`;
+  return `<div class="bar"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div><span class="bar-val">${v}</span></div>`;
 }
 
-function drawDetail(date, fs) {
-  const p = PEOPLE.find(x => x.id === selectedId);
-  const f = fs[selectedId];
-  const yf = fs['yoshida'];
-  const compatLabel = f.compat > 0 ? '相生（吉）' : f.compat === 0 ? '比和（穏）' : '相剋（注意）';
+// ============== Tabs ==============
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab'); if (!btn) return;
+  activeTab = btn.dataset.tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + activeTab));
+  render();
+});
 
-  $detail.innerHTML = `
-    <h3>${p.name} <span style="font-size:12px;color:var(--muted);font-weight:normal">— ${p.role}</span></h3>
-    <div class="row"><span>生年月日</span><span>${p.birth}</span></div>
-    <div class="row"><span>血液型</span><span>${p.blood || '—'}型 <span style="color:var(--muted);font-size:11px">（${f.bloodTrait}）</span></span></div>
-    <div class="row"><span>本命星</span><span style="color:${KYUSEI[f.star].color}">${KYUSEI[f.star].name}</span></div>
-    <div class="row"><span>干支 / 星座</span><span>${ETO[f.eto]}（${ETO_NAME[f.eto]}）/ ${f.zodiac}</span></div>
-    <div class="row"><span>今日の日盤</span><span>${KYUSEI[f.dStar].name}（${compatLabel}）</span></div>
-    ${!p.center ? `<div class="row"><span>中心人物との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
-    <div class="lucky">
-      <span class="chip">ラッキーカラー: ${f.luckyColor}</span>
-      <span class="chip">アイテム: ${f.luckyItem}</span>
-      <span class="chip">数字: ${f.luckyNum}</span>
+function drawDetail(date, all) {
+  const p = PEOPLE.find(x => x.id === selectedId) || PEOPLE[0];
+  const f = all[p.id];
+  $detailName.textContent = `${p.name} (${p.role || ''})`;
+  document.getElementById('tab-overview').innerHTML  = renderOverview(p, f);
+  document.getElementById('tab-shichu').innerHTML    = renderShichu(p, f);
+  document.getElementById('tab-astro').innerHTML     = renderAstro(p, f);
+  document.getElementById('tab-num').innerHTML       = renderNum(p, f);
+  document.getElementById('tab-fengshui').innerHTML  = renderFengshui(p, f);
+  document.getElementById('tab-iching').innerHTML    = renderIching(p, f);
+  document.getElementById('tab-mbti').innerHTML      = renderMBTI(p, f);
+}
+
+function renderOverview(p, f) {
+  const center = PEOPLE.find(x => x.center) || PEOPLE[0];
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>基本プロフィール</h3>
+        <div class="row"><span>生年月日</span><span>${p.birth}${p.hour!=null?` ${p.hour}:00頃`:''}</span></div>
+        <div class="row"><span>性別 / 血液型</span><span>${p.gender==='female'?'女性':'男性'} / ${p.blood||'?'}型 <span style="color:var(--muted);font-size:11px">(${BLOOD[p.blood]?.trait||'-'})</span></span></div>
+        <div class="row"><span>本命星 / 月命星</span><span style="color:${KYUSEI[f.engines.honmei].color}">${KYUSEI[f.engines.honmei].name} / ${KYUSEI[f.engines.getsumei].name}</span></div>
+        <div class="row"><span>太陽星座</span><span>${f.engines.sunSign}</span></div>
+        <div class="row"><span>本命卦</span><span>${f.engines.kua.kua} (${f.engines.kua.group})</span></div>
+        <div class="row"><span>MBTI</span><span>${f.mbti} ${MBTI_PROFILES[f.mbti]?.[0]||''}</span></div>
+        <div class="row"><span>ライフパス</span><span>${f.engines.lifePath}</span></div>
+      </div>
+      <div class="box">
+        <h3>今日の総合運</h3>
+        <div style="text-align:center;font-size:48px;font-weight:800;color:${scoreColor(f.total)};line-height:1;margin:10px 0">${f.total}</div>
+        <div class="bars" style="font-size:12px">
+          ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
+        </div>
+        ${p.id !== center.id ? `<div class="row" style="margin-top:10px"><span>${center.name}との相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
+        <div style="margin-top:10px">
+          <span class="chip">日干通変: ${f.engines.todayTongbian} (${f.engines.todayInfo.rank})</span>
+          <span class="chip">本命×日盤: ${f.engines.relation.name}</span>
+        </div>
+        <div class="advice">💡 ${f.advice}</div>
+      </div>
     </div>
-    <div class="advice">💡 ${f.advice}</div>
+    <div class="box" style="margin-top:14px">
+      <h3>今日のサジェスト</h3>
+      <div class="row"><span>パーソナルデイ</span><span>第${f.engines.pday}日 ・ ${f.todayVariant}</span></div>
+      <div class="row"><span>ラッキーカラー</span><span>${f.todayColor}</span></div>
+      <div class="row"><span>ラッキーアイテム</span><span>${f.todayItem}</span></div>
+      <div class="row"><span>おすすめ食</span><span>${f.todayFood}</span></div>
+      <div class="row"><span>気をつけること</span><span>${f.todayCaution}</span></div>
+      <div class="advice">🌗 ${f.shadowBlessing}</div>
+    </div>
+  `;
+}
+
+function renderShichu(p, f) {
+  const e = f.engines;
+  const pillars = [
+    ['年柱', e.yearP],
+    ['月柱', e.monthP],
+    ['日柱', e.dayP],
+    ['時柱', e.hourP],
+  ];
+  return `
+    <div class="box">
+      <h3>四柱 (${p.birth}${p.hour!=null?` ${p.hour}時`:' 時刻未指定'})</h3>
+      <div class="pillar-table">
+        ${pillars.map(([label, pl]) => {
+          if (!pl) return `<div class="pillar-cell"><div class="pillar-label">${label}</div><span class="pillar-stem">-</span><span class="pillar-branch">-</span><div class="pillar-meta">未指定</div></div>`;
+          const tb = (label === '日柱') ? '日干' : tongbianStar(e.dayP.stemIdx, pl.stemIdx);
+          const stage = twelveStage(e.dayP.stem, pl.branch);
+          return `<div class="pillar-cell">
+            <div class="pillar-label">${label}</div>
+            <span class="pillar-stem">${pl.stem}</span>
+            <span class="pillar-branch">${pl.branch}</span>
+            <div class="pillar-meta">
+              ${STEM_ELEMENTS[pl.stemIdx]}${STEM_YINYANG[pl.stemIdx]}<br>
+              通変: ${tb}<br>
+              十二運: ${stage}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${e.monthP.termName ? `<div style="font-size:11px;color:var(--muted);margin-top:6px">節入り: ${e.monthP.termName} ベース</div>` : ''}
+    </div>
+
+    <div class="grid-2" style="margin-top:14px">
+      <div class="box">
+        <h3>大運の流れ (8回, 10年単位)</h3>
+        ${e.daiun.map(d => `<div class="row${d.current?'" style="color:var(--accent);font-weight:700':''}">
+          <span>${d.age}歳${d.current?' ◀ 現在':''}</span>
+          <span>${d.ganzhi} (${d.tongbian})</span>
+        </div>`).join('')}
+      </div>
+      <div class="box">
+        <h3>今日の十二運 / 通変</h3>
+        <div class="row"><span>今日の日柱</span><span>${dayPillar(f.dateStr).ganzhi}</span></div>
+        <div class="row"><span>本人日干への通変</span><span style="color:${scoreColor(({'大吉':95,'吉':80,'中吉':60,'注意':30})[e.todayInfo.rank]||50)}">${e.todayTongbian} (${e.todayInfo.rank})</span></div>
+        <div class="row"><span>意味</span><span>${e.todayInfo.desc}</span></div>
+        <div class="row"><span>十二運</span><span>${e.dayStage}</span></div>
+        <h4>12時辰盤 (今日)</h4>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:11px">
+          ${e.hourly.map(h => `<div class="chip-mini" title="${h.info.desc}" style="text-align:center;color:${({'大吉':'#4ade80','吉':'#a3e635','中吉':'#fde68a','注意':'#fb923c'})[h.info.rank]||'#fff'}">${h.branch}: ${h.tongbian}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAstro(p, f) {
+  const e = f.engines;
+  const moonAngle = e.moon.phase * 360;
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>西洋占星術</h3>
+        <div class="row"><span>太陽星座</span><span>${e.sunSign}</span></div>
+        <div class="row"><span>太陽黄経 (出生時)</span><span>${sunLongitude(parseDate(p.birth)).toFixed(2)}°</span></div>
+        <div class="row"><span>太陽黄経 (今日)</span><span>${e.sunLon.toFixed(2)}°</span></div>
+        <h4>24節気 (現在)</h4>
+        <div class="row"><span>現在の節気</span><span>${e.curTerm.name}${e.curTerm.main?' (節)':' (中)'}</span></div>
+        <div class="row"><span>次の節気</span><span>${e.nextTerm.name} (${e.nextTerm.date.toISOString().slice(0,10)})</span></div>
+      </div>
+      <div class="box">
+        <h3>今日の月相 ${e.moon.emoji}</h3>
+        <div style="text-align:center;margin:10px 0">
+          ${moonSvg(e.moon.phase)}
+        </div>
+        <div class="row"><span>月相</span><span>${e.moon.label}</span></div>
+        <div class="row"><span>月齢</span><span>${e.moon.age.toFixed(2)} 日</span></div>
+        <div class="row"><span>月-太陽角度</span><span>${e.moon.diff.toFixed(2)}°</span></div>
+      </div>
+    </div>
+  `;
+}
+function moonSvg(phase) {
+  // phase: 0=new, 0.5=full, 1=new
+  const W = 160, H = 160, R = 70;
+  // 影の中心x座標を計算
+  const k = Math.cos(phase * Math.PI * 2);  // -1..1
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:160px;height:160px">
+    <circle cx="${W/2}" cy="${H/2}" r="${R}" fill="#1a1f3a" stroke="#3a3f5f" stroke-width="1"/>
+    <circle cx="${W/2}" cy="${H/2}" r="${R}" fill="#fde68a"/>
+    <ellipse cx="${W/2 + k*R}" cy="${H/2}" rx="${Math.abs(k)*R}" ry="${R}" fill="#1a1f3a"/>
+    ${phase < 0.5 ? `<rect x="${W/2}" y="${H/2-R}" width="${R}" height="${R*2}" fill="#1a1f3a"/>` : `<rect x="${W/2-R}" y="${H/2-R}" width="${R}" height="${R*2}" fill="#1a1f3a"/>`}
+    <circle cx="${W/2}" cy="${H/2}" r="${R}" fill="none" stroke="#fde68a" stroke-width="1.5"/>
+  </svg>`;
+}
+
+function renderNum(p, f) {
+  const e = f.engines;
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>数秘</h3>
+        <div class="row"><span>ライフパス</span><span style="font-size:18px;font-weight:700;color:var(--accent)">${e.lifePath}</span></div>
+        <div class="row"><span>バースデー</span><span>${e.bday}</span></div>
+        <div class="row"><span>パーソナルイヤー (${f.date.getUTCFullYear()})</span><span>${e.py}</span></div>
+        <div class="row"><span>パーソナルデイ (今日)</span><span>${e.pday}</span></div>
+        <div class="narrative" style="margin-top:10px">${f.todayVariant}</div>
+      </div>
+      <div class="box">
+        <h3>バースカード (11/2)</h3>
+        <div class="row"><span>数字の和</span><span>${e.bcards.sum}</span></div>
+        <div class="row"><span>パーソナリティ</span><span style="font-weight:700;color:var(--accent)">${e.bcards.personality} ${e.bcards.personalityCard}</span></div>
+        <div class="row"><span>ソウル</span><span style="font-weight:700;color:#88ccff">${e.bcards.soul} ${e.bcards.soulCard}</span></div>
+        <div class="narrative" style="margin-top:10px">${SYNTHESIS.PERSONALITY_CORE.text(f)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderFengshui(p, f) {
+  const e = f.engines;
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>本命卦</h3>
+        <div class="row"><span>本命卦</span><span style="font-size:24px;font-weight:700;color:var(--accent)">${e.kua.kua}</span></div>
+        <div class="row"><span>グループ</span><span>${e.kua.group}</span></div>
+        <h4>8方位の吉凶</h4>
+        ${Object.entries(e.dirs).map(([dir, rate]) => {
+          const r = DIR_RANK[rate];
+          return `<div class="row"><span>${dir}</span><span style="color:${r[1]};font-weight:600">${rate} (${r[0]}) — ${r[2]}</span></div>`;
+        }).join('')}
+      </div>
+      <div class="box">
+        <h3>8方位コンパス</h3>
+        <div style="text-align:center;margin-top:10px">${compassSvg(e.dirs)}</div>
+      </div>
+    </div>
+  `;
+}
+function compassSvg(dirs) {
+  const W=320, H=320, CX=W/2, CY=H/2, R=130, IR=60;
+  const order = ['北','東北','東','東南','南','西南','西','西北'];
+  const segments = order.map((dir, i) => {
+    const a0 = (-Math.PI/2) + (i - 0.5)/8 * Math.PI*2;
+    const a1 = (-Math.PI/2) + (i + 0.5)/8 * Math.PI*2;
+    const x0o = CX + Math.cos(a0)*R, y0o = CY + Math.sin(a0)*R;
+    const x1o = CX + Math.cos(a1)*R, y1o = CY + Math.sin(a1)*R;
+    const x0i = CX + Math.cos(a0)*IR, y0i = CY + Math.sin(a0)*IR;
+    const x1i = CX + Math.cos(a1)*IR, y1i = CY + Math.sin(a1)*IR;
+    const rate = dirs[dir] || '-';
+    const c = (DIR_RANK[rate] || ['','#666',''])[1];
+    const am = (a0+a1)/2;
+    const lx = CX + Math.cos(am)*(R+IR)/2, ly = CY + Math.sin(am)*(R+IR)/2;
+    const labelX = CX + Math.cos(am)*(R+18), labelY = CY + Math.sin(am)*(R+18) + 4;
+    return `<path d="M${x0i},${y0i} L${x0o},${y0o} A${R},${R} 0 0,1 ${x1o},${y1o} L${x1i},${y1i} A${IR},${IR} 0 0,0 ${x0i},${y0i} Z" fill="${c}" fill-opacity="0.55" stroke="#0f1228" stroke-width="1"/>
+      <text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="10" fill="#0f1228" font-weight="700">${rate}</text>
+      <text x="${labelX}" y="${labelY}" text-anchor="middle" font-size="13" fill="var(--fg)" font-weight="600">${dir}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:300px;height:300px">${segments}
+    <circle cx="${CX}" cy="${CY}" r="${IR-2}" fill="var(--bg2)" stroke="var(--accent)" stroke-width="2"/>
+    <text x="${CX}" y="${CY+5}" text-anchor="middle" font-size="14" fill="var(--accent)" font-weight="700">中心</text>
+  </svg>`;
+}
+
+function renderIching(p, f) {
+  const e = f.engines;
+  const hex = e.hex;
+  const meaning = HEX_MEANING[hex.num] || '';
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>今日の易卦 (パーソナル)</h3>
+        <div style="display:flex;gap:20px;align-items:center;margin:14px 0">
+          <div class="hex">
+            ${hex.yaos.map(y => {
+              const yang = (y % 2) === 1;
+              const changing = y === 6 || y === 9;
+              return `<div class="hex-line ${yang?'':'yin'} ${changing?'changing':''}"></div>`;
+            }).join('')}
+          </div>
+          <div>
+            <div style="font-size:24px;font-weight:700;color:var(--accent)">第${hex.num}卦</div>
+            <div style="font-size:18px;margin:6px 0">${HEX_NAMES[hex.num]}</div>
+            <div style="font-size:12px;color:var(--muted)">上卦 ${TRIGRAMS[hex.upper][1]} ${TRIGRAMS[hex.upper][0]} / 下卦 ${TRIGRAMS[hex.lower][1]} ${TRIGRAMS[hex.lower][0]}</div>
+            <div class="narrative" style="margin-top:10px">${meaning}</div>
+            ${hex.yaos.some(y => y===6||y===9) ? '<div style="color:var(--bad);font-size:11px;margin-top:4px">⚠ 老陽/老陰 = 変爻あり (転換期)</div>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <h3>タロット 3枚スプレッド (過去・現在・未来)</h3>
+        <div class="tarot-row">
+          ${e.tarot.map(c => `
+            <div class="tarot-card ${c.reversedDraw?'reversed':''}">
+              <div class="pos">${c.position}</div>
+              <div style="font-size:24px">${c.type==='major'?'★':SUITS[c.suit][0]}</div>
+              <div class="name">${c.name}</div>
+              <div class="suit">${c.type==='major'?'大アルカナ':c.suit+' / '+c.element+'性'}</div>
+              <div style="font-size:10px;margin-top:6px;color:#cbd5e1">${c.reversedDraw?'(逆位置)':'(正位置)'}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="narrative" style="margin-top:12px">
+          ${e.tarot.map(c => `<div><b>${c.position}:</b> ${c.type==='major' ? (c.reversedDraw?c.reversed:c.meaning) : SUITS[c.suit][1]}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMBTI(p, f) {
+  const m = MBTI_PROFILES[f.mbti] || MBTI_PROFILES['INFJ'];
+  const synthKeys = ['HERO_SYNTHESIS','PERSONALITY_CORE','CAREER_DEEP','WEALTH_CORE','HEALTH_CORE','FENGSHUI_HOME','SPIRITUAL_THEME','COMMUNICATION_STYLE','DECISION_STYLE','LEADERSHIP_STYLE','CONFLICT_PATTERN','MONEY_PSYCHOLOGY','BODY_CONSTITUTION','MENTAL_PATTERNS','SPIRITUAL_PRACTICE','PARENT_RELATIONSHIPS','FAMILY_CARE'];
+  return `
+    <div class="grid-2">
+      <div class="box">
+        <h3>MBTI: ${f.mbti} - ${m[0]}</h3>
+        <div class="row"><span>気質</span><span>${m[1]}</span></div>
+        <div class="row"><span>相性最高</span><span>${m[2].map(t=>`<span class="chip-mini">${t}</span>`).join(' ')}</span></div>
+        <div class="row"><span>挑戦的</span><span>${m[3].map(t=>`<span class="chip-mini">${t}</span>`).join(' ')}</span></div>
+      </div>
+      <div class="box">
+        <h3>ビジネス相性 (中心人物視点)</h3>
+        ${PEOPLE.filter(x => !x.center).map(other => {
+          const oF = runEngines(other, f.dateStr);
+          return `<div class="row"><span>${other.name}</span><span style="color:${scoreColor(oF.compatScore)};font-weight:600">${oF.compatScore} (${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <h3 style="color:var(--accent);font-size:14px;margin:0 0 10px">統合占断 17 カード</h3>
+      <div class="grid-3">
+        ${synthKeys.map(k => SYNTHESIS[k] ? `<div class="narrative"><h4>${SYNTHESIS[k].title}</h4>${SYNTHESIS[k].text(f)}</div>` : '').join('')}
+      </div>
+    </div>
   `;
 }
 
 // ============================================================
-// Registration modal
+// MODAL (registration)
 // ============================================================
 const $modal = document.getElementById('modal');
 const $manageBtn = document.getElementById('manageBtn');
@@ -862,6 +1611,8 @@ const $fId = document.getElementById('fId');
 const $fName = document.getElementById('fName');
 const $fRole = document.getElementById('fRole');
 const $fBirth = document.getElementById('fBirth');
+const $fHour = document.getElementById('fHour');
+const $fGender = document.getElementById('fGender');
 const $fCenter = document.getElementById('fCenter');
 const $modalTitle = document.getElementById('modalTitle');
 const $submitBtn = document.getElementById('submitBtn');
@@ -874,92 +1625,67 @@ function openModal() { $modal.classList.add('open'); resetForm(); renderPeopleLi
 function closeModal() { $modal.classList.remove('open'); }
 $manageBtn.addEventListener('click', openModal);
 $closeBtn.addEventListener('click', closeModal);
-$modal.addEventListener('click', (e) => { if (e.target === $modal) closeModal(); });
+$modal.addEventListener('click', e => { if (e.target === $modal) closeModal(); });
 
 function resetForm() {
-  $fId.value = '';
-  $fName.value = '';
-  $fRole.value = '';
-  $fBirth.value = '';
-  $fCenter.checked = false;
+  $fId.value = ''; $fName.value = ''; $fRole.value = ''; $fBirth.value = '';
+  $fHour.value = ''; $fGender.value = 'male'; $fCenter.checked = false;
   document.querySelectorAll('input[name=blood]').forEach(r => r.checked = false);
   $modalTitle.textContent = '人物の登録';
   $submitBtn.textContent = '登録する';
   $deleteBtn.style.display = 'none';
 }
 $resetFormBtn.addEventListener('click', resetForm);
-
 function loadForm(p) {
-  $fId.value = p.id;
-  $fName.value = p.name;
-  $fRole.value = p.role || '';
-  $fBirth.value = p.birth;
-  $fCenter.checked = !!p.center;
+  $fId.value = p.id; $fName.value = p.name; $fRole.value = p.role || '';
+  $fBirth.value = p.birth; $fHour.value = p.hour != null ? p.hour : '';
+  $fGender.value = p.gender || 'male'; $fCenter.checked = !!p.center;
   document.querySelectorAll('input[name=blood]').forEach(r => r.checked = (r.value === p.blood));
   $modalTitle.textContent = `「${p.name}」を編集`;
   $submitBtn.textContent = '更新する';
   $deleteBtn.style.display = '';
 }
-
-$form.addEventListener('submit', (e) => {
+$form.addEventListener('submit', e => {
   e.preventDefault();
-  const name = $fName.value.trim();
-  const birth = $fBirth.value;
+  const name = $fName.value.trim(), birth = $fBirth.value;
   if (!name || !birth) return;
   const blood = (document.querySelector('input[name=blood]:checked') || {}).value || 'O';
   const id = $fId.value || ('p' + Date.now().toString(36));
   const isCenter = $fCenter.checked;
-  const data = { id, name, role: $fRole.value.trim(), birth, blood, center: isCenter };
-
+  const hourVal = $fHour.value === '' ? null : Math.max(0, Math.min(23, +$fHour.value));
+  const data = { id, name, role: $fRole.value.trim(), birth, hour: hourVal, gender: $fGender.value, blood, center: isCenter };
   const idx = PEOPLE.findIndex(p => p.id === id);
   if (idx >= 0) PEOPLE[idx] = data; else PEOPLE.push(data);
-
   if (isCenter) PEOPLE.forEach(p => { if (p.id !== id) p.center = false; });
   if (!PEOPLE.some(p => p.center)) PEOPLE[0].center = true;
-
-  savePeople();
-  resetForm();
-  renderPeopleList();
-  selectedId = id;
-  render();
+  savePeople(); resetForm(); renderPeopleList();
+  selectedId = id; render();
 });
-
 $deleteBtn.addEventListener('click', () => {
-  const id = $fId.value;
-  if (!id) return;
+  const id = $fId.value; if (!id) return;
   if (!confirm('この人物を削除しますか？')) return;
   PEOPLE = PEOPLE.filter(p => p.id !== id);
   if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
-  savePeople();
-  resetForm();
-  renderPeopleList();
-  if (selectedId === id) selectedId = (PEOPLE[0] || {}).id || '';
+  savePeople(); resetForm(); renderPeopleList();
+  if (selectedId === id) selectedId = (PEOPLE[0]||{}).id || '';
   render();
 });
-
 $resetAllBtn.addEventListener('click', () => {
   if (!confirm('全データをサンプルに戻しますか？')) return;
   PEOPLE = DEFAULT_PEOPLE.slice();
-  savePeople();
-  resetForm();
-  renderPeopleList();
-  selectedId = 'yoshida';
-  render();
+  savePeople(); resetForm(); renderPeopleList();
+  selectedId = 'yoshida'; render();
 });
-
 function renderPeopleList() {
   $peopleList.innerHTML = '';
-  if (!PEOPLE.length) {
-    $peopleList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px">登録された人物はいません</div>';
-    return;
-  }
+  if (!PEOPLE.length) { $peopleList.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px">登録された人物はいません</div>'; return; }
   PEOPLE.forEach(p => {
     const row = document.createElement('div');
     row.className = 'person-row';
     row.innerHTML = `
       <div>
         <div>${p.name} ${p.center ? '<span class="center-badge">中心</span>' : ''}</div>
-        <div class="meta">${p.role || '—'} ・ ${p.birth} ・ ${p.blood || '?'}型</div>
+        <div class="meta">${p.role || '—'} ・ ${p.birth}${p.hour!=null?` ${p.hour}時`:''} ・ ${p.gender==='female'?'女':'男'} ・ ${p.blood || '?'}型</div>
       </div>
       <button class="ico-btn" data-act="edit" title="編集">✎</button>
       <button class="ico-btn" data-act="del"  title="削除">🗑</button>
@@ -969,9 +1695,8 @@ function renderPeopleList() {
       if (!confirm(`「${p.name}」を削除しますか？`)) return;
       PEOPLE = PEOPLE.filter(x => x.id !== p.id);
       if (!PEOPLE.some(x => x.center) && PEOPLE.length) PEOPLE[0].center = true;
-      savePeople();
-      renderPeopleList();
-      if (selectedId === p.id) selectedId = (PEOPLE[0] || {}).id || '';
+      savePeople(); renderPeopleList();
+      if (selectedId === p.id) selectedId = (PEOPLE[0]||{}).id || '';
       render();
     });
     $peopleList.appendChild(row);
@@ -979,14 +1704,11 @@ function renderPeopleList() {
 }
 
 // ============================================================
-// Init
+// INIT
 // ============================================================
 $date.value = todayStr();
 $date.addEventListener('change', render);
-document.getElementById('todayBtn').addEventListener('click', () => {
-  $date.value = todayStr();
-  render();
-});
+document.getElementById('todayBtn').addEventListener('click', () => { $date.value = todayStr(); render(); });
 if (!PEOPLE.find(p => p.id === selectedId)) selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
 render();
 </script>
