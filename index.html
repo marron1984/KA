@@ -704,6 +704,7 @@
     <input type="date" id="dateInput">
     <button class="btn" id="todayBtn">Today</button>
     <button class="btn btn-primary" id="manageBtn">+ Register</button>
+    <button class="btn" id="syncBtn" title="PCとスマホでデータを同期">⇄ 同期</button>
   </div>
 </header>
 
@@ -2290,6 +2291,148 @@ function closeModal() { $modal.classList.remove('open'); }
 $manageBtn.addEventListener('click', openModal);
 $closeBtn.addEventListener('click', closeModal);
 $modal.addEventListener('click', e => { if (e.target === $modal) closeModal(); });
+
+// ============================================================
+// SYNC (PC ⇄ Smartphone) — URL hash + JSON paste
+// ============================================================
+function encodeSync(people) {
+  const json = JSON.stringify(people);
+  // unicode-safe base64url
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeSync(s) {
+  s = s.replace(/-/g,'+').replace(/_/g,'/');
+  while (s.length % 4) s += '=';
+  const json = decodeURIComponent(escape(atob(s)));
+  const arr = JSON.parse(json);
+  if (!Array.isArray(arr) || !arr.length) throw new Error('invalid');
+  return arr;
+}
+function makeSyncURL() {
+  const base = location.origin + location.pathname;
+  return base + '#sync=' + encodeSync(PEOPLE);
+}
+function applySyncString(s) {
+  s = String(s||'').trim();
+  if (!s) throw new Error('empty');
+  // 受付フォーマット: URL全体 / hashのみ / sync=... / 生base64 / 生JSON
+  const mURL = s.match(/[#?&]sync=([^&\s#]+)/);
+  if (mURL) s = mURL[1];
+  else if (s.startsWith('sync=')) s = s.slice(5);
+  let arr;
+  if (s.trim().startsWith('[')) {
+    arr = JSON.parse(s);
+    if (!Array.isArray(arr) || !arr.length) throw new Error('invalid');
+  } else {
+    arr = decodeSync(s);
+  }
+  PEOPLE = arr;
+  if (!PEOPLE.some(p => p.center) && PEOPLE.length) PEOPLE[0].center = true;
+  savePeople();
+  return arr.length;
+}
+// ページ読み込み時、URL の #sync=... を検出して自動取り込み
+(function autoSync() {
+  try {
+    const m = location.hash.match(/sync=([^&]+)/);
+    if (!m) return;
+    const n = applySyncString(m[1]);
+    // hash を消す (重複取込み防止)
+    history.replaceState(null, '', location.pathname + location.search);
+    setTimeout(() => alert(`✓ ${n}件のデータを取り込みました (PC→このデバイス同期完了)`), 100);
+  } catch (e) {
+    console.warn('auto-sync failed', e);
+  }
+})();
+
+const $syncBtn = document.getElementById('syncBtn');
+async function copyToClipboard(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { return false; }
+}
+function openSyncDialog() {
+  const url = makeSyncURL();
+  const json = JSON.stringify(PEOPLE, null, 2);
+  const html = `
+    <div class="modal-overlay open" id="syncModal" style="z-index:200">
+      <div class="modal" style="max-width:680px">
+        <h2>⇄ デバイス間同期</h2>
+        <p style="color:var(--muted);font-size:12px;line-height:1.7;margin-bottom:18px">
+          このページのデータは各デバイスのブラウザ内 (localStorage) に保存されます。<br>
+          PC が正データの場合、下のURLをスマホで開けば同じ内容になります。
+        </p>
+
+        <div class="modal-section">
+          <h3>① URLで共有 <span style="font-size:10px;color:var(--muted);font-weight:400">(推奨)</span></h3>
+          <p style="font-size:11px;color:var(--muted);margin:0 0 8px">LINE/メール等でスマホに送って開くだけで同期完了</p>
+          <textarea id="syncURL" readonly style="width:100%;min-height:80px;font-family:monospace;font-size:11px;padding:10px;background:var(--bg2);border:1px solid var(--line);color:var(--fg);resize:vertical">${url}</textarea>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="syncCopyURL">URLをコピー</button>
+            <button class="btn" id="syncOpenURL">このページで開く確認</button>
+            <span id="syncMsg" style="font-size:11px;color:var(--good);align-self:center"></span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>② JSONで書き出し / 取り込み</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0 0 8px">URLが使えない時の保険。コピーして別デバイスのこの欄に貼り付け→「取り込む」</p>
+          <textarea id="syncJSON" style="width:100%;min-height:140px;font-family:monospace;font-size:11px;padding:10px;background:var(--bg2);border:1px solid var(--line);color:var(--fg);resize:vertical">${json}</textarea>
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" id="syncCopyJSON">JSONをコピー</button>
+            <button class="btn btn-primary" id="syncImportJSON">この内容を取り込む</button>
+            <button class="btn" id="syncDownloadJSON">ファイル保存</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;font-size:11px;color:var(--muted);line-height:1.7">
+          現在 ${PEOPLE.length}人を保存中 / 本人: ${(PEOPLE.find(p=>p.center)||{}).name || '未設定'}
+        </div>
+
+        <div class="modal-footer" style="margin-top:18px;display:flex;justify-content:flex-end">
+          <button class="btn" id="syncCloseBtn">閉じる</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
+  const sm = document.getElementById('syncModal');
+  const msg = document.getElementById('syncMsg');
+  const flash = (t, ok=true) => { msg.textContent = t; msg.style.color = ok ? 'var(--good)' : 'var(--bad)'; setTimeout(()=>msg.textContent='', 3000); };
+  document.getElementById('syncCopyURL').onclick = async () => {
+    document.getElementById('syncURL').select();
+    flash(await copyToClipboard(url) ? '✓ URLをコピーしました' : '⚠ コピー失敗。手動で選択してください', !!(await copyToClipboard(url)));
+  };
+  document.getElementById('syncOpenURL').onclick = () => window.open(url, '_blank');
+  document.getElementById('syncCopyJSON').onclick = async () => {
+    document.getElementById('syncJSON').select();
+    flash(await copyToClipboard(document.getElementById('syncJSON').value) ? '✓ JSONをコピーしました' : '⚠ コピー失敗', false);
+  };
+  document.getElementById('syncImportJSON').onclick = () => {
+    const v = document.getElementById('syncJSON').value;
+    try {
+      const n = applySyncString(v);
+      flash(`✓ ${n}件を取り込みました。再描画します…`);
+      setTimeout(() => { sm.remove(); render(); }, 600);
+    } catch (e) {
+      flash('⚠ 形式が正しくありません: ' + e.message, false);
+    }
+  };
+  document.getElementById('syncDownloadJSON').onclick = () => {
+    const blob = new Blob([document.getElementById('syncJSON').value], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `yoshida_fortune_people_${todayStr()}.json`;
+    a.click();
+    flash('✓ ダウンロードしました');
+  };
+  document.getElementById('syncCloseBtn').onclick = () => sm.remove();
+  sm.addEventListener('click', e => { if (e.target === sm) sm.remove(); });
+}
+$syncBtn.addEventListener('click', openSyncDialog);
+
 
 function resetForm() {
   $fId.value = ''; $fName.value = ''; $fRole.value = ''; $fBirth.value = '';
