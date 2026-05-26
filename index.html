@@ -744,6 +744,114 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 
+  /* ============ JP-cutting-edge motion layer ============ */
+  /* 文字スプリット (見出しの一文字遅延フェード) */
+  @keyframes letterRise {
+    from { opacity: 0; transform: translateY(0.5em) rotate(-2deg); filter: blur(6px); }
+    to   { opacity: 1; transform: translateY(0)     rotate(0);     filter: blur(0); }
+  }
+  .ed-headline .hl-char {
+    display: inline-block;
+    opacity: 0;
+    animation: letterRise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    will-change: opacity, transform, filter;
+  }
+  .ed-headline .hl-line { overflow: hidden; padding-bottom: 0.05em; }
+
+  /* スクロール連動リビール — IntersectionObserver で .is-in を付与 */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-in { opacity: 1; transform: translateY(0); }
+  .reveal-stagger > * { transition-delay: calc(var(--i, 0) * 60ms); }
+
+  /* スコアのカウントアップ用 nudge */
+  .ed-strip-cell .val,
+  .card-score,
+  .vc-score,
+  .gauge-num,
+  .cm-val {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* マグネティックホバー対応 (translate を JS から付与) */
+  .ed-tab, .vc-chip, .btn, .ed-reading-tag, .ed-date-pill {
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.3s;
+  }
+
+  /* カーソルチェイサー (PCのみ) */
+  .cursor-chaser {
+    position: fixed; top: 0; left: 0;
+    width: 8px; height: 8px;
+    pointer-events: none; z-index: 9999;
+    background: var(--accent);
+    border-radius: 50%;
+    mix-blend-mode: difference;
+    opacity: 0;
+    transition: opacity 0.4s, transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1), width 0.25s, height 0.25s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-chaser.is-hot {
+    width: 32px; height: 32px;
+    background: rgba(250,204,21, 0.35);
+  }
+  @media (hover: none), (pointer: coarse) { .cursor-chaser { display: none !important; } }
+
+  /* タブ・ピルのアンダーラインスライド (active 状態の滑らかな移動) */
+  .tab { position: relative; }
+  .tab::after {
+    content: '';
+    position: absolute; left: 12%; right: 12%; bottom: -1px;
+    height: 1px;
+    background: var(--fg);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .tab.active::after { transform: scaleX(1); }
+  .tab.active { border-bottom-color: transparent !important; }
+
+  /* クリック波紋 (body直下の固定位置で再描画の影響を受けない) */
+  .click-ripple {
+    position: fixed; border-radius: 50%;
+    background: rgba(250,204,21, 0.55);
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%) scale(0); opacity: 0.85;
+    animation: ripple 0.75s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    mix-blend-mode: multiply;
+  }
+  @keyframes ripple {
+    to { transform: translate(-50%, -50%) scale(14); opacity: 0; }
+  }
+
+  /* ヘッドライン周辺の薄いノイズ (微細な動き) — 視認できないほどに */
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+  }
+  .ed-explore-stamp { box-shadow: 0 0 0 1px rgba(0,0,0,0.05); animation: rotate360 28s linear infinite, shimmer 6s ease-in-out infinite; }
+
+  /* 数値・スコアの色が変わる時の滑らかな遷移 */
+  .card-score, .vc-score, .cm-val, .ed-strip-cell .val { transition: color 0.5s ease; }
+
+  /* スコアバー — 既存の barFill を更に味付け */
+  .bar-fill { will-change: width; transition: width 0.9s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.4s; }
+
+  /* ed-strip セルのホバー: 文字がほんの少し前進 */
+  .ed-strip-cell .val,
+  .ed-strip-cell .label,
+  .ed-strip-cell .sub { transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1), color 0.4s; }
+  .ed-strip-cell:hover .val { transform: translateY(-2px); }
+  .ed-strip-cell:hover .sub { color: var(--fg); }
+
+  /* ヒーロー上部の date-pill / reading-tag に Hover 微浮き */
+  .ed-date-pill:hover, .ed-reading-tag:hover { transform: translateY(-2px); }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -4000,6 +4108,183 @@ document.getElementById('edTabs').addEventListener('click', e => {
 
 if (!PEOPLE.find(p => p.id === selectedId)) selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
 render();
+
+// ============================================================
+// MOTION LAYER (日本最先端モーション — 既存デザインを崩さない味付け)
+// ============================================================
+const _mm = typeof matchMedia === 'function' ? matchMedia : () => ({ matches: false });
+const PREFERS_REDUCED = _mm('(prefers-reduced-motion: reduce)').matches;
+const FINE_POINTER    = _mm('(pointer: fine)').matches;
+
+// ---- 1) ヘッドライン: 文字スプリット & ステージドフェード ----
+let _lastHeadlineText = '';
+function splitHeadline() {
+  if (PREFERS_REDUCED) return;
+  const $hl = document.getElementById('edHeadline');
+  if (!$hl) return;
+  const lines = [...$hl.querySelectorAll('.hl-line')];
+  if (!lines.length) return;
+  const sig = lines.map(l => l.textContent).join('|');
+  // 既に分割済み + 同じテキストなら再生しない (チラつき防止)
+  const alreadySplit = !!$hl.querySelector('.hl-char');
+  if (alreadySplit && sig === _lastHeadlineText) return;
+  _lastHeadlineText = sig;
+  let n = 0;
+  lines.forEach((line, li) => {
+    const text = line.textContent;
+    const chars = [...text];
+    line.innerHTML = chars.map(c => {
+      if (c === ' ') return '<span class="hl-char" style="width:0.28em">&nbsp;</span>';
+      const delay = (n++ * 26 + li * 80);
+      return `<span class="hl-char" style="animation-delay:${delay}ms">${c}</span>`;
+    }).join('');
+  });
+}
+
+// ---- 2) スコア / 数値のカウントアップ ----
+const numFormatter = new Intl.NumberFormat();
+function animateCounter(el, target, opts) {
+  if (!el) return;
+  if (PREFERS_REDUCED) { el.textContent = target; return; }
+  const dur = (opts && opts.dur) || 900;
+  const ease = t => 1 - Math.pow(1 - t, 3); // easeOutCubic
+  const start = performance.now();
+  const from = parseFloat(el.dataset.cur || '0') || 0;
+  if (from === target) { el.textContent = target; return; }
+  function step(now) {
+    const t = Math.min(1, (now - start) / dur);
+    const v = from + (target - from) * ease(t);
+    el.textContent = Math.round(v);
+    if (t < 1) requestAnimationFrame(step);
+    else el.dataset.cur = target;
+  }
+  requestAnimationFrame(step);
+}
+function animateAllCounters(root) {
+  root = root || document;
+  // gauge / card / strip / cm / vc
+  root.querySelectorAll('.gauge-num, .card-score, .ed-strip-cell .val, .cm-val, .vc-score, .bar-val')
+    .forEach(el => {
+      const m = (el.textContent || '').match(/-?\d+(?:\.\d+)?/);
+      if (!m) return;
+      const v = parseFloat(m[0]);
+      if (!isFinite(v)) return;
+      animateCounter(el, v, { dur: 800 });
+    });
+}
+
+// ---- 3) スクロール連動リビール (IntersectionObserver) ----
+const revealObs = (() => {
+  if (PREFERS_REDUCED || typeof IntersectionObserver === 'undefined') return null;
+  return new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-in');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+})();
+function bindReveals() {
+  if (!revealObs) return;
+  // .ed-strip-cell のみ対象 (他は既存fadeUpと競合するため)
+  document.querySelectorAll('.ed-strip-cell').forEach((el, i) => {
+    if (el.classList.contains('is-in')) return;
+    if (!el.classList.contains('reveal')) {
+      el.classList.add('reveal');
+      el.style.setProperty('--i', i.toString());
+    }
+    revealObs.observe(el);
+  });
+}
+
+// ---- 4) マグネティックホバー (PCのみ; ピル形ボタン群) ----
+function bindMagnetic() {
+  if (PREFERS_REDUCED || !FINE_POINTER) return;
+  const sel = '.ed-tab, .vc-chip, .ed-date-pill, .ed-reading-tag';
+  document.querySelectorAll(sel).forEach(el => {
+    if (el.dataset.magbound) return;
+    el.dataset.magbound = '1';
+    let frame = 0;
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+      const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        el.style.transform = `translate(${dx * 8}px, ${dy * 6}px)`;
+      });
+    });
+    el.addEventListener('mouseleave', () => {
+      cancelAnimationFrame(frame);
+      el.style.transform = '';
+    });
+  });
+}
+
+// ---- 5) カーソルチェイサー (PCのみ) ----
+(function cursorChaser() {
+  if (PREFERS_REDUCED || !FINE_POINTER) return;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-chaser';
+  document.body.appendChild(dot);
+  let x = -100, y = -100, tx = -100, ty = -100;
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    dot.style.opacity = 0.9;
+  });
+  document.addEventListener('mouseleave', () => { dot.style.opacity = 0; });
+  function loop() {
+    x += (tx - x) * 0.22;
+    y += (ty - y) * 0.22;
+    dot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  // hot zones — pill類に乗ると拡大
+  const hotSel = 'button, a, .vc-chip, .ed-tab, .card, .ed-strip-cell, .word-card, .tab';
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest(hotSel)) dot.classList.add('is-hot');
+  });
+  document.addEventListener('mouseout', e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest(hotSel)) dot.classList.remove('is-hot');
+  });
+})();
+
+// ---- 6) クリック波紋 (body直下に出すので再描画の影響なし) ----
+document.addEventListener('click', e => {
+  if (PREFERS_REDUCED) return;
+  const target = e.target.closest('.vc-chip, .ed-tab, .tab, .card, .ed-strip-cell, .btn');
+  if (!target) return;
+  const r = document.createElement('span');
+  r.className = 'click-ripple';
+  const size = 22;
+  r.style.width = r.style.height = size + 'px';
+  r.style.left = e.clientX + 'px';
+  r.style.top  = e.clientY + 'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 800);
+});
+
+// ---- render() に乗っかる: 描画後の演出 ----
+const origRender = render;
+let _firstRenderDone = false;
+render = function() {
+  origRender();
+  splitHeadline(); // テキスト変化があれば文字スプリット
+  bindReveals();   // 新しい strip-cell があれば observer に登録
+  bindMagnetic();  // 新しい pill 要素に bind
+  // カウントアップは初回のみ (再描画でチラつくのを防ぐ)
+  if (!_firstRenderDone) {
+    requestAnimationFrame(() => animateAllCounters(document));
+    _firstRenderDone = true;
+  }
+};
+// 初回適用
+splitHeadline();
+requestAnimationFrame(() => { animateAllCounters(document); _firstRenderDone = true; });
+bindReveals();
+bindMagnetic();
 </script>
 </body>
 </html>
