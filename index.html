@@ -83,6 +83,10 @@
     letter-spacing: 0.05em;
   }
   .ed-tab:hover { background: var(--fg); color: #fff; }
+  .ed-tab.active {
+    background: var(--fg); color: #fff; border-color: var(--fg);
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.4);
+  }
   .ed-right { display: flex; gap: 8px; align-items: center; }
   .ed-right input[type=date] {
     background: var(--bg2); color: var(--fg);
@@ -321,29 +325,83 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
   /* viewer-perspective chips */
   .viewer-bar {
-    display: flex; align-items: center; gap: 10px;
-    flex-wrap: wrap;
-    margin: 0 0 12px;
-    padding-bottom: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--line2);
   }
   .viewer-bar .vlabel {
     font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
     flex-shrink: 0;
   }
-  .viewer-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .viewer-nav {
+    display: flex; gap: 4px; flex-shrink: 0;
+  }
+  .viewer-nav button {
+    background: var(--bg2); color: var(--fg);
+    border: 1px solid var(--line2);
+    border-radius: 999px;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px; line-height: 1;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+  }
+  .viewer-nav button:hover { background: var(--fg); color: #fff; border-color: var(--fg); }
+  .viewer-nav button:disabled { opacity: 0.25; cursor: not-allowed; }
+  .viewer-chips {
+    display: flex; gap: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 2px;
+    scroll-behavior: smooth;
+  }
+  .viewer-chips::-webkit-scrollbar { display: none; }
   .vc-chip {
     background: var(--bg2); color: var(--fg);
     border: 1px solid var(--line2);
-    padding: 6px 12px; cursor: pointer;
-    font-family: var(--serif); font-size: 12px;
-    border-radius: 0; transition: background 0.2s, color 0.2s, border-color 0.2s;
+    padding: 8px 14px 8px 12px;
+    cursor: pointer;
+    font-family: var(--serif); font-size: 13px;
+    border-radius: 999px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    display: inline-flex; align-items: center; gap: 8px;
+    position: relative;
   }
   .vc-chip:hover { border-color: var(--fg); }
-  .vc-chip.active { background: var(--fg); color: var(--bg2); border-color: var(--fg); }
+  .vc-chip.active {
+    background: var(--fg); color: #fff; border-color: var(--fg);
+    box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.35);
+  }
+  .vc-chip.active::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: -2px;
+  }
+  .vc-chip .vc-score {
+    font-family: var(--sans);
+    font-size: 10px; font-weight: 700;
+    background: var(--bg3); color: var(--fg);
+    border-radius: 999px;
+    padding: 2px 6px;
+    letter-spacing: 0;
+  }
+  .vc-chip.active .vc-score { background: rgba(255,255,255,0.18); color: #fff; }
   .vc-chip .vc-mini {
-    font-size: 9px; letter-spacing: 0.15em; opacity: 0.55;
-    font-family: var(--sans); margin-left: 4px; text-transform: uppercase;
+    font-size: 9px; letter-spacing: 0.18em; opacity: 0.55;
+    font-family: var(--sans); text-transform: uppercase;
   }
   /* compat matrix */
   .compat-matrix {
@@ -1034,10 +1092,11 @@
     .tab { padding: 10px 14px; font-size: 10px; white-space: nowrap; flex-shrink: 0; }
 
     /* --- VIEWER CHIPS (relationship map) --- */
-    .viewer-bar { gap: 6px; }
-    .viewer-chips { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; scrollbar-width: none; }
-    .viewer-chips::-webkit-scrollbar { display: none; }
-    .vc-chip { padding: 6px 10px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    .viewer-bar { gap: 6px; grid-template-columns: auto 1fr auto; }
+    .viewer-bar .vlabel { font-size: 8px; letter-spacing: 0.15em; }
+    .viewer-nav button { width: 32px; height: 32px; font-size: 16px; }
+    .vc-chip { padding: 7px 11px 7px 10px; font-size: 12px; }
+    .vc-chip .vc-score { font-size: 9px; padding: 2px 5px; }
 
     /* --- PERSON CARDS (bigger tap targets) --- */
     .cards { max-height: none; }
@@ -1229,6 +1288,10 @@
     <div class="viewer-bar">
       <span class="vlabel">Viewpoint 視点</span>
       <div class="viewer-chips" id="viewerChips"></div>
+      <div class="viewer-nav" id="viewerNav">
+        <button type="button" id="viewerPrev" aria-label="前の人物">‹</button>
+        <button type="button" id="viewerNext" aria-label="次の人物">›</button>
+      </div>
     </div>
     <div class="radial-wrap">
       <svg id="radial" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet"></svg>
@@ -2118,7 +2181,7 @@ function render() {
   const viewer = getViewer();
   const all = {};
   PEOPLE.forEach(p => all[p.id] = runEngines(p, date, viewer));
-  drawViewerChips();
+  drawViewerChips(all);
   drawRadial(date, all);
   drawCards(date, all);
   drawCompatMatrix(date, all);
@@ -2237,20 +2300,49 @@ function drawEditorialHero(dateStr, all) {
   }
 }
 
-function drawViewerChips() {
+function drawViewerChips(all) {
   const $vc = document.getElementById('viewerChips');
   if (!$vc) return;
-  $vc.innerHTML = PEOPLE.map(p =>
-    `<button class="vc-chip${viewerId === p.id ? ' active' : ''}" data-id="${p.id}">${p.name}${p.center ? '<span class="vc-mini">center</span>' : ''}</button>`
-  ).join('');
+  $vc.innerHTML = PEOPLE.map(p => {
+    const score = all && all[p.id] ? all[p.id].total : '';
+    const scoreHtml = score !== '' ? `<span class="vc-score" style="color:${scoreColor(score)}">${score}</span>` : '';
+    return `<button class="vc-chip${viewerId === p.id ? ' active' : ''}" data-id="${p.id}">`
+         + `<span>${p.name}</span>`
+         + (p.center ? '<span class="vc-mini">center</span>' : '')
+         + scoreHtml
+         + `</button>`;
+  }).join('');
   $vc.querySelectorAll('.vc-chip').forEach(b => {
     b.addEventListener('click', () => {
       viewerId = b.dataset.id;
-      // 視点を切り替えると、選択も自動的に追従させる (詳細パネルも視点の人物に)
       selectedId = viewerId;
       render();
     });
   });
+  // アクティブチップを視野内にスクロール
+  const active = $vc.querySelector('.vc-chip.active');
+  if (active) {
+    const cw = $vc.clientWidth;
+    const ow = active.offsetWidth;
+    const ol = active.offsetLeft;
+    const left = Math.max(0, ol - (cw - ow) / 2);
+    try {
+      if (typeof $vc.scrollTo === 'function') $vc.scrollTo({ left, behavior: 'smooth' });
+      else $vc.scrollLeft = left;
+    } catch { $vc.scrollLeft = left; }
+  }
+  // 前後ボタン
+  const idx = PEOPLE.findIndex(p => p.id === viewerId);
+  const $prev = document.getElementById('viewerPrev');
+  const $next = document.getElementById('viewerNext');
+  if ($prev) {
+    $prev.disabled = idx <= 0;
+    $prev.onclick = () => { if (idx > 0) { viewerId = PEOPLE[idx-1].id; selectedId = viewerId; render(); } };
+  }
+  if ($next) {
+    $next.disabled = idx >= PEOPLE.length - 1;
+    $next.onclick = () => { if (idx < PEOPLE.length - 1) { viewerId = PEOPLE[idx+1].id; selectedId = viewerId; render(); } };
+  }
 }
 
 function drawCompatMatrix(date, all) {
@@ -2498,6 +2590,7 @@ document.getElementById('tabs').addEventListener('click', e => {
   activeTab = btn.dataset.tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + activeTab));
+  if (typeof syncEdTabsActive === 'function') syncEdTabsActive();
   render();
 });
 
@@ -3860,6 +3953,12 @@ const NAV_TO_INNER = {
   '星占': 'astro', '塔羅': 'iching', '数秘': 'num', '易経': 'iching',
   '四柱': 'shichu', '風水': 'fengshui', 'MBTI': 'mbti',
 };
+function syncEdTabsActive() {
+  document.querySelectorAll('#edTabs .ed-tab').forEach(b => {
+    const inner = NAV_TO_INNER[b.textContent.trim()];
+    b.classList.toggle('active', inner === activeTab);
+  });
+}
 document.getElementById('edTabs').addEventListener('click', e => {
   const btn = e.target.closest('.ed-tab'); if (!btn) return;
   const inner = NAV_TO_INNER[btn.textContent.trim()];
@@ -3867,10 +3966,37 @@ document.getElementById('edTabs').addEventListener('click', e => {
     activeTab = inner;
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === inner));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + inner));
+    syncEdTabsActive();
     render();
   }
   document.getElementById('sec-detail')?.scrollIntoView({ behavior:'smooth', block:'start' });
 });
+
+// 詳細パネル: 左右スワイプで前後のタブへ
+(function bindSwipe() {
+  const detail = document.getElementById('sec-detail');
+  if (!detail) return;
+  const TAB_ORDER = ['overview','shichu','astro','num','fengshui','iching','mbti','words'];
+  let sx = 0, sy = 0, sw = 0;
+  detail.addEventListener('touchstart', e => {
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; sw = e.timeStamp;
+  }, { passive: true });
+  detail.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    const dt = e.timeStamp - sw;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5 || dt > 700) return;
+    const idx = TAB_ORDER.indexOf(activeTab);
+    if (idx < 0) return;
+    const ni = dx < 0 ? Math.min(TAB_ORDER.length-1, idx+1) : Math.max(0, idx-1);
+    if (ni === idx) return;
+    activeTab = TAB_ORDER[ni];
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + activeTab));
+    syncEdTabsActive();
+    render();
+  }, { passive: true });
+})();
 
 if (!PEOPLE.find(p => p.id === selectedId)) selectedId = (PEOPLE.find(p => p.center) || PEOPLE[0] || {}).id || '';
 render();
