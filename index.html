@@ -829,6 +829,174 @@
     to { transform: translate(-50%, -50%) scale(14); opacity: 0; }
   }
 
+  /* ========== AGGRESSIVE OPENING (黒幕→分割) ========== */
+  .opening-curtain {
+    position: fixed; inset: 0; z-index: 100000;
+    background: var(--fg);
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    clip-path: inset(0 0 0 0);
+  }
+  .opening-curtain.is-out {
+    animation: curtainSplit 1.0s cubic-bezier(0.77,0,0.18,1) forwards;
+  }
+  @keyframes curtainSplit {
+    0%   { clip-path: inset(0 0 0 0); }
+    100% { clip-path: inset(50% 0 50% 0); }
+  }
+  .opening-mark {
+    font-family: var(--display);
+    color: var(--bg);
+    font-weight: 900;
+    font-size: clamp(60px, 14vw, 200px);
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: openingMark 1.05s cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  @keyframes openingMark {
+    0%   { opacity: 0; letter-spacing: 1.2em; filter: blur(8px); }
+    35%  { opacity: 1; letter-spacing: 0.35em; filter: blur(0); }
+    100% { opacity: 0; letter-spacing: -0.05em; transform: scale(1.08); filter: blur(2px); }
+  }
+  .opening-meta {
+    position: absolute;
+    bottom: 36px; left: 36px;
+    color: var(--bg); opacity: 0;
+    font-family: var(--sans); font-size: 11px;
+    letter-spacing: 0.35em; text-transform: uppercase;
+    animation: openingMeta 1.0s ease both 0.15s;
+  }
+  .opening-meta-r {
+    position: absolute;
+    bottom: 36px; right: 36px;
+    color: var(--bg); opacity: 0;
+    font-family: var(--sans); font-size: 11px;
+    letter-spacing: 0.35em; text-transform: uppercase;
+    animation: openingMeta 1.0s ease both 0.25s;
+  }
+  @keyframes openingMeta {
+    0%   { opacity: 0; transform: translateY(20px); }
+    30%  { opacity: 0.65; transform: translateY(0); }
+    100% { opacity: 0; }
+  }
+
+  /* ========== MARQUEE (情報帯下に高速流れる帯) ========== */
+  .marquee {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+    overflow: hidden;
+    background: var(--bg);
+    position: relative;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(20px, 3vw, 42px);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--fg);
+    user-select: none;
+  }
+  .marquee.invert {
+    background: var(--fg); color: var(--bg);
+    border-color: var(--fg);
+  }
+  .marquee-inner {
+    display: flex;
+    white-space: nowrap;
+    animation: marqueeRoll 28s linear infinite;
+    will-change: transform;
+  }
+  .marquee.reverse .marquee-inner { animation-direction: reverse; }
+  .marquee-block { display: inline-flex; align-items: center; padding-right: 0; }
+  .marquee-block .mq-item { padding: 0 28px; }
+  .marquee-block .mq-dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+  .marquee.invert .mq-dot { background: var(--accent); }
+  @keyframes marqueeRoll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee:hover .marquee-inner { animation-play-state: paused; }
+
+  /* ========== MOUSE SPOTLIGHT (黄色オーラ追従) ========== */
+  .mouse-spotlight {
+    position: fixed; pointer-events: none; z-index: 2;
+    width: 640px; height: 640px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(250,204,21, 0.22) 0%, rgba(250,204,21, 0) 65%);
+    transform: translate(-9999px, -9999px);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.5s;
+    will-change: transform;
+  }
+  .mouse-spotlight.is-on { opacity: 1; }
+  @media (hover: none), (pointer: coarse) { .mouse-spotlight { display: none; } }
+
+  /* ========== CLICK STAR BURST (★が5方向に飛ぶ) ========== */
+  .click-star {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 14px; height: 14px;
+    transform: translate(-50%, -50%);
+    color: var(--fg);
+    font-size: 14px; line-height: 1;
+    font-family: var(--sans);
+    will-change: transform, opacity;
+  }
+  .click-star.is-yellow { color: var(--accent); }
+  .click-star::before { content: '+'; font-weight: 900; }
+  @keyframes starFly {
+    0%   { transform: translate(-50%, -50%) translate(0, 0) scale(1) rotate(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) translate(var(--fx), var(--fy)) scale(0.3) rotate(720deg); opacity: 0; }
+  }
+
+  /* ========== Parallax targets (transform 設定は JS から) ========== */
+  .ed-headline { will-change: transform; }
+  .ed-explore-stamp { will-change: transform; }
+
+  /* ヘッドラインのゴーストレイヤ (薄黄色オフセット) */
+  .ed-headline { position: relative; isolation: isolate; }
+  .ed-headline::before {
+    content: attr(data-ghost);
+    position: absolute; inset: 0;
+    color: rgba(250,204,21, 0.85);
+    transform: translate(10px, 8px);
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    line-height: 0.92;
+    white-space: pre-line;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+  .ed-headline .hl-line { position: relative; z-index: 1; }
+  @media (max-width: 720px) {
+    .ed-headline::before { transform: translate(4px, 3px); }
+  }
+
+  /* Hero 全体の微妙なskew (アグレッシブ感) */
+  .ed-hero { position: relative; }
+  .ed-hero::after {
+    content: ''; position: absolute;
+    left: 0; right: 0; bottom: -1px; height: 1px;
+    background: var(--accent);
+    transform-origin: left;
+    animation: heroLine 1.4s cubic-bezier(0.77, 0, 0.18, 1) both 0.8s;
+    z-index: 5;
+  }
+  @keyframes heroLine {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+
   /* ヘッドライン周辺の薄いノイズ (微細な動き) — 視認できないほどに */
   @keyframes shimmer {
     0%, 100% { opacity: 0.85; }
@@ -1325,6 +1493,10 @@
 </section>
 
 <section class="ed-strip" id="edStrip"></section>
+
+<section class="marquee" id="edMarquee">
+  <div class="marquee-inner" id="edMarqueeInner"></div>
+</section>
 
 <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -2377,7 +2549,10 @@ function drawEditorialHero(dateStr, all) {
   // headline
   const hl = generateHeadline(cf);
   const $hl = document.getElementById('edHeadline');
-  if ($hl) $hl.innerHTML = hl.en.map(s => `<span class="hl-line">${s}</span>`).join('');
+  if ($hl) {
+    $hl.innerHTML = hl.en.map(s => `<span class="hl-line">${s}</span>`).join('');
+    $hl.setAttribute('data-ghost', hl.en.join('\n')); // ゴースト用テキスト
+  }
   // tagline
   const $jt = document.getElementById('edJaTag');
   if ($jt) $jt.textContent = hl.ja;
@@ -2405,6 +2580,33 @@ function drawEditorialHero(dateStr, all) {
         <div class="sub">${sub}</div>
       </div>`
     ).join('');
+  }
+
+  // ----- マーキー描画 -----
+  const $mq = document.getElementById('edMarqueeInner');
+  if ($mq) {
+    const e = cf.engines;
+    const items = [
+      'URANAI',
+      `N°${String(issue).padStart(3,'0')}`,
+      "TODAY'S READING",
+      (center.name || '').toUpperCase(),
+      KYUSEI[e.honmei].name,
+      e.dayP.ganzhi,
+      e.curTerm.name,
+      `LP ${e.lifePath}`,
+      'EDITORIAL',
+      dateStr.replace(/-/g, '.'),
+      KUA_TRIGRAM[e.kua.kua] || '',
+      e.todayTongbian,
+      hl.en[0].replace(',', ''),
+      e.sunSign,
+    ].filter(Boolean);
+    const block = `<div class="marquee-block">`
+      + items.map(it => `<span class="mq-item">${it}</span><span class="mq-dot"></span>`).join('')
+      + `</div>`;
+    // 二重化で seamless ループ
+    $mq.innerHTML = block + block;
   }
 }
 
@@ -4141,18 +4343,26 @@ function splitHeadline() {
   });
 }
 
-// ---- 2) スコア / 数値のカウントアップ ----
-const numFormatter = new Intl.NumberFormat();
+// ---- 2) スコア / 数値のスクランブル + カウントアップ ----
 function animateCounter(el, target, opts) {
   if (!el) return;
   if (PREFERS_REDUCED) { el.textContent = target; return; }
-  const dur = (opts && opts.dur) || 900;
-  const ease = t => 1 - Math.pow(1 - t, 3); // easeOutCubic
+  const dur = (opts && opts.dur) || 1100;
+  const scrambleDur = dur * 0.45;
+  const ease = t => 1 - Math.pow(1 - t, 3);
   const start = performance.now();
   const from = parseFloat(el.dataset.cur || '0') || 0;
   if (from === target) { el.textContent = target; return; }
+  const tgt = Math.abs(target);
+  const scrambleMax = Math.max(99, tgt * 2 + 9);
   function step(now) {
-    const t = Math.min(1, (now - start) / dur);
+    if (now - start < scrambleDur) {
+      // 高速ランダム数字 (Matrix風)
+      el.textContent = Math.floor(Math.random() * scrambleMax);
+      requestAnimationFrame(step);
+      return;
+    }
+    const t = Math.min(1, (now - start - scrambleDur) / (dur - scrambleDur));
     const v = from + (target - from) * ease(t);
     el.textContent = Math.round(v);
     if (t < 1) requestAnimationFrame(step);
@@ -4251,20 +4461,92 @@ function bindMagnetic() {
   });
 })();
 
-// ---- 6) クリック波紋 (body直下に出すので再描画の影響なし) ----
+// ---- 6) クリック ★ バースト (黄色+黒の十字が放射状に飛ぶ) ----
 document.addEventListener('click', e => {
   if (PREFERS_REDUCED) return;
-  const target = e.target.closest('.vc-chip, .ed-tab, .tab, .card, .ed-strip-cell, .btn');
+  const target = e.target.closest('.vc-chip, .ed-tab, .tab, .card, .ed-strip-cell, .btn, .ed-headline, .marquee-block');
   if (!target) return;
-  const r = document.createElement('span');
-  r.className = 'click-ripple';
-  const size = 22;
-  r.style.width = r.style.height = size + 'px';
-  r.style.left = e.clientX + 'px';
-  r.style.top  = e.clientY + 'px';
-  document.body.appendChild(r);
-  setTimeout(() => r.remove(), 800);
+  const N = 7;
+  for (let i = 0; i < N; i++) {
+    const star = document.createElement('span');
+    const yellow = i % 2 === 0;
+    star.className = 'click-star' + (yellow ? ' is-yellow' : '');
+    star.style.left = e.clientX + 'px';
+    star.style.top  = e.clientY + 'px';
+    const angle = (i / N) * Math.PI * 2 + Math.random() * 0.3;
+    const dist  = 60 + Math.random() * 80;
+    star.style.setProperty('--fx', (Math.cos(angle) * dist).toFixed(1) + 'px');
+    star.style.setProperty('--fy', (Math.sin(angle) * dist).toFixed(1) + 'px');
+    star.style.animation = `starFly ${600 + Math.random() * 300}ms cubic-bezier(0.22,0.61,0.36,1) both`;
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 1000);
+  }
 });
+
+// ---- 7) マウススポットライト (黄色オーラが追従) ----
+(function spotlight() {
+  if (PREFERS_REDUCED || !FINE_POINTER) return;
+  const sp = document.createElement('div');
+  sp.className = 'mouse-spotlight';
+  document.body.appendChild(sp);
+  let tx = -9999, ty = -9999, x = tx, y = ty;
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    sp.classList.add('is-on');
+  });
+  document.addEventListener('mouseleave', () => sp.classList.remove('is-on'));
+  function loop() {
+    x += (tx - x) * 0.18;
+    y += (ty - y) * 0.18;
+    sp.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+// ---- 8) スクロールパララックス ----
+(function parallax() {
+  if (PREFERS_REDUCED) return;
+  let ticking = false;
+  const apply = () => {
+    const y = window.scrollY || window.pageYOffset || 0;
+    const $hl = document.getElementById('edHeadline');
+    const $st = document.querySelector('.ed-explore-stamp');
+    if ($hl) $hl.style.transform = `translateX(${Math.min(y * 0.18, 80)}px)`;
+    if ($st) $st.style.transform = `translateY(${-y * 0.35}px)`;
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(apply); ticking = true; }
+  }, { passive: true });
+})();
+
+// ---- 9) オープニング演出 (黒幕→水平に分割して上下へ消える) ----
+(function opening() {
+  if (PREFERS_REDUCED) return;
+  // すでに表示済みなら出さない (ページ内遷移想定)
+  if (sessionStorage.getItem('uranai_opened') === '1') return;
+  try { sessionStorage.setItem('uranai_opened', '1'); } catch {}
+  const curtain = document.createElement('div');
+  curtain.className = 'opening-curtain';
+  curtain.innerHTML = `
+    <div class="opening-mark">URANAI</div>
+    <div class="opening-meta">私的占断 — TODAY'S READING</div>
+    <div class="opening-meta-r">EDITORIAL ／ ${todayStr()}</div>
+  `;
+  document.body.appendChild(curtain);
+  // ロック解除: 動作開始
+  setTimeout(() => {
+    curtain.classList.add('is-out');
+    // ヘッドラインを再分割 (アニメ再生)
+    setTimeout(() => {
+      _lastHeadlineText = '';
+      document.querySelectorAll('#edHeadline .hl-line').forEach(l => { l.textContent = l.textContent; });
+      splitHeadline();
+    }, 200);
+    setTimeout(() => curtain.remove(), 1100);
+  }, 900);
+})();
 
 // ---- render() に乗っかる: 描画後の演出 ----
 const origRender = render;
