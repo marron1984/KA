@@ -6,23 +6,26 @@
 <meta name="theme-color" content="#ffffff">
 <title>吉田占いダッシュボード</title>
 <style>
-  /* === URANAI / Editorial — pure white + display sans === */
+  /* === URANAI / Editorial — warm cream + handmade journal === */
   :root {
-    --bg:     #ffffff;
-    --bg2:    #ffffff;
-    --bg3:    #f6f6f3;
-    --fg:     #0a0a0a;
-    --fg2:    #1a1a1a;
-    --muted:  #8a8a86;
-    --accent: #facc15;            /* editorial yellow (1点アクセント) */
-    --line:   #0a0a0a;
-    --line2:  #e6e6e2;
-    --good:   #3d5e44;
-    --mid:    #8a7240;
-    --bad:    #8c3a3a;
+    --bg:     #f3ead6;            /* warm cream paper */
+    --bg2:    #fffaec;            /* off-white card */
+    --bg3:    #e8ddc1;            /* nested warm */
+    --fg:     #2a2018;            /* warm dark brown (not pure black) */
+    --fg2:    #3a2e22;
+    --muted:  #8a7a64;
+    --accent: #c0533f;            /* warm terracotta red */
+    --accent2:#e8b347;            /* warm gold yellow */
+    --good:   #6d8957;
+    --mid:    #b08c44;
+    --bad:    #a04832;
+    --frog:   #a8c97a;
+    --line:   #2a2018;
+    --line2:  #d6c8a8;
     --serif:  "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Times New Roman", serif;
     --sans:   "Helvetica Neue", -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
     --display:"Helvetica Neue", "Arial Black", -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+    --hand:   "Klee One","Yuji Syuku","Hiragino Maru Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { background: var(--bg); }
@@ -34,6 +37,17 @@
     background: var(--bg);
     letter-spacing: 0.005em;
   }
+  /* 紙のグレイン (フィルム風) */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.09  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.12;
+    mix-blend-mode: multiply;
+  }
+  /* 内容はノイズより前面に */
+  body > * { position: relative; z-index: 2; }
   /* ============== EDITORIAL HEADER (top nav) ============== */
   header.ed-nav {
     position: sticky; top: 0; z-index: 50;
@@ -46,7 +60,50 @@
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
-  .ed-brand { display: flex; align-items: baseline; gap: 18px; flex-wrap: nowrap; }
+  .ed-brand { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
+  .ed-mascot {
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1);
+  }
+  .ed-mascot svg { display: block; }
+  .ed-mascot:hover { transform: rotate(-8deg) scale(1.08); }
+  @keyframes frogBob {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-2px); }
+  }
+  .ed-mascot { animation: frogBob 3.6s ease-in-out infinite; }
+
+  /* 相性ビジュアル: ●●●●○ + ラベル + 数値 */
+  .compat-vis {
+    display: inline-flex; align-items: center; gap: 4px;
+    line-height: 1;
+  }
+  .compat-vis .cdot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--line2);
+    display: inline-block;
+  }
+  .compat-vis .cdot.on { background: var(--accent); border-color: var(--accent); }
+  .compat-vis .clbl {
+    margin-left: 6px;
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .compat-vis .cnum {
+    color: var(--muted);
+    font-size: 10px;
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+  }
+  .compat-vis.tight .clbl { font-size: 12px; }
+  .compat-vis.tight .cdot { width: 7px; height: 7px; }
+  .compat-vis.big .cdot { width: 11px; height: 11px; }
+  .compat-vis.big .clbl { font-size: 15px; font-weight: 600; }
   .ed-brand .ed-wordmark {
     font-family: var(--display);
     font-weight: 900;
@@ -85,7 +142,7 @@
   .ed-tab:hover { background: var(--fg); color: #fff; }
   .ed-tab.active {
     background: var(--fg); color: #fff; border-color: var(--fg);
-    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.4);
+    box-shadow: 0 0 0 3px rgba(232, 179, 71, 0.45);
   }
   .ed-right { display: flex; gap: 8px; align-items: center; }
   .ed-right input[type=date] {
@@ -380,7 +437,7 @@
   .vc-chip:hover { border-color: var(--fg); }
   .vc-chip.active {
     background: var(--fg); color: #fff; border-color: var(--fg);
-    box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.35);
+    box-shadow: 0 0 0 4px rgba(232, 179, 71, 0.4);
   }
   .vc-chip.active::before {
     content: '';
@@ -798,7 +855,7 @@
   }
   .cursor-chaser.is-hot {
     width: 32px; height: 32px;
-    background: rgba(250,204,21, 0.35);
+    background: rgba(232, 179, 71, 0.4);
   }
   @media (hover: none), (pointer: coarse) { .cursor-chaser { display: none !important; } }
 
@@ -819,7 +876,7 @@
   /* クリック波紋 (body直下の固定位置で再描画の影響を受けない) */
   .click-ripple {
     position: fixed; border-radius: 50%;
-    background: rgba(250,204,21, 0.55);
+    background: rgba(232, 179, 71, 0.6);
     pointer-events: none; z-index: 9998;
     transform: translate(-50%, -50%) scale(0); opacity: 0.85;
     animation: ripple 0.75s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
@@ -829,13 +886,19 @@
     to { transform: translate(-50%, -50%) scale(14); opacity: 0; }
   }
 
-  /* ========== AGGRESSIVE OPENING (黒幕→分割) ========== */
+  /* ========== OPENING (温かみのある幕→分割) ========== */
   .opening-curtain {
     position: fixed; inset: 0; z-index: 100000;
     background: var(--fg);
     pointer-events: none;
     display: flex; align-items: center; justify-content: center;
     clip-path: inset(0 0 0 0);
+  }
+  .opening-curtain::after {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 0.6  0 0 0 0 0.4  0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.18; mix-blend-mode: overlay;
+    pointer-events: none;
   }
   .opening-curtain.is-out {
     animation: curtainSplit 1.0s cubic-bezier(0.77,0,0.18,1) forwards;
@@ -930,7 +993,7 @@
     position: fixed; pointer-events: none; z-index: 2;
     width: 640px; height: 640px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(250,204,21, 0.22) 0%, rgba(250,204,21, 0) 65%);
+    background: radial-gradient(circle, rgba(232, 179, 71, 0.22) 0%, rgba(232, 179, 71, 0) 65%);
     transform: translate(-9999px, -9999px);
     mix-blend-mode: multiply;
     opacity: 0;
@@ -966,7 +1029,7 @@
   .ed-headline::before {
     content: attr(data-ghost);
     position: absolute; inset: 0;
-    color: rgba(250,204,21, 0.85);
+    color: rgba(232, 179, 71, 0.85);
     transform: translate(10px, 8px);
     text-transform: uppercase;
     font-weight: 900;
@@ -1438,6 +1501,20 @@
 <body>
 <header class="ed-nav">
   <div class="ed-brand">
+    <span class="ed-mascot" aria-hidden="true">
+      <svg viewBox="0 0 60 50" width="40" height="34">
+        <ellipse cx="30" cy="32" rx="22" ry="16" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.6"/>
+        <circle cx="18" cy="14" r="9" fill="#cde2a3" stroke="var(--fg)" stroke-width="1.6"/>
+        <circle cx="42" cy="14" r="9" fill="#cde2a3" stroke="var(--fg)" stroke-width="1.6"/>
+        <circle cx="18.5" cy="15" r="3.6" fill="var(--fg)"/>
+        <circle cx="42.5" cy="15" r="3.6" fill="var(--fg)"/>
+        <circle cx="17" cy="14" r="0.9" fill="#fffaec"/>
+        <circle cx="41" cy="14" r="0.9" fill="#fffaec"/>
+        <path d="M22 35 Q30 41 38 35" stroke="var(--fg)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <circle cx="14" cy="34" r="1.4" fill="#e8a8a0" opacity="0.7"/>
+        <circle cx="46" cy="34" r="1.4" fill="#e8a8a0" opacity="0.7"/>
+      </svg>
+    </span>
     <span class="ed-wordmark">URANAI</span>
     <span class="ed-issue">私的占断 ／ <span id="edIssueNo">N°143</span></span>
   </div>
@@ -2435,6 +2512,25 @@ function chooseAdvice(total, rank) {
   return '重要な意思決定は明日に回そう。体調管理を最優先に。';
 }
 
+// 相性スコアの可視化 (●●●●○ + ラベル + 小さく数値)
+function compatLabel(score) {
+  let level, label;
+  if (score >= 88)      { level = 5; label = '深い縁'; }
+  else if (score >= 74) { level = 4; label = '良い流れ'; }
+  else if (score >= 58) { level = 3; label = '穏やかな縁'; }
+  else if (score >= 42) { level = 2; label = '学びの相手'; }
+  else                  { level = 1; label = '距離を保つ'; }
+  return { level, label };
+}
+function compatVis(score, opts) {
+  const { level, label } = compatLabel(score);
+  const size = (opts && opts.size) || ''; // 'tight' | 'big' | ''
+  const showNum = !(opts && opts.hideNum);
+  const dots = Array.from({length:5}, (_,i) =>
+    `<span class="cdot${i < level ? ' on' : ''}"></span>`).join('');
+  return `<span class="compat-vis ${size}">${dots}<span class="clbl">${label}</span>${showNum?`<span class="cnum">${score}</span>`:''}</span>`;
+}
+
 function scoreColor(s) {
   if (s >= 80) return '#3d5e44';   // 大吉 — 苔
   if (s >= 65) return '#5e7a4f';   // 中の上 — 若苔
@@ -2670,7 +2766,7 @@ function drawCompatMatrix(date, all) {
         const det = compatDetails(viewer, o, date);
         return `<div class="cm-row">
           <div class="cm-name">${o.name}<span class="nm-sub">${det.rel.name} / 通変 ${det.tongbian}</span></div>
-          <div class="cm-val" style="color:${scoreColor(det.score)}">${det.score}</div>
+          <div class="cm-val">${compatVis(det.score, { size: 'tight' })}</div>
         </div>`;
       }).join('')}
     </div>
@@ -2733,6 +2829,7 @@ function drawRadial(date, all) {
     link.style.animationDuration = (4 - (c/100)*2.5).toFixed(2) + 's';
     $svg.appendChild(link);
     const mx = (vPos.x + oPos.x)/2, my = (vPos.y + oPos.y)/2;
+    const cl = compatLabel(c);
     const lbl = document.createElementNS(NS, 'text');
     lbl.setAttribute('x', mx); lbl.setAttribute('y', my - 3);
     lbl.setAttribute('text-anchor', 'middle');
@@ -2740,7 +2837,7 @@ function drawRadial(date, all) {
     lbl.setAttribute('fill', scoreColor(c));
     lbl.setAttribute('font-weight', '600');
     lbl.style.fontFamily = "var(--serif)";
-    lbl.textContent = c;
+    lbl.textContent = cl.label;
     $svg.appendChild(lbl);
   });
 
@@ -2847,7 +2944,7 @@ function drawCards(date, all) {
       </div>
       <div class="card-foot">
         ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
-        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `　<span style="margin-left:4px">${viewer.name}視点の相性 <b style="color:${scoreColor(f.compatScore)}">${f.compatScore}</b></span>`}
+        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `<div style="margin-top:6px">${viewer.name} → ${compatVis(f.compatScore, { size: 'tight' })}</div>`}
       </div>
       ${(() => {
         if (isViewer) return '';
@@ -2940,7 +3037,7 @@ function renderOverview(p, f) {
         <div class="bars" style="font-size:12px">
           ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
         </div>
-        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span style="color:${scoreColor(f.compatScore)};font-weight:700">${f.compatScore} / 100</span></div>` : ''}
+        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span>${compatVis(f.compatScore, { size: 'big' })}</span></div>` : ''}
         <div style="margin-top:10px">
           <span class="chip">日干通変: ${f.engines.todayTongbian} (${f.engines.todayInfo.rank})</span>
           <span class="chip">本命×日盤: ${f.engines.relation.name}</span>
@@ -2955,14 +3052,14 @@ function renderOverview(p, f) {
           <h4>${p.name} から見た相性</h4>
           ${others.map(o => {
             const d = compatDetails(p, o, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span><span style="color:${scoreColor(d.score)};font-weight:600">${d.score}</span></div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight' })}</div>`;
           }).join('')}
         </div>
         <div>
           <h4>${p.name} へ向けられる相性</h4>
           ${others.map(o => {
             const d = compatDetails(o, p, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span><span style="color:${scoreColor(d.score)};font-weight:600">${d.score}</span></div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight' })}</div>`;
           }).join('')}
         </div>
       </div>
@@ -3213,7 +3310,7 @@ function renderMBTI(p, f) {
         <h3>ビジネス相性 (${getViewer().name} 視点)</h3>
         ${PEOPLE.filter(x => x.id !== getViewer().id).map(other => {
           const oF = runEngines(other, f.dateStr, getViewer());
-          return `<div class="row"><span>${other.name}</span><span style="color:${scoreColor(oF.compatScore)};font-weight:600">${oF.compatScore} (${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></div>`;
+          return `<div class="row"><span>${other.name} <span style="color:var(--muted);font-size:10px">(${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></span>${compatVis(oF.compatScore, { size: 'tight' })}</div>`;
         }).join('')}
       </div>
     </div>
