@@ -501,33 +501,70 @@
   .bar-fill { height: 100%; border-radius: 0; transition: width 0.4s ease; }
   .bar-val { text-align: right; color: var(--fg); font-variant-numeric: tabular-nums; font-family: var(--serif); }
   .card-foot { margin-top: 6px; font-size: 10px; color: var(--muted); letter-spacing: 0.05em; }
-  .card-oneliner {
+  .card-oneliners {
     margin-top: 10px;
-    padding: 10px 12px;
+    padding: 12px 14px 10px;
     background: var(--bg3);
     border-left: 2px solid var(--accent);
+    position: relative;
+  }
+  .card-oneliner {
     font-family: var(--serif);
-    font-size: 13px;
+    font-size: 13.5px;
     line-height: 1.55;
+    padding: 6px 0;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 4px 10px;
   }
+  .card-oneliner + .card-oneliner {
+    border-top: 1px dashed var(--line2);
+    margin-top: 2px;
+  }
   .card-oneliner .ol-arrow {
     font-size: 9px; letter-spacing: 0.15em; color: var(--muted);
-    text-transform: uppercase; align-self: center;
+    text-transform: uppercase; align-self: start; padding-top: 4px;
     font-family: var(--sans); font-weight: 700;
   }
+  .card-oneliner .ol-body { display: flex; flex-direction: column; gap: 4px; }
   .card-oneliner .ol-text { color: var(--fg); }
-  .card-oneliner .ol-tone {
-    grid-column: 2;
+  .card-oneliner .ol-cat {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 9px; letter-spacing: 0.15em;
+    background: var(--bg2); color: var(--muted);
+    border: 1px solid var(--line2);
+    padding: 2px 8px; border-radius: 999px;
+    font-family: var(--sans); text-transform: uppercase;
+  }
+  .card-oneliners .ol-tone-note {
+    margin-top: 6px;
     font-size: 10px; color: var(--muted);
     font-family: var(--sans); letter-spacing: 0.05em;
+    text-align: right;
   }
-  .card.selected .card-oneliner { background: rgba(255,255,255,0.08); border-left-color: var(--accent); }
+  .ol-refresh {
+    position: absolute; top: 8px; right: 8px;
+    width: 26px; height: 26px;
+    border-radius: 50%; border: 1px solid var(--line2);
+    background: var(--bg2); color: var(--muted);
+    font-size: 13px; cursor: pointer;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.5s cubic-bezier(0.22,0.61,0.36,1), background 0.2s, color 0.2s, border-color 0.2s;
+    z-index: 2;
+  }
+  .ol-refresh:hover {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+    transform: rotate(180deg);
+  }
+  .ol-refresh:active { transform: rotate(360deg) scale(0.9); }
+  .card.selected .card-oneliners { background: rgba(255,255,255,0.08); border-left-color: var(--accent2); }
   .card.selected .card-oneliner .ol-text { color: rgba(255,255,255,0.95); }
-  .card.selected .card-oneliner .ol-tone { color: rgba(255,255,255,0.55); }
+  .card.selected .card-oneliner .ol-cat { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.2); }
+  .card.selected .ol-tone-note { color: rgba(255,255,255,0.55); }
   .card.selected .card-oneliner .ol-arrow { color: rgba(255,255,255,0.55); }
+  .card.selected .ol-refresh { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2); }
   /* Tabs */
   .tabs {
     display: flex; gap: 0;
@@ -2948,12 +2985,20 @@ function drawCards(date, all) {
       </div>
       ${(() => {
         if (isViewer) return '';
-        const ol = cardOneLiner(p, f, viewer);
-        if (!ol) return '';
-        return `<div class="card-oneliner">
-          <span class="ol-arrow">${viewer.name} →</span>
-          <span class="ol-text">「${ol.text}」</span>
-          <span class="ol-tone">${ol.tone.note}</span>
+        const ols = cardOneLiners(p, f, viewer, 2);
+        if (!ols.length) return '';
+        return `<div class="card-oneliners">
+          <button class="ol-refresh" type="button" data-pid="${p.id}" title="他の候補を出す" aria-label="他の候補">↻</button>
+          ${ols.map(ol => `
+            <div class="card-oneliner">
+              <span class="ol-arrow">${viewer.name} →</span>
+              <div class="ol-body">
+                <span class="ol-text">「${ol.text}」</span>
+                <span class="ol-cat">${ol.cat}</span>
+              </div>
+            </div>
+          `).join('')}
+          <div class="ol-tone-note">${ols[0].tone.note}</div>
         </div>`;
       })()}
     `;
@@ -4203,18 +4248,51 @@ function pickWordsWeighted(arr, person, f, viewer, n, ctx, salt) {
   return picks;
 }
 
-// 各人カードの「今日 viewer がかける一言」
-function cardOneLiner(person, f, viewer) {
-  if (!viewer || viewer.id === person.id) return null;
+// 各人カードの「今日 viewer がかける言葉」(複数バリアント)
+const _olRotate = {}; // person.id → number (↻ボタンで増分)
+function bumpOneLinerRotate(pid) {
+  _olRotate[pid] = (_olRotate[pid] || 0) + 1;
+  render();
+}
+function cardOneLiners(person, f, viewer, n) {
+  n = n || 2;
+  if (!viewer || viewer.id === person.id) return [];
   const ctx = getPersonCtx(person, f);
-  // viewer→person の関係を ctx に反映
   const vHon = honmeiStar(viewer.birth);
   const rel = starRelation(vHon, f.engines.honmei);
   const tone = toneFromRelation(rel);
   ctx.kinds = KIND_POOLS[tone.kind] || ctx.kinds;
-  const top = pickWordsWeighted(WANT_WORDS, person, f, viewer, 1, ctx, 'oneliner');
-  if (!top.length) return null;
-  return { ...top[0], tone };
+  // ローテに応じて salt をずらす → ↻押下で別候補に
+  const rotate = _olRotate[person.id] || 0;
+  const start = rotate * 7;
+  const seen = new Set();
+  const out = [];
+  for (let i = start; i < start + 18 && out.length < n; i++) {
+    const top = pickWordsWeighted(WANT_WORDS, person, f, viewer, 1, ctx, 'ol' + i);
+    if (!top.length) continue;
+    const key = top[0].text;
+    if (seen.has(key)) continue;
+    // 2件目以降は別カテゴリを優先 (軸を分ける)
+    if (out.length && out.some(o => o.cat === top[0].cat)) continue;
+    seen.add(key);
+    out.push({ ...top[0], tone });
+  }
+  // 別カテゴリ縛りで埋まらなければ重複だけ排除して埋める
+  if (out.length < n) {
+    for (let i = start; i < start + 18 && out.length < n; i++) {
+      const top = pickWordsWeighted(WANT_WORDS, person, f, viewer, 1, ctx, 'ol' + i);
+      if (top.length && !seen.has(top[0].text)) {
+        seen.add(top[0].text);
+        out.push({ ...top[0], tone });
+      }
+    }
+  }
+  return out;
+}
+// 後方互換 (使ってる箇所が出てきても壊れないように)
+function cardOneLiner(person, f, viewer) {
+  const arr = cardOneLiners(person, f, viewer, 1);
+  return arr[0] || null;
 }
 
 function renderWords(p, f) {
@@ -4558,9 +4636,20 @@ function bindMagnetic() {
   });
 })();
 
+// 一言ローテボタン (カード選択にイベント伝播させない)
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.ol-refresh');
+  if (!btn) return;
+  e.stopPropagation();
+  e.preventDefault();
+  bumpOneLinerRotate(btn.dataset.pid);
+}, true); // capture phase で先に処理
+
 // ---- 6) クリック ★ バースト (黄色+黒の十字が放射状に飛ぶ) ----
 document.addEventListener('click', e => {
   if (PREFERS_REDUCED) return;
+  // ↻ボタンの click は別途処理してるので除外
+  if (e.target.closest('.ol-refresh')) return;
   const target = e.target.closest('.vc-chip, .ed-tab, .tab, .card, .ed-strip-cell, .btn, .ed-headline, .marquee-block');
   if (!target) return;
   const N = 7;
