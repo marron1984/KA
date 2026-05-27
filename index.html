@@ -2562,19 +2562,30 @@ function chooseAdvice(total, rank) {
 }
 
 // 相性スコアの可視化 (●●●●○ + ラベル + 小さく数値)
-function compatLabel(score) {
-  let level, label;
-  if (score >= 88)      { level = 5; label = '深い縁'; }
-  else if (score >= 74) { level = 4; label = '良い流れ'; }
-  else if (score >= 58) { level = 3; label = '穏やかな縁'; }
-  else if (score >= 42) { level = 2; label = '学びの相手'; }
-  else                  { level = 1; label = '距離を保つ'; }
-  return { level, label };
+// 各レベル3バリエーション; ペア+月でシード抽選して固定 (画面リロードで暴れない)
+const COMPAT_LABELS = {
+  5: ['深い縁', '響き合う縁', '魂が通う相手'],
+  4: ['良い流れ', '澄んだ繋がり', '心地よい風'],
+  3: ['穏やかな縁', 'やわらかな縁', '静かな繋がり'],
+  2: ['学びの相手', '気付きの縁', '考えさせる相手'],
+  1: ['距離を保つ', '今は静観', '間合いを取る'],
+};
+function compatLabel(score, seedKey) {
+  let level;
+  if (score >= 88)      level = 5;
+  else if (score >= 74) level = 4;
+  else if (score >= 58) level = 3;
+  else if (score >= 42) level = 2;
+  else                  level = 1;
+  const variants = COMPAT_LABELS[level];
+  const idx = seedKey ? (hash(String(seedKey)) % variants.length) : 0;
+  return { level, label: variants[idx] };
 }
 function compatVis(score, opts) {
-  const { level, label } = compatLabel(score);
-  const size = (opts && opts.size) || ''; // 'tight' | 'big' | ''
-  const showNum = !(opts && opts.hideNum);
+  opts = opts || {};
+  const { level, label } = compatLabel(score, opts.seed);
+  const size = opts.size || ''; // 'tight' | 'big' | ''
+  const showNum = !opts.hideNum;
   const dots = Array.from({length:5}, (_,i) =>
     `<span class="cdot${i < level ? ' on' : ''}"></span>`).join('');
   return `<span class="compat-vis ${size}">${dots}<span class="clbl">${label}</span>${showNum?`<span class="cnum">${score}</span>`:''}</span>`;
@@ -2815,7 +2826,7 @@ function drawCompatMatrix(date, all) {
         const det = compatDetails(viewer, o, date);
         return `<div class="cm-row">
           <div class="cm-name">${o.name}<span class="nm-sub">${det.rel.name} / 通変 ${det.tongbian}</span></div>
-          <div class="cm-val">${compatVis(det.score, { size: 'tight' })}</div>
+          <div class="cm-val">${compatVis(det.score, { size: 'tight', seed: viewer.id + '|' + o.id + '|' + date.slice(0,7) })}</div>
         </div>`;
       }).join('')}
     </div>
@@ -2878,7 +2889,7 @@ function drawRadial(date, all) {
     link.style.animationDuration = (4 - (c/100)*2.5).toFixed(2) + 's';
     $svg.appendChild(link);
     const mx = (vPos.x + oPos.x)/2, my = (vPos.y + oPos.y)/2;
-    const cl = compatLabel(c);
+    const cl = compatLabel(c, viewer.id + '|' + p.id + '|' + date.slice(0,7));
     const lbl = document.createElementNS(NS, 'text');
     lbl.setAttribute('x', mx); lbl.setAttribute('y', my - 3);
     lbl.setAttribute('text-anchor', 'middle');
@@ -2993,7 +3004,7 @@ function drawCards(date, all) {
       </div>
       <div class="card-foot">
         ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
-        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `<div style="margin-top:6px">${viewer.name} → ${compatVis(f.compatScore, { size: 'tight' })}</div>`}
+        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `<div style="margin-top:6px">${viewer.name} → ${compatVis(f.compatScore, { size: 'tight', seed: viewer.id + '|' + p.id + '|' + date.slice(0,7) })}</div>`}
       </div>
       ${(() => {
         if (isViewer) return '';
@@ -3094,7 +3105,7 @@ function renderOverview(p, f) {
         <div class="bars" style="font-size:12px">
           ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
         </div>
-        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span>${compatVis(f.compatScore, { size: 'big' })}</span></div>` : ''}
+        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span>${compatVis(f.compatScore, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</span></div>` : ''}
         <div style="margin-top:10px">
           <span class="chip">日干通変: ${f.engines.todayTongbian} (${f.engines.todayInfo.rank})</span>
           <span class="chip">本命×日盤: ${f.engines.relation.name}</span>
@@ -3109,14 +3120,14 @@ function renderOverview(p, f) {
           <h4>${p.name} から見た相性</h4>
           ${others.map(o => {
             const d = compatDetails(p, o, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight' })}</div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: p.id + '|' + o.id + '|' + f.dateStr.slice(0,7) })}</div>`;
           }).join('')}
         </div>
         <div>
           <h4>${p.name} へ向けられる相性</h4>
           ${others.map(o => {
             const d = compatDetails(o, p, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight' })}</div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: o.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</div>`;
           }).join('')}
         </div>
       </div>
@@ -3367,7 +3378,7 @@ function renderMBTI(p, f) {
         <h3>ビジネス相性 (${getViewer().name} 視点)</h3>
         ${PEOPLE.filter(x => x.id !== getViewer().id).map(other => {
           const oF = runEngines(other, f.dateStr, getViewer());
-          return `<div class="row"><span>${other.name} <span style="color:var(--muted);font-size:10px">(${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></span>${compatVis(oF.compatScore, { size: 'tight' })}</div>`;
+          return `<div class="row"><span>${other.name} <span style="color:var(--muted);font-size:10px">(${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></span>${compatVis(oF.compatScore, { size: 'tight', seed: getViewer().id + '|' + other.id + '|' + f.dateStr.slice(0,7) })}</div>`;
         }).join('')}
       </div>
     </div>
