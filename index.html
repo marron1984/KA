@@ -297,13 +297,14 @@
     max-width: 1500px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
   }
+  .ed-strip > * { min-width: 0; }
   @media (max-width: 900px) {
-    .ed-strip { grid-template-columns: repeat(2, 1fr); }
+    .ed-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ed-hero { padding: 24px 20px 16px; }
     .ed-strip { padding: 0 20px 28px; }
   }
@@ -357,12 +358,14 @@
     max-width: 1500px;
     margin: 0 auto;
   }
-  @media (max-width: 1000px) { main { grid-template-columns: 1fr; padding: 20px; } }
+  @media (max-width: 1000px) { main { grid-template-columns: minmax(0, 1fr); padding: 20px; } }
   .panel {
     background: var(--bg2);
     border: 1px solid var(--line2);
     border-radius: 0;
     padding: 28px;
+    min-width: 0;
+    overflow: hidden;
   }
   .panel-wide { grid-column: 1 / -1; }
   .panel h2 {
@@ -383,12 +386,13 @@
   /* viewer-perspective chips */
   .viewer-bar {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 10px;
     margin: 0 0 14px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--line2);
+    min-width: 0;
   }
   .viewer-bar .vlabel {
     font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted);
@@ -418,6 +422,7 @@
     scrollbar-width: none;
     padding: 4px 2px;
     scroll-behavior: smooth;
+    min-width: 0;
   }
   .viewer-chips::-webkit-scrollbar { display: none; }
   .vc-chip {
@@ -462,9 +467,10 @@
   }
   /* compat matrix */
   .compat-matrix {
-    display: grid; grid-template-columns: 1fr auto; gap: 1px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px;
     background: var(--line); border: 1px solid var(--line2);
     margin-top: 14px;
+    min-width: 0;
   }
   .cm-row {
     display: contents;
@@ -571,6 +577,8 @@
     border-bottom: 1px solid var(--line);
     margin-bottom: 24px;
     flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
   }
   .tab {
     background: none; border: none;
@@ -585,12 +593,13 @@
   }
   .tab:hover { color: var(--fg); }
   .tab.active { color: var(--fg); border-bottom-color: var(--fg); }
-  .tab-panel { display: none; }
+  .tab-panel { display: none; min-width: 0; }
   .tab-panel.active { display: block; }
   /* Grid layouts within tabs */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  @media (max-width: 720px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 720px) { .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); } }
+  .grid-2 > *, .grid-3 > * { min-width: 0; }
   .box {
     background: var(--bg2);
     border: 1px solid var(--line2);
@@ -615,10 +624,11 @@
   .row > span:first-child { color: var(--muted); flex-shrink: 0; font-size: 11px; letter-spacing: 0.05em; }
   .row > span:last-child { text-align: right; font-family: var(--serif); }
   .pillar-table {
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1px; margin: 14px 0;
     background: var(--line);
     border: 1px solid var(--line2);
+    min-width: 0;
   }
   .pillar-cell {
     background: var(--bg2); padding: 14px 6px; border-radius: 0;
@@ -1260,9 +1270,10 @@
     letter-spacing: 0.1em;
   }
   .words-cols {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px;
   }
-  @media (max-width: 720px) { .words-cols { grid-template-columns: 1fr; } }
+  .words-cols > * { min-width: 0; }
+  @media (max-width: 720px) { .words-cols { grid-template-columns: minmax(0, 1fr); } }
   .words-col .wc-head {
     font-family: var(--serif); font-size: 18px;
     margin: 0 0 14px; padding-bottom: 10px;
@@ -1426,11 +1437,12 @@
     /* --- INFO STRIP (2x3 grid on mobile, last cell full-width) --- */
     .ed-strip {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       padding: 0 16px 20px;
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
     }
+    .ed-strip-cell { min-width: 0; }
     .ed-strip-cell {
       padding: 14px 14px 16px;
       border-right: 1px solid var(--line2);
