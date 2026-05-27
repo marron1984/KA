@@ -2563,21 +2563,30 @@ function chooseAdvice(total, rank) {
 
 // 相性スコアの可視化 (●●●●○ + ラベル + 小さく数値)
 // 各レベル3バリエーション; ペア+月でシード抽選して固定 (画面リロードで暴れない)
+// 50以下は辛辣 (50/51 で言葉のトーンが切り替わる)
 const COMPAT_LABELS = {
   5: ['深い縁', '響き合う縁', '魂が通う相手'],
   4: ['良い流れ', '澄んだ繋がり', '心地よい風'],
   3: ['穏やかな縁', 'やわらかな縁', '静かな繋がり'],
-  2: ['学びの相手', '気付きの縁', '考えさせる相手'],
-  1: ['距離を保つ', '今は静観', '間合いを取る'],
+  2: ['浅い接点', '上滑りの縁', '深まりにくい'],         // 51-57 控えめ
+  1: ['噛み合わない縁', '足を引っ張る相手', '消耗する関係'], // ≤50 辛辣
 };
 function compatLabel(score, seedKey) {
+  // ●の数 (視覚)
   let level;
   if (score >= 88)      level = 5;
   else if (score >= 74) level = 4;
   else if (score >= 58) level = 3;
   else if (score >= 42) level = 2;
   else                  level = 1;
-  const variants = COMPAT_LABELS[level];
+  // 言葉のトーン (50以下が辛辣) — ●の数とは独立
+  let tier;
+  if (score >= 88)      tier = 5;
+  else if (score >= 74) tier = 4;
+  else if (score >= 58) tier = 3;
+  else if (score >= 51) tier = 2;
+  else                  tier = 1; // ≤50 → 辛辣
+  const variants = COMPAT_LABELS[tier];
   const idx = seedKey ? (hash(String(seedKey)) % variants.length) : 0;
   return { level, label: variants[idx] };
 }
