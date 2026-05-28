@@ -65,15 +65,88 @@
   .ed-brand { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
   .ed-mascot {
     display: inline-flex; align-items: center; justify-content: center;
-    transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1);
+    cursor: pointer;
+    user-select: none;
+    transform-origin: center bottom;
+    animation: frogHop 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    will-change: transform;
   }
-  .ed-mascot svg { display: block; }
-  .ed-mascot:hover { transform: rotate(-8deg) scale(1.08); }
-  @keyframes frogBob {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-2px); }
+  .ed-mascot svg { display: block; overflow: visible; }
+  .ed-mascot:hover { animation-play-state: paused; }
+  .ed-mascot:hover .frog-svg {
+    animation: frogHoverShake 0.5s ease-in-out infinite;
   }
-  .ed-mascot { animation: frogBob 3.6s ease-in-out infinite; }
+  .ed-mascot.leap {
+    animation: frogLeap 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+  /* メインの跳ね (squash & stretch 強め) */
+  @keyframes frogHop {
+    0%, 100% { transform: translateY(0)    rotate(0deg)  scale(1, 1); }
+    8%       { transform: translateY(-1px) rotate(0deg)  scale(1.08, 0.88); }   /* charge (sq) */
+    18%      { transform: translateY(-14px) rotate(-6deg) scale(0.9, 1.14); }   /* leap up (st) */
+    28%      { transform: translateY(-8px) rotate(-3deg) scale(0.95, 1.08); }   /* apex */
+    38%      { transform: translateY(2px)  rotate(0deg)  scale(1.15, 0.82); }   /* land squash */
+    46%      { transform: translateY(-3px) rotate(2deg)  scale(0.98, 1.04); }   /* rebound */
+    55%      { transform: translateY(0)    rotate(0deg)  scale(1, 1); }
+    68%      { transform: translateY(-5px) rotate(3deg)  scale(0.97, 1.05); }   /* small wiggle */
+    78%      { transform: translateY(0)    rotate(-2deg) scale(1.03, 0.97); }
+    88%      { transform: translateY(-2px) rotate(0deg)  scale(1, 1); }
+  }
+  /* hover中の小刻みシェイク */
+  @keyframes frogHoverShake {
+    0%, 100% { transform: rotate(0)    translate(0, 0); }
+    20%      { transform: rotate(-6deg) translate(-1px, -2px); }
+    40%      { transform: rotate(6deg)  translate(1px, -1px); }
+    60%      { transform: rotate(-4deg) translate(-1px, -2px); }
+    80%      { transform: rotate(4deg)  translate(1px, 0); }
+  }
+  /* クリックで大ジャンプ */
+  @keyframes frogLeap {
+    0%   { transform: translateY(0) rotate(0)    scale(1, 1); }
+    15%  { transform: translateY(-2px) rotate(0) scale(1.2, 0.7); }
+    35%  { transform: translateY(-32px) rotate(-360deg) scale(0.85, 1.18); }
+    65%  { transform: translateY(-16px) rotate(-360deg) scale(0.95, 1.05); }
+    80%  { transform: translateY(4px) rotate(-360deg) scale(1.25, 0.75); }
+    92%  { transform: translateY(-4px) rotate(-360deg) scale(0.97, 1.05); }
+    100% { transform: translateY(0) rotate(-360deg) scale(1, 1); }
+  }
+  /* 目の瞬き */
+  .frog-eye {
+    transform-origin: center 16px;
+    animation: frogBlink 5.4s steps(1) infinite;
+  }
+  .frog-eye-r { animation-delay: 0.04s; }
+  @keyframes frogBlink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    93%, 96%      { transform: scaleY(0.08); }
+    97%, 99%      { transform: scaleY(1); }
+  }
+  /* 体の中身も呼吸 */
+  .frog-body, .frog-shine {
+    transform-origin: center 38px;
+    animation: frogBreathe 3.2s ease-in-out infinite;
+  }
+  @keyframes frogBreathe {
+    0%, 100% { transform: scale(1, 1); }
+    50%      { transform: scale(1.03, 0.97); }
+  }
+  /* 足のキック */
+  .frog-leg { transform-origin: center 50px; }
+  .leg-l { animation: legKickL 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+  .leg-r { animation: legKickR 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+  @keyframes legKickL {
+    0%, 30%, 60%, 100% { transform: rotate(0) translate(0, 0); }
+    18%, 48%          { transform: rotate(-14deg) translate(-1px, 1px); }
+  }
+  @keyframes legKickR {
+    0%, 30%, 60%, 100% { transform: rotate(0) translate(0, 0); }
+    18%, 48%          { transform: rotate(14deg) translate(1px, 1px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ed-mascot, .frog-svg, .frog-eye, .frog-body, .frog-shine, .frog-leg {
+      animation: none !important;
+    }
+  }
 
   /* 相性ビジュアル: ●●●●○ + ラベル + 数値 */
   .compat-vis {
@@ -1614,30 +1687,30 @@
 <header class="ed-nav">
   <div class="ed-brand">
     <span class="ed-mascot" aria-label="URANAI">
-      <svg viewBox="0 0 64 56" width="52" height="46">
+      <svg viewBox="0 0 64 56" width="52" height="46" class="frog-svg">
+        <!-- 後ろ足 (左右) — bodyの後ろに描く -->
+        <path class="frog-leg leg-l" d="M 9 42 Q 5 48 10 52 L 16 50" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path class="frog-leg leg-r" d="M 55 42 Q 59 48 54 52 L 48 50" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.6" stroke-linejoin="round"/>
         <!-- 体 -->
-        <ellipse cx="32" cy="38" rx="24" ry="16" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.8"/>
+        <ellipse class="frog-body" cx="32" cy="38" rx="24" ry="16" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.8"/>
         <!-- 体のハイライト -->
-        <ellipse cx="24" cy="32" rx="6" ry="3" fill="#cde2a3" opacity="0.6"/>
-        <!-- 後ろ足 (左右) -->
-        <path d="M 9 42 Q 5 48 10 52 L 16 50" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.6" stroke-linejoin="round"/>
-        <path d="M 55 42 Q 59 48 54 52 L 48 50" fill="var(--frog)" stroke="var(--fg)" stroke-width="1.6" stroke-linejoin="round"/>
+        <ellipse class="frog-shine" cx="24" cy="32" rx="6" ry="3" fill="#cde2a3" opacity="0.6"/>
         <!-- 目 (白目) -->
-        <circle cx="20" cy="16" r="9.5" fill="#dfeeb8" stroke="var(--fg)" stroke-width="1.8"/>
-        <circle cx="44" cy="16" r="9.5" fill="#dfeeb8" stroke="var(--fg)" stroke-width="1.8"/>
-        <!-- 瞳 -->
-        <circle cx="20.5" cy="17" r="3.8" fill="var(--fg)"/>
-        <circle cx="44.5" cy="17" r="3.8" fill="var(--fg)"/>
-        <!-- 瞳ハイライト -->
-        <circle cx="19" cy="15.6" r="1" fill="#fffaec"/>
-        <circle cx="43" cy="15.6" r="1" fill="#fffaec"/>
+        <g class="frog-eye frog-eye-l">
+          <circle cx="20" cy="16" r="9.5" fill="#dfeeb8" stroke="var(--fg)" stroke-width="1.8"/>
+          <circle class="frog-pupil pup-l" cx="20.5" cy="17" r="3.8" fill="var(--fg)"/>
+          <circle cx="19" cy="15.6" r="1" fill="#fffaec"/>
+        </g>
+        <g class="frog-eye frog-eye-r">
+          <circle cx="44" cy="16" r="9.5" fill="#dfeeb8" stroke="var(--fg)" stroke-width="1.8"/>
+          <circle class="frog-pupil pup-r" cx="44.5" cy="17" r="3.8" fill="var(--fg)"/>
+          <circle cx="43" cy="15.6" r="1" fill="#fffaec"/>
+        </g>
         <!-- 口 -->
-        <path d="M 24 40 Q 32 47 40 40" stroke="var(--fg)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path class="frog-mouth" d="M 24 40 Q 32 47 40 40" stroke="var(--fg)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
         <!-- ほっぺ -->
         <circle cx="14" cy="38" r="1.8" fill="#e8a8a0" opacity="0.75"/>
         <circle cx="50" cy="38" r="1.8" fill="#e8a8a0" opacity="0.75"/>
-        <!-- 頭の天辺の点 -->
-        <circle cx="32" cy="11" r="1.4" fill="var(--fg)" opacity="0.4"/>
       </svg>
     </span>
     <span class="ed-wordmark">URANAI</span>
@@ -5044,6 +5117,43 @@ function bindMagnetic() {
   document.addEventListener('mouseout', e => {
     if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest(hotSel)) dot.classList.remove('is-hot');
   });
+})();
+
+// ============================================================
+// FROG MASCOT — クリックで大ジャンプ + マウス追従で瞳が動く
+// ============================================================
+(function initFrog() {
+  const mascot = document.querySelector('.ed-mascot');
+  if (!mascot) return;
+  // クリック (タップ) で大ジャンプ
+  mascot.addEventListener('click', e => {
+    e.stopPropagation();
+    if (mascot.classList.contains('leap')) return;
+    mascot.classList.add('leap');
+    setTimeout(() => mascot.classList.remove('leap'), 900);
+  });
+  // PC で瞳がマウスを追う
+  if (typeof matchMedia !== 'function' || !matchMedia('(pointer: fine)').matches) return;
+  if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const pups = mascot.querySelectorAll('.frog-pupil');
+  if (!pups.length) return;
+  // 各瞳の中心の元位置を記録
+  const origins = Array.from(pups).map(p => ({
+    el: p,
+    cx: parseFloat(p.getAttribute('cx')),
+    cy: parseFloat(p.getAttribute('cy')),
+  }));
+  document.addEventListener('mousemove', e => {
+    const r = mascot.getBoundingClientRect();
+    const mx = (e.clientX - (r.left + r.width / 2)) / (r.width || 1);
+    const my = (e.clientY - (r.top + r.height / 2)) / (r.height || 1);
+    const dx = Math.max(-1.6, Math.min(1.6, mx * 3));
+    const dy = Math.max(-1.2, Math.min(1.4, my * 2.6));
+    origins.forEach(({ el, cx, cy }) => {
+      el.setAttribute('cx', (cx + dx).toFixed(2));
+      el.setAttribute('cy', (cy + dy).toFixed(2));
+    });
+  }, { passive: true });
 })();
 
 // 一言ローテボタン (カード選択にイベント伝播させない)
