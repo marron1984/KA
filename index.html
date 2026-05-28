@@ -1350,6 +1350,67 @@
     margin-top: 14px; font-size: 10px; color: var(--muted);
     letter-spacing: 0.1em;
   }
+  /* ============ PAIR FOCUS — ペア占断ビュー ============ */
+  .pair-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+    padding: 22px 18px;
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+  }
+  .pair-side {
+    display: flex; flex-direction: column; gap: 8px;
+    min-width: 0;
+  }
+  .pair-right { text-align: right; align-items: flex-end; }
+  .pair-side .ps-role {
+    font-size: 9px; letter-spacing: 0.3em;
+    color: var(--muted); font-weight: 700; text-transform: uppercase;
+  }
+  .pair-side .ps-name {
+    font-family: var(--serif); font-size: 20px;
+    font-weight: 500; line-height: 1.2;
+  }
+  .pair-side .ps-mbti {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
+  }
+  .pair-side .ps-chips {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .pair-right .ps-chips { justify-content: flex-end; }
+  .pair-x {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+  .pair-x .pair-x-mark {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 42px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .pair-x .pair-x-rel {
+    font-size: 9px; letter-spacing: 0.25em;
+    color: var(--muted); text-transform: uppercase;
+    margin-top: 6px; font-weight: 700;
+  }
+  @media (max-width: 720px) {
+    .pair-header {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+      padding: 18px 14px;
+    }
+    .pair-right { text-align: left; align-items: flex-start; }
+    .pair-right .ps-chips { justify-content: flex-start; }
+    .pair-x { padding: 0; }
+    .pair-x .pair-x-mark { font-size: 28px; }
+  }
+
   /* nav transitions */
   .btn { transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s; }
   .btn:active { transform: scale(0.96); }
@@ -1720,6 +1781,7 @@
     <h2>DETAIL — <span id="detailName">—</span></h2>
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="pair">ペア占断</button>
       <button class="tab" data-tab="shichu">四柱</button>
       <button class="tab" data-tab="astro">天体</button>
       <button class="tab" data-tab="num">数秘</button>
@@ -1729,6 +1791,7 @@
       <button class="tab" data-tab="words">ことば WORDS</button>
     </div>
     <div id="tab-overview"  class="tab-panel active"></div>
+    <div id="tab-pair"      class="tab-panel"></div>
     <div id="tab-shichu"    class="tab-panel"></div>
     <div id="tab-astro"     class="tab-panel"></div>
     <div id="tab-num"       class="tab-panel"></div>
@@ -3083,6 +3146,7 @@ function drawDetail(date, all) {
   const f = all[p.id];
   $detailName.textContent = `${p.name} (${p.role || ''})`;
   document.getElementById('tab-overview').innerHTML  = renderOverview(p, f);
+  document.getElementById('tab-pair').innerHTML      = renderPair(p, f);
   document.getElementById('tab-shichu').innerHTML    = renderShichu(p, f);
   document.getElementById('tab-astro').innerHTML     = renderAstro(p, f);
   document.getElementById('tab-num').innerHTML       = renderNum(p, f);
@@ -4327,6 +4391,255 @@ function cardOneLiner(person, f, viewer) {
   return arr[0] || null;
 }
 
+// ============================================================
+// PAIR FOCUS — 2人深掘りビュー用ヘルパー
+// ============================================================
+function pairMBTIInsight(a, b) {
+  if (!a || !b || !MBTI_PROFILES[a] || !MBTI_PROFILES[b])
+    return { label: '不明', text: '' };
+  const A = MBTI_PROFILES[a], B = MBTI_PROFILES[b];
+  const good = (A[2] || []).includes(b) || (B[2] || []).includes(a);
+  const clash = (A[3] || []).includes(b) || (B[3] || []).includes(a);
+  const diffs = [a[0]!==b[0], a[1]!==b[1], a[2]!==b[2], a[3]!==b[3]];
+  const ax = ['外向×内向の活力差','現実×理想の視点差','論理×情緒の決断軸の違い','計画×即応の進め方の差'];
+  const reasons = diffs.map((d,i) => d ? ax[i] : '').filter(Boolean);
+  const same = 4 - diffs.filter(Boolean).length;
+  let label, text;
+  if (a === b)        { label = '同型ペア (Twin)'; text = `${A[1]}同士。価値観の深い共有がある一方、視野の死角も似る。新しい刺激を外から取り入れて。`; }
+  else if (good)      { label = '🟢 補完しやすい'; text = `${A[0]}と${B[0]}は本能的に補い合える組み合わせ。${reasons.join(' / ') || '微妙な差が成長を生む'}。`; }
+  else if (clash)     { label = '🔴 摩擦が出やすい'; text = `${A[0]}と${B[0]}は価値判断が真逆になりやすい。${reasons.join(' / ')}。意識的な翻訳が必要。`; }
+  else if (same >= 3) { label = '🟡 近接型'; text = `${a} と ${b} は ${same}/4 の軸が一致。安心して話せる一方、踏み込み不足になりがち。`; }
+  else                { label = '🟡 中立'; text = `${A[1]} と ${B[1]}。${reasons.join(' / ')}。仕事で組むなら役割を明示すると噛み合う。`; }
+  return { label, text };
+}
+
+const BLOOD_PAIR_NOTE = {
+  'A|A': '几帳面同士。安定感はあるが突破力に欠ける。誰かが攻めの役を引き受けて。',
+  'A|B': 'AはBの自由さに苛立ちやすい。Bは緻密さに敬意を、Aはペースに余白を。',
+  'A|O': 'A の計画性 × O の決断力。役割が明確なら最強。',
+  'A|AB':'冷静さ同士。論理は噛み合うが感情共有は希薄。意識して気持ちを言語化。',
+  'B|A': 'BはAの計画性を疎ましく感じやすい。Aの段取りに乗ると結果が出る。',
+  'B|B': 'マイペース同士。発火力はあるが地に足が付かない。期限を共有して。',
+  'B|O': '陽気な化学反応。勢いで成功するが詰めが甘くなる。記録を残して。',
+  'B|AB':'発想は飛ぶがゴール定義が共有しづらい。最初に "ここに着地する" を握る。',
+  'O|A': '推進力(O)と几帳面さ(A)で実務の鉄板コンビ。Oは独走しないこと。',
+  'O|B': '陽性の名コンビ。場の空気は最高、抜けが多いので外部チェック必須。',
+  'O|O': '熱量過多。譲り合いを意識しないと衝突する。役割で住み分け。',
+  'O|AB':'OとABはテンポが違う。OはAB の沈黙を尊重、ABはOの熱に応えて。',
+  'AB|A':'論理同士。冷静なやり取りで噛み合う。情の共有は別途意識的に。',
+  'AB|B':'AB側のロジックがB側にハマれば飛躍する。逆だと擦れ違う。',
+  'AB|O':'AB の理性 × O の熱。良い化学だが疲労が偏りやすい。',
+  'AB|AB':'同型。透明な対話ができる反面、外部刺激なしには停滞しがち。',
+};
+function pairBloodInsight(va, vb) {
+  const key = (va || '?') + '|' + (vb || '?');
+  return BLOOD_PAIR_NOTE[key] || '記録なし';
+}
+
+function pairRoleAdvice(viewer, target, vF, tF, relVT) {
+  const tb = tongbianStar(vF.engines.dayP.stemIdx, tF.engines.dayP.stemIdx);
+  const role = ({
+    '正官': `${viewer.name}が指揮し ${target.name}が支える縦の関係で機能。決裁・対外折衝は${viewer.name}、実務遂行は${target.name}。`,
+    '偏官': `${target.name}は${viewer.name}を発奮させる存在。挑発的な対話を経て結果が出る。プロジェクト立ち上げに向く。`,
+    '正財': `${target.name}は${viewer.name}にとって安定収益・実利の縁。営業/数字の場面で組むのが吉。`,
+    '偏財': `流動的な利益・情報の橋渡し。短期プロジェクト・コラボ向き。`,
+    '食神': `${viewer.name}のクリエイティブを ${target.name}が開花させる。発想出し→形にする流れで組んで。`,
+    '傷官': `鋭い才能の発露を促す関係。批評と尖りが同居するので評価の場では強い。日常で消耗注意。`,
+    '比肩': `対等な同志。役割分担ではなく "並走" 型。互いの孤立をカバーする盟友になり得る。`,
+    '劫財': `近しすぎる関係。利害が一致する時は最強、ズレると消耗。境界線を明示して。`,
+    '印綬': `${target.name}は${viewer.name}にとって学びの源泉。メンター/師として接する関係。`,
+    '偏印': `非定型なインスピレーション源。${target.name}との会話で新しい着想が降りてくる。`,
+  })[tb] || '中立な距離。';
+  const elNote = ({
+    '相生(発展)': '五行は相生関係 — 自然に育てる/育つ流れがある。',
+    '比和(調和)': '五行は比和 — 価値観の同期は容易だが、外部刺激が必要。',
+    '洩気(消耗)': '五行は洩気 — 与える側の疲労に注意。会話の頻度を調整。',
+    '相剋(摩擦)': '五行は相剋 — 緊張が成長になる場合と消耗になる場合がある。距離設計を意識。',
+    '受剋(被害)': '五行は受剋 — 受ける側の負担が大きい。短時間の関わりに留めるのが吉。',
+  })[relVT.name] || '';
+  return role + (elNote ? ' ' + elNote : '');
+}
+
+function pairHexagram(viewerId, targetId, dateStr) {
+  // 2人のリレーション専用の今日の卦
+  const seed = (hash(viewerId + '|' + targetId) ^ hash(dateStr)) >>> 0;
+  const rnd = lcgSeed(seed);
+  const yaos = [];
+  for (let i = 0; i < 6; i++) yaos.push(castYao(rnd));
+  const hex = hexagramFromYaos(yaos);
+  return { ...hex, yaos };
+}
+
+
+function renderPair(p, f) {
+  const viewer = getViewer();
+  if (p.id === viewer.id) {
+    return `<div class="box" style="text-align:center;padding:40px 20px">
+      <h3 style="border:none">ペア占断</h3>
+      <p style="font-size:13px;line-height:1.7;color:var(--muted);max-width:420px;margin:12px auto">
+        「視点 (Viewpoint)」とは別の人物を選択してください。<br>
+        リレーションシップマップで別ノードをタップするか、人物カードをタップすると、その人と <b style="color:var(--fg)">${viewer.name}</b> のペア深掘りが表示されます。
+      </p>
+    </div>`;
+  }
+  const vF = runEngines(viewer, f.dateStr, viewer);
+  const tF = f;
+  const fwd = compatDetails(viewer, p, f.dateStr);
+  const rev = compatDetails(p, viewer, f.dateStr);
+  const vDay = vF.engines.dayP, tDay = tF.engines.dayP;
+  const tbVT = tongbianStar(vDay.stemIdx, tDay.stemIdx);
+  const tbTV = tongbianStar(tDay.stemIdx, vDay.stemIdx);
+  const vHon = vF.engines.honmei, tHon = tF.engines.honmei;
+  const relVT = starRelation(vHon, tHon);
+  const relTV = starRelation(tHon, vHon);
+  const vMBTI = vF.mbti, tMBTI = tF.mbti;
+  const mb = pairMBTIInsight(vMBTI, tMBTI);
+  const bloodNote = pairBloodInsight(viewer.blood, p.blood);
+  const bloodScore = (BLOOD_COMPAT[viewer.blood]?.[p.blood]) || 6;
+  const role = pairRoleAdvice(viewer, p, vF, tF, relVT);
+
+  // 言葉の処方箋 (viewer → target)
+  const ctx = getPersonCtx(p, tF);
+  const tone = toneFromRelation(relVT);
+  ctx.kinds = KIND_POOLS[tone.kind] || ctx.kinds;
+  const wantPick = pickWordsWeighted(WANT_WORDS, p, tF, viewer, 3, ctx, 'pair-want');
+  const avoidPick = pickWordsWeighted(AVOID_WORDS, p, tF, viewer, 3, ctx, 'pair-avoid');
+
+  // 2人のタロット
+  const pairSeed = hash(viewer.id + '|' + p.id + '|' + f.dateStr);
+  const pairTarot = drawCardsSeeded(3, pairSeed, ['基盤','現在','行方']);
+  // 2人の今日の卦
+  const pHex = pairHexagram(viewer.id, p.id, f.dateStr);
+  const seedKey = viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7);
+  // 5行の主軸関係を視覚化する SVG ミニ図
+  const elOrder = ['木','火','土','金','水'];
+  const vEl = KYUSEI[vHon].el, tEl = KYUSEI[tHon].el;
+
+  return `
+    <div class="pair-header">
+      <div class="pair-side pair-left">
+        <div class="ps-role">VIEWPOINT</div>
+        <div class="ps-name">${viewer.name}</div>
+        <div class="ps-mbti">${vMBTI} ${MBTI_PROFILES[vMBTI]?.[0]||''}</div>
+        <div class="ps-chips">
+          <span class="chip-mini">${KYUSEI[vHon].name}</span>
+          <span class="chip-mini">${vDay.ganzhi}</span>
+          <span class="chip-mini">${viewer.blood||'?'}型</span>
+        </div>
+      </div>
+      <div class="pair-x">
+        <div class="pair-x-mark">×</div>
+        <div class="pair-x-rel">${relVT.name.replace(/\(.*\)/, '')}</div>
+      </div>
+      <div class="pair-side pair-right">
+        <div class="ps-role">TARGET</div>
+        <div class="ps-name">${p.name}</div>
+        <div class="ps-mbti">${tMBTI} ${MBTI_PROFILES[tMBTI]?.[0]||''}</div>
+        <div class="ps-chips">
+          <span class="chip-mini">${KYUSEI[tHon].name}</span>
+          <span class="chip-mini">${tDay.ganzhi}</span>
+          <span class="chip-mini">${p.blood||'?'}型</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px">
+      <div class="box">
+        <h3>${viewer.name} → ${p.name}</h3>
+        <div style="text-align:center;margin:12px 0 14px">${compatVis(fwd.score, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</div>
+        <div class="row"><span>五行関係</span><span>${relVT.name}</span></div>
+        <div class="row"><span>通変 (日干)</span><span>${tbVT}</span></div>
+        <div class="row"><span>意味</span><span style="text-align:right">${TONGBIAN_INFO[tbVT]?.desc||'-'}</span></div>
+        <div class="row"><span>かける語気</span><span>${tone.note}</span></div>
+      </div>
+      <div class="box">
+        <h3>${p.name} → ${viewer.name}</h3>
+        <div style="text-align:center;margin:12px 0 14px">${compatVis(rev.score, { size: 'big', seed: p.id + '|' + viewer.id + '|' + f.dateStr.slice(0,7) })}</div>
+        <div class="row"><span>五行関係</span><span>${relTV.name}</span></div>
+        <div class="row"><span>通変 (日干)</span><span>${tbTV}</span></div>
+        <div class="row"><span>意味</span><span style="text-align:right">${TONGBIAN_INFO[tbTV]?.desc||'-'}</span></div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:14px">
+      <h3>気質の相性</h3>
+      <div class="grid-2">
+        <div>
+          <h4>MBTI ${vMBTI} × ${tMBTI}</h4>
+          <div style="margin:6px 0;font-family:var(--serif);font-size:14px">${mb.label}</div>
+          <div class="advice" style="font-size:12.5px;line-height:1.7">${mb.text}</div>
+        </div>
+        <div>
+          <h4>血液型 ${viewer.blood||'?'} × ${p.blood||'?'}</h4>
+          <div style="margin:6px 0;font-family:var(--serif);font-size:14px">${'★'.repeat(Math.round(bloodScore/2))}${'☆'.repeat(Math.max(0, 5 - Math.round(bloodScore/2)))} <span style="color:var(--muted);font-size:11px">${bloodScore}/10</span></div>
+          <div class="advice" style="font-size:12.5px;line-height:1.7">${bloodNote}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:14px">
+      <h3>役割分担の提案</h3>
+      <p style="font-size:13px;line-height:1.85;font-family:var(--serif);margin:0">${role}</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px">
+      <div class="box">
+        <h3 style="color:var(--good)">${viewer.name} → ${p.name} 今日かける言葉</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+          ${wantPick.map(w => `
+            <div class="word-card want">
+              <span class="wc-quote-l">「</span>${w.text}<span class="wc-quote-r">」</span>
+              <span class="wc-cat">${w.cat}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="box">
+        <h3 style="color:var(--bad)">今日避ける言葉</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+          ${avoidPick.map(w => `
+            <div class="word-card avoid">
+              <span class="wc-quote-l">「</span>${w.text}<span class="wc-quote-r">」</span>
+              <span class="wc-cat">${w.cat}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:14px">
+      <h3>2人の今日のタロット (基盤・現在・行方)</h3>
+      <div class="tarot-row">
+        ${pairTarot.map(c => `
+          <div class="tarot-card ${c.reversedDraw?'reversed':''}">
+            <div class="pos">${c.position}</div>
+            <div class="name">${c.name}</div>
+            <div class="suit">${c.reversedDraw ? (c.reversed || '逆位置') : (c.meaning || c.domain || '')}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:14px">
+      <h3>2人の今日の卦 — 第${pHex.num}卦 ${HEX_NAMES[pHex.num]||''}</h3>
+      <div class="grid-2" style="align-items:center">
+        <div class="hex">
+          ${pHex.yaos.map(y => {
+            const yin = (y % 2 === 0);
+            const ch = (y === 6 || y === 9);
+            return `<div class="hex-line${yin?' yin':''}${ch?' changing':''}"></div>`;
+          }).join('')}
+        </div>
+        <div>
+          <div class="row"><span>卦の意</span><span style="text-align:right">${HEX_MEANING[pHex.num]||'-'}</span></div>
+          ${pHex.yaos.some(y => y===6||y===9) ? '<div style="color:var(--bad);font-size:11px;margin-top:8px">⚠ 変爻あり — 関係が変化する時</div>' : ''}
+          <div class="advice" style="font-size:12.5px;line-height:1.75">この卦は ${viewer.name} と ${p.name} の今日の "間" を表す。</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderWords(p, f) {
   // 選択中の人物向けの言葉帳。viewer (中心人物) との五行関係で語気が変わる。
   const viewer = getViewer();
@@ -4493,7 +4806,7 @@ document.getElementById('edTabs').addEventListener('click', e => {
 (function bindSwipe() {
   const detail = document.getElementById('sec-detail');
   if (!detail) return;
-  const TAB_ORDER = ['overview','shichu','astro','num','fengshui','iching','mbti','words'];
+  const TAB_ORDER = ['overview','pair','shichu','astro','num','fengshui','iching','mbti','words'];
   let sx = 0, sy = 0, sw = 0;
   detail.addEventListener('touchstart', e => {
     sx = e.touches[0].clientX; sy = e.touches[0].clientY; sw = e.timeStamp;
