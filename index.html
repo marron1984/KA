@@ -2640,16 +2640,57 @@ function chooseAdvice(total, rank) {
 }
 
 // 相性スコアの可視化 (●●●●○ + ラベル + 小さく数値)
-// 各レベル3バリエーション; ペア+月でシード抽選して固定 (画面リロードで暴れない)
-// 50以下は辛辣 (50/51 で言葉のトーンが切り替わる)
+// 5 score-tier × 5 五行関係 × 6 variants = 150通り
+// 五行関係を入力に取って精度を上げる (相生/比和/相剋/受剋/洩気で文言が変わる)
 const COMPAT_LABELS = {
-  5: ['深い縁', '響き合う縁', '魂が通う相手'],
-  4: ['良い流れ', '澄んだ繋がり', '心地よい風'],
-  3: ['穏やかな縁', 'やわらかな縁', '静かな繋がり'],
-  2: ['浅い接点', '上滑りの縁', '深まりにくい'],         // 51-57 控えめ
-  1: ['噛み合わない縁', '足を引っ張る相手', '消耗する関係'], // ≤50 辛辣
+  // Lv 5 (≥88) — 深い
+  5: {
+    '相生': ['育ち合う運命の縁','互いを照らす伴侶','共に伸びる縦糸','補い合う宿命','種から花までを共にする縁','育ての師と弟子'],
+    '比和': ['響き合う双子の魂','同じ周波数の同志','鏡のように映し合う縁','言葉なく通じる相棒','共鳴し続ける絆','寄り添う影と本体'],
+    '相剋': ['磨き合う宿縁','火花散る運命の好敵手','切磋琢磨の双璧','鋭く高め合う盟友','互いの石を磨く関係','真剣勝負の宿命'],
+    '受剋': ['試練を通して深まる絆','鍛えられて成熟する縁','厳しさが愛となる師','畏怖と尊敬の縁','越えるべき大いなる存在','試されて磨かれる弟子'],
+    '洩気': ['注ぐ愛の深さ','与え尽くす慈愛の縁','育てることが喜びになる縁','全てを差し出す関係','命を分かち合う深い愛','注ぎ続ける親愛'],
+  },
+  // Lv 4 (≥74) — 良い
+  4: {
+    '相生': ['高め合える流れ','風通しの良い関係','自然に育つ縁','補完しあう日常','軽やかに伸びる二人','育てる手応えのある縁'],
+    '比和': ['共鳴する縁','心地よく波長が合う','自然に通じ合える','静かな共感','同じものを愛せる縁','距離が近い同志'],
+    '相剋': ['緊張ある成長','鍛え合う仲間','健全な刺激源','程よく対立する縁','競り合って高まる','引き締まる関係'],
+    '受剋': ['学びを与えてくれる存在','厳しい愛の師','越えたい先輩','仰ぐ相手','自分を高める基準','一歩先を行く縁'],
+    '洩気': ['育てる側の喜び','注ぎ甲斐のある相手','育てる流れに乗る','与えて満たされる縁','後輩を伸ばす縁','教えて学ぶ関係'],
+  },
+  // Lv 3 (≥58) — 穏やか
+  3: {
+    '相生': ['穏やかな育ちの縁','ゆるやかに伸びる関係','育ち合うペース','静かな相互成長','ほどよい育成の縁','落ち着いた育みの関係'],
+    '比和': ['穏やかな同調','似た者同士の安心','並んで歩む縁','ゆるい共鳴','静かに通じる','同じ景色を見る関係'],
+    '相剋': ['ピリッとした距離','程よい刺激の関係','良い意味で噛み合わない','軽い緊張ある縁','互いに侵さない距離','鋭い切磋'],
+    '受剋': ['教えてくれる縁','学ぶ立場の関係','仰ぎ見る距離','一歩下がる縁','受け取る縁','影響を受ける関係'],
+    '洩気': ['そっと支える縁','静かに尽くす関係','与える側の穏やかさ','注ぐ程度の関係','ゆるい育ての縁','黙って支える距離'],
+  },
+  // Lv 2 (51-57) — 浅め
+  2: {
+    '相生': ['浅い育ちの縁','育ち切らない関係','入り口で止まる縁','表面的な相生','噛み合うが続かない','育つ前に冷める'],
+    '比和': ['似てるが深まらない','表面の共鳴','ぬるい同質','通じるが響かない','ぼんやり似た縁','似ているだけの縁'],
+    '相剋': ['ぎこちない緊張','ピリピリだけの縁','噛み合わない刺激','摩擦が空回る','削り合う前段階','表面の対立'],
+    '受剋': ['圧を感じる縁','反発したくなる距離','学べないお説教','上から目線の縁','萎縮させられる入り口','ぎこちない師弟'],
+    '洩気': ['報われにくい優しさ','一方通行の支え','与えても薄い反応','空回る愛情','注いでも満たない縁','浅い世話'],
+  },
+  // Lv 1 (≤50) — 辛辣
+  1: {
+    '相生': ['注ぐが返らない縁','一方通行の育成','空回る育てる側','与えるだけ削られる','育つ前に枯れる','報われない関係'],
+    '比和': ['同質ゆえの停滞','共倒れの匂い','似た者同士の傷舐め','馴れ合いだけの縁','一緒にいると鈍化する','同じ穴のムジナ'],
+    '相剋': ['消耗する剋し合い','削り合う関係','火花だけで終わる縁','互いを傷つける宿縁','噛み合わない衝突','不毛な対立'],
+    '受剋': ['萎縮させられる関係','押し潰される縁','圧で参る相手','越えられない壁','心が折れる縁','一方的に削られる'],
+    '洩気': ['消耗する片想い','燃え尽きる縁','注ぎ尽くして抜け殻','与えるだけで枯れる','完全に一方的','報われない献身'],
+  },
 };
-function compatLabel(score, seedKey) {
+function relKey(rel) {
+  if (!rel) return '比和';
+  const name = (rel.name || rel || '').toString();
+  const m = name.match(/^(相生|比和|相剋|受剋|洩気)/);
+  return m ? m[1] : '比和';
+}
+function compatLabel(score, seedKey, rel) {
   // ●の数 (視覚)
   let level;
   if (score >= 88)      level = 5;
@@ -2657,21 +2698,24 @@ function compatLabel(score, seedKey) {
   else if (score >= 58) level = 3;
   else if (score >= 42) level = 2;
   else                  level = 1;
-  // 言葉のトーン (50以下が辛辣) — ●の数とは独立
+  // 言葉のトーン (50以下が辛辣)
   let tier;
   if (score >= 88)      tier = 5;
   else if (score >= 74) tier = 4;
   else if (score >= 58) tier = 3;
   else if (score >= 51) tier = 2;
-  else                  tier = 1; // ≤50 → 辛辣
-  const variants = COMPAT_LABELS[tier];
+  else                  tier = 1;
+  const rk = relKey(rel);
+  const variants = (COMPAT_LABELS[tier] && COMPAT_LABELS[tier][rk])
+    || COMPAT_LABELS[tier]['比和']
+    || ['深い縁'];
   const idx = seedKey ? (hash(String(seedKey)) % variants.length) : 0;
   return { level, label: variants[idx] };
 }
 function compatVis(score, opts) {
   opts = opts || {};
-  const { level, label } = compatLabel(score, opts.seed);
-  const size = opts.size || ''; // 'tight' | 'big' | ''
+  const { level, label } = compatLabel(score, opts.seed, opts.rel);
+  const size = opts.size || '';
   const showNum = !opts.hideNum;
   const dots = Array.from({length:5}, (_,i) =>
     `<span class="cdot${i < level ? ' on' : ''}"></span>`).join('');
@@ -2913,7 +2957,7 @@ function drawCompatMatrix(date, all) {
         const det = compatDetails(viewer, o, date);
         return `<div class="cm-row">
           <div class="cm-name">${o.name}<span class="nm-sub">${det.rel.name} / 通変 ${det.tongbian}</span></div>
-          <div class="cm-val">${compatVis(det.score, { size: 'tight', seed: viewer.id + '|' + o.id + '|' + date.slice(0,7) })}</div>
+          <div class="cm-val">${compatVis(det.score, { size: 'tight', seed: viewer.id + '|' + o.id + '|' + date.slice(0,7), rel: det.rel })}</div>
         </div>`;
       }).join('')}
     </div>
@@ -2976,7 +3020,8 @@ function drawRadial(date, all) {
     link.style.animationDuration = (4 - (c/100)*2.5).toFixed(2) + 's';
     $svg.appendChild(link);
     const mx = (vPos.x + oPos.x)/2, my = (vPos.y + oPos.y)/2;
-    const cl = compatLabel(c, viewer.id + '|' + p.id + '|' + date.slice(0,7));
+    const relForLabel = starRelation(honmeiStar(p.birth), honmeiStar(viewer.birth));
+    const cl = compatLabel(c, viewer.id + '|' + p.id + '|' + date.slice(0,7), relForLabel);
     const lbl = document.createElementNS(NS, 'text');
     lbl.setAttribute('x', mx); lbl.setAttribute('y', my - 3);
     lbl.setAttribute('text-anchor', 'middle');
@@ -3078,6 +3123,7 @@ function drawCards(date, all) {
     const card = document.createElement('div');
     card.className = 'card' + (selectedId === p.id ? ' selected' : '');
     const isViewer = p.id === viewer.id;
+    const cardRel = isViewer ? null : starRelation(honmeiStar(p.birth), honmeiStar(viewer.birth));
     card.innerHTML = `
       <div class="card-head">
         <div>
@@ -3091,7 +3137,7 @@ function drawCards(date, all) {
       </div>
       <div class="card-foot">
         ${KYUSEI[f.engines.honmei].name} / ${f.engines.dayP.ganzhi} / ${p.blood||'?'}型 ・ 今日「${f.engines.todayTongbian}」
-        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `<div style="margin-top:6px">${viewer.name} → ${compatVis(f.compatScore, { size: 'tight', seed: viewer.id + '|' + p.id + '|' + date.slice(0,7) })}</div>`}
+        ${isViewer ? '<span style="margin-left:6px;color:var(--fg);font-weight:600">＝視点</span>' : `<div style="margin-top:6px">${viewer.name} → ${compatVis(f.compatScore, { size: 'tight', seed: viewer.id + '|' + p.id + '|' + date.slice(0,7), rel: cardRel })}</div>`}
       </div>
       ${(() => {
         if (isViewer) return '';
@@ -3193,7 +3239,10 @@ function renderOverview(p, f) {
         <div class="bars" style="font-size:12px">
           ${bar('仕事', f.work)}${bar('対人', f.social)}${bar('健康', f.health)}${bar('金運', f.money)}
         </div>
-        ${p.id !== viewer.id ? `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span>${compatVis(f.compatScore, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</span></div>` : ''}
+        ${p.id !== viewer.id ? (() => {
+          const ovDet = compatDetails(viewer, p, f.dateStr);
+          return `<div class="row" style="margin-top:10px"><span>${viewer.name}視点の相性</span><span>${compatVis(f.compatScore, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7), rel: ovDet?.rel })}</span></div>`;
+        })() : ''}
         <div style="margin-top:10px">
           <span class="chip">日干通変: ${f.engines.todayTongbian} (${f.engines.todayInfo.rank})</span>
           <span class="chip">本命×日盤: ${f.engines.relation.name}</span>
@@ -3208,14 +3257,14 @@ function renderOverview(p, f) {
           <h4>${p.name} から見た相性</h4>
           ${others.map(o => {
             const d = compatDetails(p, o, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: p.id + '|' + o.id + '|' + f.dateStr.slice(0,7) })}</div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: p.id + '|' + o.id + '|' + f.dateStr.slice(0,7), rel: d.rel })}</div>`;
           }).join('')}
         </div>
         <div>
           <h4>${p.name} へ向けられる相性</h4>
           ${others.map(o => {
             const d = compatDetails(o, p, f.dateStr);
-            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: o.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</div>`;
+            return `<div class="row"><span>${o.name}<span style="color:var(--muted);font-size:10px;margin-left:6px">${d.rel.name} / 通変 ${d.tongbian}</span></span>${compatVis(d.score, { size: 'tight', seed: o.id + '|' + p.id + '|' + f.dateStr.slice(0,7), rel: d.rel })}</div>`;
           }).join('')}
         </div>
       </div>
@@ -3466,7 +3515,8 @@ function renderMBTI(p, f) {
         <h3>ビジネス相性 (${getViewer().name} 視点)</h3>
         ${PEOPLE.filter(x => x.id !== getViewer().id).map(other => {
           const oF = runEngines(other, f.dateStr, getViewer());
-          return `<div class="row"><span>${other.name} <span style="color:var(--muted);font-size:10px">(${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></span>${compatVis(oF.compatScore, { size: 'tight', seed: getViewer().id + '|' + other.id + '|' + f.dateStr.slice(0,7) })}</div>`;
+          const mbtiDet = compatDetails(getViewer(), other, f.dateStr);
+          return `<div class="row"><span>${other.name} <span style="color:var(--muted);font-size:10px">(${MBTI_PROFILES[oF.mbti]?.[0]||oF.mbti})</span></span>${compatVis(oF.compatScore, { size: 'tight', seed: getViewer().id + '|' + other.id + '|' + f.dateStr.slice(0,7), rel: mbtiDet?.rel })}</div>`;
         }).join('')}
       </div>
     </div>
@@ -4561,7 +4611,7 @@ function renderPair(p, f) {
     <div class="grid-2" style="margin-top:14px">
       <div class="box">
         <h3>${viewer.name} → ${p.name}</h3>
-        <div style="text-align:center;margin:12px 0 14px">${compatVis(fwd.score, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7) })}</div>
+        <div style="text-align:center;margin:12px 0 14px">${compatVis(fwd.score, { size: 'big', seed: viewer.id + '|' + p.id + '|' + f.dateStr.slice(0,7), rel: relVT })}</div>
         <div class="row"><span>五行関係</span><span>${relVT.name}</span></div>
         <div class="row"><span>通変 (日干)</span><span>${tbVT}</span></div>
         <div class="row"><span>意味</span><span style="text-align:right">${TONGBIAN_INFO[tbVT]?.desc||'-'}</span></div>
@@ -4569,7 +4619,7 @@ function renderPair(p, f) {
       </div>
       <div class="box">
         <h3>${p.name} → ${viewer.name}</h3>
-        <div style="text-align:center;margin:12px 0 14px">${compatVis(rev.score, { size: 'big', seed: p.id + '|' + viewer.id + '|' + f.dateStr.slice(0,7) })}</div>
+        <div style="text-align:center;margin:12px 0 14px">${compatVis(rev.score, { size: 'big', seed: p.id + '|' + viewer.id + '|' + f.dateStr.slice(0,7), rel: relTV })}</div>
         <div class="row"><span>五行関係</span><span>${relTV.name}</span></div>
         <div class="row"><span>通変 (日干)</span><span>${tbTV}</span></div>
         <div class="row"><span>意味</span><span style="text-align:right">${TONGBIAN_INFO[tbTV]?.desc||'-'}</span></div>
